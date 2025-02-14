@@ -1,0 +1,20 @@
+{
+  "name": "web3telegram-node-ts",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "tsx index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@iexec/web3telegram": "file:../..",
+    "tsx": "^4.7.0"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^5.0.4"
+  }
+}
