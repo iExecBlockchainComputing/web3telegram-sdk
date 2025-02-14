@@ -426,24 +426,6 @@ steps:
       - check-types
       - build
 
-  - name: deprecate-old-nightly-version
-    image: node:18.19
-    pull: always
-    commands:
-      - apt-get update && apt-get install -y jq
-      # fetches the latest nightly version of the @iexec/web3telegram package from npm registry
-      - PREVIOUS_NIGHTLY_VERSION=$(npm view @iexec/web3telegram dist-tags --json | jq '."nightly"' | sed 's/"//g')
-      - if [ -n "$PREVIOUS_NIGHTLY_VERSION" ]; then npm deprecate @iexec/web3telegram@$PREVIOUS_NIGHTLY_VERSION "Deprecate $PREVIOUS_NIGHTLY_VERSION"; fi
-    depends_on:
-      - format
-      - lint
-      - check-types
-      - build
-      - authenticate
-    when:
-      branch:
-        - develop
-
   - name: publish-nightly
     image: plugins/npm
     pull: always
@@ -459,7 +441,6 @@ steps:
       - lint
       - check-types
       - build
-      - deprecate-old-nightly-version
       - set-version-nightly
     when:
       branch:
