@@ -1,15 +1,15 @@
-# Demo
+# Examples
 
-basic `@iexec/web3telegram` demos using various environment and bundlers.
+basic `@iexec/web3telegram` examples using various environment and bundlers.
 
-the demo recovers the contacts (eth address) who have authorized the web3telegram dapp to send them messages.
+the example recovers the contacts (eth address) who have authorized the web3telegram dapp to send them messages.
 
 ## Usage
 
 build the `@iexec/web3telegram` project from the repository root directory
 
 ```sh
-cd .. && npm ci && npm run build && cd demo
+cd .. && npm ci && npm run build && cd examples
 ```
 
 pick a demo
@@ -31,7 +31,7 @@ run the demo
 npm start
 ```
 
-**NB:** for browser demos
+**NB:** for browser examples
 
 - you will need an ethereum wallet connected to [iexec sidechain](https://chainlist.org/chain/134)
 - click the `TEST` button to start fetching contacts
