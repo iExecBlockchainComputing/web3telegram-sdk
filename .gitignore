@@ -20,7 +20,7 @@
 # tests output
 /coverage
 # CI
-.drone.yml
+# .drone.yml
 
 
 # sonar output
