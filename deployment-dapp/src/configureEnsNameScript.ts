@@ -15,6 +15,7 @@ const main = async () => {
     DRONE_DEPLOY_TO,
     WALLET_PRIVATE_KEY_DEV,
     WALLET_PRIVATE_KEY_PROD,
+    DEPLOYED_APP_ADDRESS, // if already deployed in a previous step and want to configure ENS promoting configure-ens pipeline
     ENS_NAME,
   } = process.env;
 
@@ -27,8 +28,7 @@ const main = async () => {
   )
     throw Error(`Invalid promote target ${DRONE_DEPLOY_TO}`);
 
-  const appAddress = await loadAppAddress();
-
+  const appAddress = DEPLOYED_APP_ADDRESS ?? (await loadAppAddress()); // use ALREADY_DEPLOYED_APP_ADDRESS when promoting configure-ens pipeline
   let privateKey;
   let ensName;
   if (
@@ -36,13 +36,13 @@ const main = async () => {
     DRONE_DEPLOY_TO === DRONE_TARGET_CONFIGURE_ENS_DEV
   ) {
     privateKey = WALLET_PRIVATE_KEY_DEV;
-    ensName = ENS_NAME || WEB3_TELEGRAM_ENS_NAME_DEV;
+    ensName = ENS_NAME ?? WEB3_TELEGRAM_ENS_NAME_DEV;
   } else if (
     DRONE_DEPLOY_TO === DRONE_TARGET_DEPLOY_PROD ||
     DRONE_DEPLOY_TO === DRONE_TARGET_CONFIGURE_ENS_PROD
   ) {
     privateKey = WALLET_PRIVATE_KEY_PROD;
-    ensName = ENS_NAME || WEB3_TELEGRAM_ENS_NAME_PROD;
+    ensName = ENS_NAME ?? WEB3_TELEGRAM_ENS_NAME_PROD;
   }
 
   if (!privateKey)

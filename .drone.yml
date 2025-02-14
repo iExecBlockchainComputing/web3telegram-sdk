@@ -1298,6 +1298,7 @@ steps:
     pull: always
     params:
       - ENS_NAME
+      - DEPLOYED_APP_ADDRESS
     environment:
       DRONE_DEPLOY_TO: $DRONE_DEPLOY_TO
       WALLET_PRIVATE_KEY_DEV:
