@@ -15,7 +15,7 @@ export const APP_TAG = ['tee', 'scone'];
 
 //ENS name
 export const WEB3_TELEGRAM_ENS_DOMAIN = 'apps.iexec.eth';
-export const WEB3_TELEGRAM_ENS_NAME_DEV = `web3telegram-dev1.${WEB3_TELEGRAM_ENS_DOMAIN}`;
+export const WEB3_TELEGRAM_ENS_NAME_DEV = `web3telegram-test.${WEB3_TELEGRAM_ENS_DOMAIN}`;
 export const WEB3_TELEGRAM_ENS_NAME_PROD = `web3telegram.${WEB3_TELEGRAM_ENS_DOMAIN}`;
 
 //scone image
