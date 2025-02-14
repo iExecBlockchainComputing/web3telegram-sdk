@@ -1269,3 +1269,41 @@ steps:
       - PACKAGE_VERSION
     commands:
       - if [ -n "$PACKAGE_VERSION" ]; then npm deprecate @iexec/web3telegram@$PACKAGE_VERSION ""; else echo "PACKAGE_VERSION is not set"; fi
+---
+# pipeline to configure ens
+kind: pipeline
+type: docker
+name: configure ens
+
+trigger:
+  event:
+    - promote
+  target:
+    - configure-ens-dev
+    - configure-ens-prod
+  branch:
+    - develop
+    - main
+
+steps:
+  - name: install deps
+    image: node:18.19
+    pull: always
+    commands:
+      - cd deployment-dapp
+      - npm ci
+
+  - name: configure ens
+    image: node:18.19
+    pull: always
+    params:
+      - ENS_NAME
+    environment:
+      DRONE_DEPLOY_TO: $DRONE_DEPLOY_TO
+      WALLET_PRIVATE_KEY_DEV:
+        from_secret: web3telegram-dapp-owner-dev-privatekey
+      WALLET_PRIVATE_KEY_PROD:
+        from_secret: web3telegram-dapp-owner-prod-privatekey
+    commands:
+      - cd deployment-dapp
+      - npm run configure-ens

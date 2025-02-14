@@ -11,8 +11,12 @@ import { configureEnsName } from './singleFunction/configureEnsName.js';
 
 const main = async () => {
   // get env variables from drone
-  const { DRONE_DEPLOY_TO, WALLET_PRIVATE_KEY_DEV, WALLET_PRIVATE_KEY_PROD } =
-    process.env;
+  const {
+    DRONE_DEPLOY_TO,
+    WALLET_PRIVATE_KEY_DEV,
+    WALLET_PRIVATE_KEY_PROD,
+    ENS_NAME,
+  } = process.env;
 
   if (
     !DRONE_DEPLOY_TO ||
@@ -32,13 +36,13 @@ const main = async () => {
     DRONE_DEPLOY_TO === DRONE_TARGET_CONFIGURE_ENS_DEV
   ) {
     privateKey = WALLET_PRIVATE_KEY_DEV;
-    ensName = WEB3_TELEGRAM_ENS_NAME_DEV;
+    ensName = ENS_NAME || WEB3_TELEGRAM_ENS_NAME_DEV;
   } else if (
     DRONE_DEPLOY_TO === DRONE_TARGET_DEPLOY_PROD ||
     DRONE_DEPLOY_TO === DRONE_TARGET_CONFIGURE_ENS_PROD
   ) {
     privateKey = WALLET_PRIVATE_KEY_PROD;
-    ensName = WEB3_TELEGRAM_ENS_NAME_PROD;
+    ensName = ENS_NAME || WEB3_TELEGRAM_ENS_NAME_PROD;
   }
 
   if (!privateKey)
