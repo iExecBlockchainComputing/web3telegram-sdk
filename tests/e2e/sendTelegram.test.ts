@@ -376,7 +376,7 @@ describe('web3telegram.sendTelegram()', () => {
     2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
   );
 
-  describe.skip('when useVoucher:true', () => {
+  describe('when useVoucher:true', () => {
     it(
       'should throw error if no voucher available for the requester',
       async () => {
@@ -387,14 +387,17 @@ describe('web3telegram.sendTelegram()', () => {
             protectedData: validProtectedData.address,
             workerpoolAddressOrEns: learnProdWorkerpoolAddress,
             workerpoolMaxPrice: 1000,
-            // useVoucher: true,
+            useVoucher: true,
           });
         } catch (err) {
           error = err;
         }
         expect(error).toBeDefined();
-        expect(error.message).toBe(
-          'Oops, it seems your wallet is not associated with any voucher. Check on https://builder.iex.ec/'
+        expect(error.message).toBe('Failed to sendTelegram');
+        expect(error.cause).toStrictEqual(
+          Error(
+            'Oops, it seems your wallet is not associated with any voucher. Check on https://builder.iex.ec/'
+          )
         );
       },
       2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
@@ -419,7 +422,7 @@ describe('web3telegram.sendTelegram()', () => {
             protectedData: validProtectedData.address,
             // workerpoolAddressOrEns: prodWorkerpoolAddress, // default
             workerpoolMaxPrice: 1000,
-            // useVoucher: true,
+            useVoucher: true,
           });
         } catch (err) {
           error = err;
@@ -454,7 +457,7 @@ describe('web3telegram.sendTelegram()', () => {
             telegramContent: 'e2e telegram content for test',
             protectedData: validProtectedData.address,
             // workerpoolAddressOrEns: prodWorkerpoolAddress, // default
-            // useVoucher: true,
+            useVoucher: true,
           });
           expect(sendTelegramResponse.taskId).toBeDefined();
         },
@@ -504,7 +507,7 @@ describe('web3telegram.sendTelegram()', () => {
                 protectedData: validProtectedData.address,
                 // workerpoolAddressOrEns: prodWorkerpoolAddress, // default
                 workerpoolMaxPrice: nonSponsoredAmount,
-                // useVoucher: true,
+                useVoucher: true,
               });
             } catch (err) {
               error = err;
@@ -562,7 +565,7 @@ describe('web3telegram.sendTelegram()', () => {
               protectedData: validProtectedData.address,
               // workerpoolAddressOrEns: prodWorkerpoolAddress, // default
               workerpoolMaxPrice: nonSponsoredAmount,
-              // useVoucher: true,
+              useVoucher: true,
             });
             expect(sendTelegramResponse.taskId).toBeDefined();
           },
@@ -608,7 +611,7 @@ describe('web3telegram.sendTelegram()', () => {
                 protectedData: validProtectedData.address,
                 // workerpoolAddressOrEns: prodWorkerpoolAddress, // default
                 // workerpoolMaxPrice: 0, // default
-                // useVoucher: true,
+                useVoucher: true,
               });
             } catch (err) {
               error = err;
