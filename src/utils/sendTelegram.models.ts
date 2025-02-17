@@ -1,8 +1,6 @@
 import { Address, BN } from 'iexec';
 import { PublishedWorkerpoolorder } from 'iexec/IExecOrderbookModule';
-// import { VoucherInfo } from 'iexec/IExecVoucherModule';
 
-// To import from 'iexec' once exported
 type VoucherInfo = {
   owner: Address;
   address: Address;
@@ -41,38 +39,38 @@ export function checkUserVoucher({
 export function filterWorkerpoolOrders({
   workerpoolOrders,
   workerpoolMaxPrice,
-}: // useVoucher,
-// userVoucher,
-{
+  useVoucher,
+  userVoucher,
+}: {
   workerpoolOrders: PublishedWorkerpoolorder[];
   workerpoolMaxPrice: number;
-  // useVoucher: boolean;
-  // userVoucher?: VoucherInfo;
+  useVoucher: boolean;
+  userVoucher?: VoucherInfo;
 }) {
   if (workerpoolOrders.length === 0) {
     return null;
   }
 
-  const eligibleWorkerpoolOrders = [...workerpoolOrders];
-  const maxVoucherSponsoredAmount = 0; // may be safer to use bigint
+  let eligibleWorkerpoolOrders = [...workerpoolOrders];
+  let maxVoucherSponsoredAmount = 0; // may be safer to use bigint
 
-  // if (useVoucher) {
-  //   if (!userVoucher) {
-  //     throw new Error(
-  //       'useVoucher === true but userVoucher is undefined? Hum...'
-  //     );
-  //   }
-  //   // only voucher sponsored workerpoolorders
-  //   eligibleWorkerpoolOrders = eligibleWorkerpoolOrders.filter(({ order }) =>
-  //     userVoucher.sponsoredWorkerpools.includes(order.workerpool)
-  //   );
-  //   if (eligibleWorkerpoolOrders.length === 0) {
-  //     throw new Error(
-  //       'Found some workerpool orders but none can be sponsored by your voucher.'
-  //     );
-  //   }
-  //   maxVoucherSponsoredAmount = bnToNumber(userVoucher.balance);
-  // }
+  if (useVoucher) {
+    if (!userVoucher) {
+      throw new Error(
+        'useVoucher === true but userVoucher is undefined? Hum...'
+      );
+    }
+    // only voucher sponsored workerpoolorders
+    eligibleWorkerpoolOrders = eligibleWorkerpoolOrders.filter(({ order }) =>
+      userVoucher.sponsoredWorkerpools.includes(order.workerpool)
+    );
+    if (eligibleWorkerpoolOrders.length === 0) {
+      throw new Error(
+        'Found some workerpool orders but none can be sponsored by your voucher.'
+      );
+    }
+    maxVoucherSponsoredAmount = bnToNumber(userVoucher.balance);
+  }
 
   const [cheapestOrder] = eligibleWorkerpoolOrders.sort(
     (order1, order2) =>

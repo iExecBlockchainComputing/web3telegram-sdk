@@ -4,7 +4,11 @@ import { filterWorkerpoolOrders } from '../../../src/utils/sendTelegram.models.j
 describe('filterWorkerpoolOrders', () => {
   it('should return null if there are no workerpool orders', () => {
     expect(
-      filterWorkerpoolOrders({ workerpoolOrders: [], workerpoolMaxPrice: 100 })
+      filterWorkerpoolOrders({
+        workerpoolOrders: [],
+        workerpoolMaxPrice: 100,
+        useVoucher: false,
+      })
     ).toBeNull();
   });
 
@@ -37,6 +41,7 @@ describe('filterWorkerpoolOrders', () => {
       filterWorkerpoolOrders({
         workerpoolOrders: orders,
         workerpoolMaxPrice: 100,
+        useVoucher: false,
       })
     ).toEqual(orders[0].order);
   });
@@ -70,6 +75,7 @@ describe('filterWorkerpoolOrders', () => {
       filterWorkerpoolOrders({
         workerpoolOrders: orders,
         workerpoolMaxPrice: 100,
+        useVoucher: false,
       })
     ).toBeNull();
   });
@@ -145,6 +151,7 @@ describe('filterWorkerpoolOrders', () => {
       filterWorkerpoolOrders({
         workerpoolOrders: orders,
         workerpoolMaxPrice: 100,
+        useVoucher: false,
       })
     ).toEqual(orders[1].order); // the cheapest
   });
@@ -220,6 +227,7 @@ describe('filterWorkerpoolOrders', () => {
       filterWorkerpoolOrders({
         workerpoolOrders: orders,
         workerpoolMaxPrice: 100,
+        useVoucher: false,
       })
     ).toBeNull();
   });
@@ -295,6 +303,7 @@ describe('filterWorkerpoolOrders', () => {
       filterWorkerpoolOrders({
         workerpoolOrders: orders,
         workerpoolMaxPrice: 100,
+        useVoucher: false,
       })
     ).toEqual(orders[1].order);
   });

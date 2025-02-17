@@ -35,7 +35,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/iExecBlockchainComputing/web3telegram.git"
+    "url": "git+https://github.com/iExecBlockchainComputing/web3telegram-sdk.git"
   },
   "keywords": [
     "iExec"
@@ -43,9 +43,9 @@
   "author": "iExec",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/iExecBlockchainComputing/web3telegram/issues"
+    "url": "https://github.com/iExecBlockchainComputing/web3telegram-sdk/issues"
   },
-  "homepage": "https://github.com/iExecBlockchainComputing/web3telegram#readme",
+  "homepage": "https://github.com/iExecBlockchainComputing/web3telegram-sdk#readme",
   "dependencies": {
     "@ethersproject/bytes": "^5.7.0",
     "@ethersproject/random": "^5.7.0",

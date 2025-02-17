@@ -17,6 +17,7 @@ import {
   throwIfMissing,
   addressSchema,
   senderNameSchema,
+  booleanSchema,
 } from '../utils/validators.js';
 import {
   DappAddressConsumer,
@@ -28,7 +29,10 @@ import {
   SendTelegramResponse,
   SubgraphConsumer,
 } from './types.js';
-import { filterWorkerpoolOrders } from '../utils/sendTelegram.models.js';
+import {
+  checkUserVoucher,
+  filterWorkerpoolOrders,
+} from '../utils/sendTelegram.models.js';
 
 export type SendTelegram = typeof sendTelegram;
 
@@ -47,6 +51,7 @@ export const sendTelegram = async ({
   appMaxPrice = MAX_DESIRED_APP_ORDER_PRICE,
   workerpoolMaxPrice = MAX_DESIRED_WORKERPOOL_ORDER_PRICE,
   protectedData,
+  useVoucher = false,
 }: IExecConsumer &
   SubgraphConsumer &
   DappAddressConsumer &
@@ -88,6 +93,9 @@ export const sendTelegram = async ({
     const vWorkerpoolMaxPrice = positiveNumberSchema()
       .label('workerpoolMaxPrice')
       .validateSync(workerpoolMaxPrice);
+    const vUseVoucher = booleanSchema()
+      .label('useVoucher')
+      .validateSync(useVoucher);
 
     // Check protected data validity through subgraph
     const isValidProtectedData = await checkProtectedDataValidity(
@@ -101,6 +109,20 @@ export const sendTelegram = async ({
     }
     const requesterAddress = await iexec.wallet.getAddress();
 
+    let userVoucher;
+    if (vUseVoucher) {
+      try {
+        userVoucher = await iexec.voucher.showUserVoucher(requesterAddress);
+        checkUserVoucher({ userVoucher });
+      } catch (err) {
+        if (err?.message?.startsWith('No Voucher found for address')) {
+          throw new Error(
+            'Oops, it seems your wallet is not associated with any voucher. Check on https://builder.iex.ec/'
+          );
+        }
+        throw err;
+      }
+    }
     const [
       datasetorderForApp,
       datasetorderForWhitelist,
@@ -159,6 +181,7 @@ export const sendTelegram = async ({
           app: vDappAddressOrENS,
           dataset: vDatasetAddress,
           requester: requesterAddress, // public orders + user specific orders
+          isRequesterStrict: useVoucher, // If voucher, we only want user specific orders
           minTag: ['tee', 'scone'],
           maxTag: ['tee', 'scone'],
           category: 0,
@@ -169,6 +192,7 @@ export const sendTelegram = async ({
           app: vDappWhitelistAddress,
           dataset: vDatasetAddress,
           requester: requesterAddress, // public orders + user specific orders
+          isRequesterStrict: useVoucher, // If voucher, we only want user specific orders
           minTag: ['tee', 'scone'],
           maxTag: ['tee', 'scone'],
           category: 0,
@@ -179,10 +203,10 @@ export const sendTelegram = async ({
             workerpoolOrders: [
               ...workerpoolOrderbookForApp.orders,
               ...workerpoolOrderbookForAppWhitelist.orders,
-              // useVoucher: vUseVoucher,
-              // userVoucher,
             ],
             workerpoolMaxPrice: vWorkerpoolMaxPrice,
+            useVoucher: vUseVoucher,
+            userVoucher,
           });
           if (!desiredPriceWorkerpoolOrder) {
             throw new Error('No Workerpool order found for the desired price');
@@ -245,7 +269,6 @@ export const sendTelegram = async ({
       tag: ['tee', 'scone'],
       workerpool: vWorkerpoolAddressOrEns,
       params: {
-        iexec_developer_logger: true,
         iexec_secrets: {
           1: requesterSecretId,
         },
@@ -255,12 +278,15 @@ export const sendTelegram = async ({
     const requestorder = await iexec.order.signRequestorder(requestorderToSign);
 
     // Match orders and compute task ID
-    const { dealid } = await iexec.order.matchOrders({
-      apporder: apporder,
-      datasetorder: datasetorder,
-      workerpoolorder: workerpoolorder,
-      requestorder: requestorder,
-    });
+    const { dealid } = await iexec.order.matchOrders(
+      {
+        apporder: apporder,
+        datasetorder: datasetorder,
+        workerpoolorder: workerpoolorder,
+        requestorder: requestorder,
+      },
+      { useVoucher: vUseVoucher }
+    );
     const taskId = await iexec.deal.computeTaskId(dealid, 0);
     return {
       taskId,
