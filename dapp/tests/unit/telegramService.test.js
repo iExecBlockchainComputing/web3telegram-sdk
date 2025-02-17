@@ -60,6 +60,7 @@ describe('sendTelegram', () => {
     );
     expect(response).toEqual({
       message: 'Failed to send Telegram message.',
+      error: new Error('Network error'),
       status: 500,
     });
   });

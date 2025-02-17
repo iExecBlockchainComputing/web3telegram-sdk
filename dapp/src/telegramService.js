@@ -27,7 +27,7 @@ async function sendTelegram({
     return {
       message: 'Failed to send Telegram message.',
       // TODO: delete this line in production mode to avoid exposing the error message to the user (security risk)
-      error: error,
+      error,
       status: 500,
     };
   }
