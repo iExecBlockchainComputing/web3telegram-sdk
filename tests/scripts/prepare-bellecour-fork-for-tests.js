@@ -21,7 +21,7 @@ const PROD_WORKERPOOL_OWNER_WALLET =
 const APP_OWNER_WALLET = '0x626D65C778fB98f813C25F84249E3012B80e8d91';
 const LEARN_WORKERPOOL_ENS = 'prod-v8-learn.main.pools.iexec.eth';
 const PROD_WORKERPOOL_ENS = 'prod-v8-bellecour.main.pools.iexec.eth';
-const WEB3_TELEGRAM_DAPP_ADDRESS_ENS = 'web3telegram-dev1.apps.iexec.eth';
+const WEB3_TELEGRAM_DAPP_ADDRESS_ENS = 'web3telegram-test.apps.iexec.eth';
 
 const rpcURL = DRONE ? 'http://bellecour-fork:8545' : 'http://127.0.0.1:8545';
 
