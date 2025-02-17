@@ -809,7 +809,9 @@ steps:
         from_secret: web3telegram-dapp-owner-dev-privatekey
       WALLET_PRIVATE_KEY_PROD:
         from_secret: web3telegram-dapp-owner-prod-privatekey
-      TELEGRAM_BOT_TOKEN:
+      TELEGRAM_BOT_TOKEN_DEV:
+        from_secret: telegram-bot-token-dev
+      TELEGRAM_BOT_TOKEN_PROD:
         from_secret: telegram-bot-token-prod
     commands:
       - cd deployment-dapp

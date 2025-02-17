@@ -16,7 +16,8 @@ const main = async () => {
     DRONE_DEPLOY_TO,
     WALLET_PRIVATE_KEY_DEV,
     WALLET_PRIVATE_KEY_PROD,
-    TELEGRAM_BOT_TOKEN,
+    TELEGRAM_BOT_TOKEN_DEV,
+    TELEGRAM_BOT_TOKEN_PROD,
   } = process.env;
 
   if (
@@ -29,8 +30,21 @@ const main = async () => {
     ].includes(DRONE_DEPLOY_TO)
   )
     throw Error(`Invalid promote target ${DRONE_DEPLOY_TO}`);
+  
+  let telegramBotToken;
+  if (
+    DRONE_DEPLOY_TO === DRONE_TARGET_PUSH_SECRET_DEV ||
+    DRONE_DEPLOY_TO === DRONE_TARGET_PUSH_SECRET_DEV
+  ) {
+    telegramBotToken = TELEGRAM_BOT_TOKEN_DEV;
+  } else if (
+    DRONE_DEPLOY_TO === DRONE_TARGET_PUSH_SECRET_PROD ||
+    DRONE_DEPLOY_TO === DRONE_TARGET_PUSH_SECRET_PROD
+  ) {
+    telegramBotToken = TELEGRAM_BOT_TOKEN_PROD;
+  }
 
-  if (!TELEGRAM_BOT_TOKEN) throw Error('Missing env TELEGRAM_BOT_TOKEN');
+  if (!telegramBotToken) throw Error('Missing env TELEGRAM_BOT_TOKEN');
 
   let privateKey;
   if (
