@@ -21,7 +21,7 @@ const PROD_WORKERPOOL_OWNER_WALLET =
 const APP_OWNER_WALLET = '0x626D65C778fB98f813C25F84249E3012B80e8d91';
 const LEARN_WORKERPOOL_ENS = 'prod-v8-learn.main.pools.iexec.eth';
 const PROD_WORKERPOOL_ENS = 'prod-v8-bellecour.main.pools.iexec.eth';
-// TODO change to prod ens  when it's available 
+// TODO change to prod ens  when it's available
 const WEB3_TELEGRAM_DAPP_ADDRESS_ENS = 'web3telegram-test.apps.iexec.eth';
 
 const rpcURL = DRONE ? 'http://bellecour-fork:8545' : 'http://127.0.0.1:8545';
@@ -41,7 +41,6 @@ const PROD_WORKERPOOL = await provider.resolveName(PROD_WORKERPOOL_ENS);
 const WEB3_TELEGRAM_DAPP_ADDRESS = await provider.resolveName(
   WEB3_TELEGRAM_DAPP_ADDRESS_ENS
 );
-console.log('🚀 ~ WEB3_TELEGRAM_DAPP_ADDRESS:', WEB3_TELEGRAM_DAPP_ADDRESS);
 
 const setBalance = async (address, weiAmount) => {
   fetch(rpcURL, {
