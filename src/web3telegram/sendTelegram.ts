@@ -230,7 +230,7 @@ export const sendTelegram = async ({
       )
       .catch((e) => {
         throw new WorkflowError({
-          message: 'Failed to encrypt email content',
+          message: 'Failed to encrypt message content',
           errorCause: e,
         });
       });
