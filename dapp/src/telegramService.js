@@ -23,11 +23,8 @@ async function sendTelegram({
 
   if (error) {
     console.error('Failed to send Telegram message.');
-
     return {
       message: 'Failed to send Telegram message.',
-      // TODO: delete this line in production mode to avoid exposing the error message to the user (security risk)
-      error,
       status: 500,
     };
   }

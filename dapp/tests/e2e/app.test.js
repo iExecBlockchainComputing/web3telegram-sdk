@@ -172,19 +172,10 @@ describe('sendTelegram', () => {
       path.join(IEXEC_OUT, 'computed.json'),
       'utf-8'
     );
-    // expect(JSON.parse(resultTxt)).toStrictEqual({
-    //   message: 'Failed to send Telegram message.',
-    //   status: 500,
-    // });
     expect(JSON.parse(resultTxt)).toStrictEqual({
       message: 'Failed to send Telegram message.',
-      error: {
-        code: 'ETELEGRAM',
-        message: 'ETELEGRAM: 404 Not Found',
-      },
       status: 500,
     });
-
     expect(JSON.parse(computedJson)).toStrictEqual({
       'deterministic-output-path': `${IEXEC_OUT}/result.txt`,
     });
