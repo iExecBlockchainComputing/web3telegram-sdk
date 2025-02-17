@@ -1,8 +1,10 @@
+// TODO : use prod address when available (not yet deployed)
 export const WEB3TELEGRAM_DAPP_ADDRESS =
-  '0xd078631470faE42c25bB757d48EF5DBE35A57790';
+  '0x796c4CcE0535C59527cdE4a7cb185465248DbAAb'; // web3telegram-test.apps.iexec.eth
 
+// TODO : use prod address when available (not yet deployed)
 export const WHITELIST_SMART_CONTRACT_ADDRESS =
-  '0x0745eDe758C25365392DFD94890972f419876f1A';
+  '0xe006677cBe2a1AcD9c586260a37c35a06277c1b6';
 
 export const PROD_WORKERPOOL_ADDRESS = 'prod-v8-bellecour.main.pools.iexec.eth';
 
