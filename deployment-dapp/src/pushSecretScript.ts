@@ -69,7 +69,7 @@ const main = async () => {
 
   //push app secret to the secret management
   const jsonSecret = JSON.stringify({
-    TELEGRAM_BOT_TOKEN,
+    telegramBotToken,
   });
   await pushSecret(iexec, appAddress, jsonSecret);
 };
