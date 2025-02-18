@@ -12,7 +12,7 @@
 Web3Telegram is composed of 2 methods:
 
 - **fetchMyContacts** — that enables an entity to retrieve a list of Ethereum accounts whose owners have authorized the entity to message them
-- **fetchUserContacts** — Description todo
+- **fetchUserContacts** — that enables an entity to retrieve a list of Ethereum accounts whose owners have authorized the provided user to message them
 - **sendTelegram** — that allows an entity to message a user on telegram (previously fetched via the fetchMyContacts method) knowing only her/his Ethereum account.
 
 <div align="center">
