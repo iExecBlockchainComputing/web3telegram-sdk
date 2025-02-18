@@ -14,7 +14,7 @@ fill in the environment variables:
 - **IEXEC_OUT**: The path on your local machine where the result of the Dapp execution will be written.
 - **IEXEC_DATASET_FILENAME**: The name of the data file that you place in the **IEXEC_IN** directory.
 - **IEXEC_APP_DEVELOPER_SECRET**: A JSON string with the following keys:
-? 
+  - **TELEGRAM_BOT_TOKEN**: The API key of the telegram bot used to send the message.
 - **IEXEC_REQUESTER_SECRET_1**: A JSON string with the following keys:
   - **telegramContentMultiAddr**: Multiaddress pointing to the encrypted message content to send.
   - **telegramContentEncryptionKey**: The encryption key used to encrypt the content.
@@ -36,37 +36,38 @@ The Dapp will send a telegram message using the object and content specified in 
 
 ## Running the Dapp locally using Docker
 
-1. **Build the Docker image**: Navigate to the `/web3telegram/dapp` directory of the project and run the following command to build the Docker image:
+1.  **Build the Docker image**: Navigate to the `/web3telegram/dapp` directory of the project and run the following command to build the Docker image:
 
     ```sh
     docker build . --tag web3telegram-dapp
     ```
 
-2. **Create local directories**: In your terminal, execute the following commands to create two local directories on your machine:
+2.  **Create local directories**: In your terminal, execute the following commands to create two local directories on your machine:
 
     ```sh
     mkdir /tmp/iexec_in
     mkdir /tmp/iexec_out
     ```
 
-3. **Prepare your data**: Place your `data.zip` file inside the `/tmp/iexec_in` directory you just created. This file contains the data you want to protect, which in this case is the message you want to send. Ensure that the chatd iD is saved as a `chatId.txt` file within the `data.zip` archive.
+3.  **Prepare your data**: Place your `data.zip` file inside the `/tmp/iexec_in` directory you just created. This file contains the data you want to protect, which in this case is the message you want to send. Ensure that the chatd iD is saved as a `chatId.txt` file within the `data.zip` archive.
 
-4. **Set up your telegram message content**: In the command provided in step 5, make sure to replace the placeholders:
-   - `<telegram_content>`: The content of the message you want to send.
+4.  **Set up your telegram message content**: In the command provided in step 5, make sure to replace the placeholders:
 
-5. **Run the Docker container**: Execute the following command to run the 
-Docker container and execute the Dapp:
+    - `<telegram_content>`: The content of the message you want to send.
 
-    ```sh
-    docker run --rm \
-        -v /tmp/iexec_in:/iexec_in \
-        -v /tmp/iexec_out:/iexec_out \
-        -e IEXEC_IN=/iexec_in \
-        -e IEXEC_OUT=/iexec_out \
-        -e IEXEC_DATASET_FILENAME=data.zip \
-        IEXEC_REQUESTER_SECRET_1='{"telegramContentEncryptionKey":"telegram_content_encryption_key","telegramContentMultiAddr":"encrypted_telegram_content_multiaddress","senderName":"sender_name","contentType":"text/plain"}' \
-        web3telegram-dapp
-    ```
+5.  **Run the Docker container**: Execute the following command to run the
+    Docker container and execute the Dapp:
+
+        ```sh
+        docker run --rm \
+            -v /tmp/iexec_in:/iexec_in \
+            -v /tmp/iexec_out:/iexec_out \
+            -e IEXEC_IN=/iexec_in \
+            -e IEXEC_OUT=/iexec_out \
+            -e IEXEC_DATASET_FILENAME=data.zip \
+            IEXEC_REQUESTER_SECRET_1='{"telegramContentEncryptionKey":"telegram_content_encryption_key","telegramContentMultiAddr":"encrypted_telegram_content_multiaddress","senderName":"sender_name","contentType":"text/plain"}' \
+            web3telegram-dapp
+        ```
 
 After running the Docker container, you can find the result of the Dapp's execution in the `/tmp/iexec_out` directory on your machine.
 
@@ -75,5 +76,5 @@ After running the Docker container, you can find the result of the Dapp's execut
 - Create a `.env` file at the root of the project and set the environment variables.
 - Create a `data.zip` file in the `tests/_tests_inputs_` directory with an chatId file containing the chat ID address to receive the message sent by the dapp.
 - To run the tests, use `npm run test`.
-After running the tests, check the inbox of the chatId address specified in the chatId file in the `tests/_tests_inputs_` directory to receive the message sent by the dapp.
+  After running the tests, check the inbox of the chatId address specified in the chatId file in the `tests/_tests_inputs_` directory to receive the message sent by the dapp.
 - To run the tests with code coverage, use `npm run ctest`.
