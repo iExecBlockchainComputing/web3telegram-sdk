@@ -1,6 +1,6 @@
 const path = require('path');
 const fsPromises = require('fs').promises;
-const start = require('../../src/sendTelegram');
+const start = require('../../src/executeTask');
 
 describe('sendTelegram', () => {
   beforeEach(async () => {

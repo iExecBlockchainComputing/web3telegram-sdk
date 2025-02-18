@@ -4,7 +4,7 @@ const {
   downloadEncryptedContent,
   decryptContent,
 } = require('../../src/decryptContent');
-const start = require('../../src/sendTelegram');
+const start = require('../../src/executeTask');
 
 jest.mock('fs', () => ({
   promises: {
