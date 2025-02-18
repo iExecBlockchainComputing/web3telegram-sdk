@@ -8,14 +8,18 @@ const downloadEncryptedContent = async (
   multiaddr,
   { ipfsGateway = DEFAULT_IPFS_GATEWAY } = {}
 ) => {
-  const publicUrl = `${ipfsGateway}${multiaddr}`;
-  const modifiedMultiaddr = publicUrl.replace('/p2p/', '/ipfs/');
-  const res = await fetch(modifiedMultiaddr);
-  if (!res.ok) {
-    throw Error(`Failed to load content from ${publicUrl}`);
+  try {
+    const publicUrl = `${ipfsGateway}${multiaddr.replace('/p2p/', '/ipfs/')}`;
+    const res = await fetch(publicUrl);
+    if (!res.ok) {
+      throw new Error(`Failed to load content from ${publicUrl}`);
+    }
+    const arrayBuffer = await res.arrayBuffer();
+    return new Uint8Array(arrayBuffer);
+  } catch (error) {
+    console.error('Error downloading encrypted content:', error);
+    throw error;
   }
-  const arrayBuffer = await res.arrayBuffer();
-  return new Uint8Array(arrayBuffer);
 };
 
 const decryptContent = (encryptedContent, encryptionKey) => {
