@@ -7,12 +7,12 @@
 **Web3Telegram** offers developers methods to create apps that:
 
 - enable an entity (such as a (d)app provider or an end-user) to message an Ethereum account holder without knowing her/his chatId or telegram username.
-- eliminate the need for end-users to share their chatId or  telegram username with multiple third-parties, reducing the risk of data breaches and spam.
+- eliminate the need for end-users to share their chatId or telegram username with multiple third-parties, reducing the risk of data breaches and spam.
 
 Web3Telegram is composed of 2 methods:
 
 - **fetchMyContacts** — that enables an entity to retrieve a list of Ethereum accounts whose owners have authorized the entity to message them
-- **fetchUserContacts** — Description todo
+- **fetchUserContacts** — that enables an entity to retrieve a list of Ethereum accounts whose owners have authorized the provided user to message them
 - **sendTelegram** — that allows an entity to message a user on telegram (previously fetched via the fetchMyContacts method) knowing only her/his Ethereum account.
 
 <div align="center">
@@ -42,7 +42,7 @@ yarn add @iexec/web3telegram
 ### Browser
 
 ```ts
-import { IExecWeb3telegram } from "@iexec/web3telegram";
+import { IExecWeb3telegram } from '@iexec/web3telegram';
 
 const web3Provider = window.ethereum;
 const web3telegram = new IExecWeb3telegram(web3Provider);
@@ -51,9 +51,9 @@ const web3telegram = new IExecWeb3telegram(web3Provider);
 ### NodeJS
 
 ```ts
-import { IExecWeb3telegram, getWeb3Provider } from "@iexec/web3telegram";
+import { IExecWeb3telegram, getWeb3Provider } from '@iexec/web3telegram';
 
-const { PRIVATE_KEY } = process.env; 
+const { PRIVATE_KEY } = process.env;
 
 const web3Provider = getWeb3Provider(PRIVATE_KEY);
 const web3telegram = new IExecWeb3telegram(web3Provider);
