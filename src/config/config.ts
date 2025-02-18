@@ -1,6 +1,6 @@
 // TODO : use prod address when available (not yet deployed)
 export const WEB3TELEGRAM_DAPP_ADDRESS =
-  '0xb3abe56470f23a5a5b6ab28fc6554b2a7dc1ba41'; // web3telegram-test.apps.iexec.eth
+  '0x73C206638051be2e4c7976A0C6cAa989CD075B95'; // web3telegram-test.apps.iexec.eth
 
 // TODO : use prod address when available (not yet deployed)
 export const WHITELIST_SMART_CONTRACT_ADDRESS =
