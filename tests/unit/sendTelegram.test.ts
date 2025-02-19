@@ -234,20 +234,19 @@ describe('sendTelegram', () => {
           category: 0,
         }
       );
-      // TODO enable this test when prod whitelist is implemented and app ens prod is available
-      // expect(iexec.orderbook.fetchWorkerpoolOrderbook).toHaveBeenNthCalledWith(
-      //   2,
-      //   {
-      //     workerpool: TEST_CHAIN.prodWorkerpool,
-      //     app: WHITELIST_SMART_CONTRACT_ADDRESS.toLowerCase(),
-      //     dataset: protectedData,
-      //     requester: userAddress,
-      //     isRequesterStrict: false,
-      //     minTag: ['tee', 'scone'],
-      //     maxTag: ['tee', 'scone'],
-      //     category: 0,
-      //   }
-      // );
+      expect(iexec.orderbook.fetchWorkerpoolOrderbook).toHaveBeenNthCalledWith(
+        2,
+        {
+          workerpool: TEST_CHAIN.prodWorkerpool,
+          app: WHITELIST_SMART_CONTRACT_ADDRESS.toLowerCase(),
+          dataset: protectedData,
+          requester: userAddress,
+          isRequesterStrict: false,
+          minTag: ['tee', 'scone'],
+          maxTag: ['tee', 'scone'],
+          category: 0,
+        }
+      );
     });
   });
 });
