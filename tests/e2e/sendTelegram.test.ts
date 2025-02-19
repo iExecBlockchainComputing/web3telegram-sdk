@@ -285,7 +285,7 @@ describe('web3telegram.sendTelegram()', () => {
     2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
   );
 
-  it.skip(
+  it(
     'should successfully send telegram with granted access to whitelist address',
     async () => {
       //create valid protected data
