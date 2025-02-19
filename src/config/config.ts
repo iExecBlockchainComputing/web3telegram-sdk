@@ -1,9 +1,7 @@
-// TODO : use prod address when available (not yet deployed)
-export const WEB3TELEGRAM_DAPP_ADDRESS = 'web3telegram-test.apps.iexec.eth';
+export const WEB3TELEGRAM_DAPP_ADDRESS = 'web3telegram.apps.iexec.eth';
 
-// TODO : use prod address when available (not yet deployed)
 export const WHITELIST_SMART_CONTRACT_ADDRESS =
-  '0xe006677cBe2a1AcD9c586260a37c35a06277c1b6';
+  '0x192C6f5AccE52c81Fcc2670f10611a3665AAA98F';
 
 export const PROD_WORKERPOOL_ADDRESS = 'prod-v8-bellecour.main.pools.iexec.eth';
 
