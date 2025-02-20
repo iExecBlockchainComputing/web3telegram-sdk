@@ -8,12 +8,12 @@ services:
       - 8545
     ports:
       - 8545:8545
-    # healthcheck:
-    #   test: nc -z 0.0.0.0 8545
-    #   interval: 30s
-    #   timeout: 5s
-    #   retries: 3
-    #   start_period: 90s
+    healthcheck:
+      test: (echo >/dev/tcp/$(hostname)/8545) &>/dev/null
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 90s
 
   sms:
     image: iexechub/iexec-sms:7.1.0
@@ -35,9 +35,9 @@ services:
       IEXEC_SMS_IMAGE_LAS_IMAGE: foo
     ports:
       - 13300:13300
-    # depends_on:
-    #   bellecour-fork:
-    #     condition: service_healthy
+    depends_on:
+      bellecour-fork:
+        condition: service_healthy
 
   result-proxy:
     image: iexechub/iexec-result-proxy:7.1.0
@@ -52,8 +52,8 @@ services:
     ports:
       - 13200:13200
     depends_on:
-      # bellecour-fork:
-      #   condition: service_healthy
+      bellecour-fork:
+        condition: service_healthy
       result-proxy-mongo:
         condition: service_started
       ipfs:
@@ -111,8 +111,8 @@ services:
       MONGO_HOST: market-mongo
       REDIS_HOST: market-redis
     depends_on:
-      # bellecour-fork:
-      #   condition: service_healthy
+      bellecour-fork:
+        condition: service_healthy
       market-redis:
         condition: service_started
       market-mongo:
@@ -137,8 +137,8 @@ services:
       RATE_LIMIT_PERIOD: 60000
       MAX_OPEN_ORDERS_PER_WALLET: 1000
     depends_on:
-      # bellecour-fork:
-      #   condition: service_healthy
+      bellecour-fork:
+        condition: service_healthy
       market-redis:
         condition: service_started
       market-mongo:
@@ -189,8 +189,8 @@ services:
       ethereum: bellecour:http://bellecour-fork:8545
       GRAPH_ETHEREUM_GENESIS_BLOCK_NUMBER: $BELLECOUR_FORK_BLOCK
     depends_on:
-      #   bellecour-fork:
-      #     condition: service_healthy
+      bellecour-fork:
+        condition: service_healthy
       graphnode-postgres:
         condition: service_healthy
       ipfs:
@@ -227,8 +227,8 @@ services:
       VOUCHER_HUB_ADDRESS: '0x3137B6DF4f36D338b82260eDBB2E7bab034AFEda'
       VOUCHER_HUB_START_BLOCK: $BELLECOUR_FORK_BLOCK
     depends_on:
-      # bellecour-fork:
-      #   condition: service_healthy
+      bellecour-fork:
+        condition: service_healthy
       graphnode:
         condition: service_healthy
       ipfs:
@@ -239,8 +239,8 @@ services:
     command:
       - echo "all services ready"
     depends_on:
-      # bellecour-fork:
-      #   condition: service_healthy
+      bellecour-fork:
+        condition: service_healthy
       graphnode:
         condition: service_healthy
       sms:
