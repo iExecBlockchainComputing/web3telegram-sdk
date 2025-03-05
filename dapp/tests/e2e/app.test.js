@@ -24,9 +24,9 @@ describe('sendTelegram', () => {
     // requester secret setup
     process.env.IEXEC_REQUESTER_SECRET_1 = JSON.stringify({
       telegramContentMultiAddr:
-        '/ipfs/QmVodr1Bxa2bTiz1pLmWjDrCeTEdGPfe58qRMRwErJDcRu',
+        '/ipfs/QmVLdTHY83NcyRwPtg7wHC7HjDgS48y3KKk7hYC1jnfAta',
       telegramContentEncryptionKey:
-        'rjUmm5KQTwZ5oraBKMnmpgh6QM/qRR33kVF+Ct0/K6c=',
+        'NTCCSZh81Zg0H4qNP5KMe9FTutRZqHYQnNJd+d4+M9k=',
       senderName: 'e2e test',
     });
   }); // end beforeEach
@@ -44,9 +44,9 @@ describe('sendTelegram', () => {
   });
   it('should fail if telegramContentEncryptionKey is empty', async () => {
     process.env.IEXEC_REQUESTER_SECRET_1 = JSON.stringify({
-      telegramContentEncryptionKey: '',
       telegramContentMultiAddr:
-        '/ipfs/QmVodr1Bxa2bTiz1pLmWjDrCeTEdGPfe58qRMRwErJDcRu',
+        '/ipfs/QmVLdTHY83NcyRwPtg7wHC7HjDgS48y3KKk7hYC1jnfAta',
+      telegramContentEncryptionKey: '',
       senderName: 'sender test name',
     });
     await expect(() => start()).rejects.toThrow(
@@ -57,9 +57,9 @@ describe('sendTelegram', () => {
   });
   it('should fail if telegramContentEncryptionKey is empty', async () => {
     process.env.IEXEC_REQUESTER_SECRET_1 = JSON.stringify({
-      telegramContentEncryptionKey: '',
       telegramContentMultiAddr:
-        '/ipfs/QmVodr1Bxa2bTiz1pLmWjDrCeTEdGPfe58qRMRwErJDcRu',
+        '/ipfs/QmVLdTHY83NcyRwPtg7wHC7HjDgS48y3KKk7hYC1jnfAta',
+      telegramContentEncryptionKey: '',
       senderName: 'sender test name',
     });
     await expect(() => start()).rejects.toThrow(
@@ -71,8 +71,8 @@ describe('sendTelegram', () => {
   it('should fail if telegramContentEncryptionKey is not base64', async () => {
     process.env.IEXEC_REQUESTER_SECRET_1 = JSON.stringify({
       telegramContentMultiAddr:
-        '/ipfs/QmVodr1Bxa2bTiz1pLmWjDrCeTEdGPfe58qRMRwErJDcRu',
-      telegramContentEncryptionKey: 'notabase64',
+        '/ipfs/QmVLdTHY83NcyRwPtg7wHC7HjDgS48y3KKk7hYC1jnfAta',
+      telegramContentEncryptionKey: 'not a base64 string',
       senderName: 'sender test name',
     });
     await expect(() => start()).rejects.toThrow(
@@ -95,7 +95,7 @@ describe('sendTelegram', () => {
     process.env.IEXEC_REQUESTER_SECRET_1 = JSON.stringify({
       telegramContentMultiAddr: '',
       telegramContentEncryptionKey:
-        'rjUmm5KQTwZ5oraBKMnmpgh6QM/qRR33kVF+Ct0/K6c=',
+        'NTCCSZh81Zg0H4qNP5KMe9FTutRZqHYQnNJd+d4+M9k=',
       senderName: 'sender test name',
     });
     await expect(() => start()).rejects.toThrow(
@@ -106,9 +106,9 @@ describe('sendTelegram', () => {
   });
   it('should fail if telegramContentMultiAddr is no an ipfs multiaddr', async () => {
     process.env.IEXEC_REQUESTER_SECRET_1 = JSON.stringify({
-      telegramContentMultiAddr: 'notamultiaddr',
+      telegramContentMultiAddr: 'not an ipfs multiaddr',
       telegramContentEncryptionKey:
-        'rjUmm5KQTwZ5oraBKMnmpgh6QM/qRR33kVF+Ct0/K6c=',
+        'NTCCSZh81Zg0H4qNP5KMe9FTutRZqHYQnNJd+d4+M9k=',
       senderName: 'sender test name',
     });
     await expect(() => start()).rejects.toThrow(
@@ -127,9 +127,9 @@ describe('sendTelegram', () => {
     process.env.IEXEC_REQUESTER_SECRET_1 = JSON.stringify({
       senderName: 'A very long sender tag may be flagged as spam',
       telegramContentMultiAddr:
-        '/ipfs/QmVodr1Bxa2bTiz1pLmWjDrCeTEdGPfe58qRMRwErJDcRu',
+        '/ipfs/QmVLdTHY83NcyRwPtg7wHC7HjDgS48y3KKk7hYC1jnfAta',
       telegramContentEncryptionKey:
-        'rjUmm5KQTwZ5oraBKMnmpgh6QM/qRR33kVF+Ct0/K6c=',
+        'NTCCSZh81Zg0H4qNP5KMe9FTutRZqHYQnNJd+d4+M9k=',
     });
     await expect(() => start()).rejects.toThrow(
       Error(
@@ -141,9 +141,9 @@ describe('sendTelegram', () => {
     process.env.IEXEC_REQUESTER_SECRET_1 = JSON.stringify({
       senderName: '',
       telegramContentMultiAddr:
-        '/ipfs/QmVodr1Bxa2bTiz1pLmWjDrCeTEdGPfe58qRMRwErJDcRu',
+        '/ipfs/QmVLdTHY83NcyRwPtg7wHC7HjDgS48y3KKk7hYC1jnfAta',
       telegramContentEncryptionKey:
-        'rjUmm5KQTwZ5oraBKMnmpgh6QM/qRR33kVF+Ct0/K6c=',
+        'NTCCSZh81Zg0H4qNP5KMe9FTutRZqHYQnNJd+d4+M9k=',
     });
     await expect(() => start()).rejects.toThrow(
       Error('Requester secret error: "senderName" is not allowed to be empty')
@@ -152,10 +152,11 @@ describe('sendTelegram', () => {
   it('should send the telegram if senderName is undefined and set the default senderName to "iExec web3telegram"', async () => {
     process.env.IEXEC_REQUESTER_SECRET_1 = JSON.stringify({
       telegramContentMultiAddr:
-        '/ipfs/QmVodr1Bxa2bTiz1pLmWjDrCeTEdGPfe58qRMRwErJDcRu',
+        '/ipfs/QmVLdTHY83NcyRwPtg7wHC7HjDgS48y3KKk7hYC1jnfAta',
       telegramContentEncryptionKey:
-        'rjUmm5KQTwZ5oraBKMnmpgh6QM/qRR33kVF+Ct0/K6c=',
+        'NTCCSZh81Zg0H4qNP5KMe9FTutRZqHYQnNJd+d4+M9k=',
     });
+    await start().catch((e) => console.log('error', e));
     await expect(start()).resolves.not.toThrow();
   });
   it('should not fail if telegram service fail to send the telegram message and write error in output', async () => {
