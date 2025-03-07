@@ -1,5 +1,5 @@
 import './App.css';
-import { test } from './web3telegram.js';
+import { test } from './web3telegram';
 
 function App() {
   return (
