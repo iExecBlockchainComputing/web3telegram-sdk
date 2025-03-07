@@ -9,7 +9,7 @@
 - enable an entity (such as a (d)app provider or an end-user) to message an Ethereum account holder without knowing her/his chatId or telegram username.
 - eliminate the need for end-users to share their chatId or telegram username with multiple third-parties, reducing the risk of data breaches and spam.
 
-Web3Telegram is composed of 2 methods:
+Web3Telegram is composed of 3 methods:
 
 - **fetchMyContacts** — that enables an entity to retrieve a list of Ethereum accounts whose owners have authorized the entity to message them
 - **fetchUserContacts** — that enables an entity to retrieve a list of Ethereum accounts whose owners have authorized the provided user to message them
