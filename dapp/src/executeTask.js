@@ -56,7 +56,7 @@ async function start() {
   try {
     const deserializer = new IExecDataProtectorDeserializer();
     protectedData = {
-      chatId: await deserializer.getValue('chatId', 'string'),
+      chatId: await deserializer.getValue('telegram_chatId', 'string'),
     };
   } catch (e) {
     throw Error(`Failed to parse ProtectedData: ${e.message}`);
