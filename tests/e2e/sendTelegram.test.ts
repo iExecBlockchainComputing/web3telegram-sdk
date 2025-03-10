@@ -82,7 +82,7 @@ describe('web3telegram.sendTelegram()', () => {
       ...getTestConfig(providerWallet.privateKey)
     );
     validProtectedData = await dataProtector.protectData({
-      data: { chatId: 'example@test.com' },
+      data: { telegram_chatId: '1461320872' },
       name: 'test do not use',
     });
     //create invalid protected data
@@ -201,7 +201,7 @@ describe('web3telegram.sendTelegram()', () => {
       expect(error?.message).toBe('Failed to sendTelegram');
       expect(error?.cause).toBeInstanceOf(Error);
       expect((error?.cause as Error).message).toBe(
-        'This protected data does not contain "chatId:string" in its schema.'
+        'This protected data does not contain "telegram_chatId:string" in its schema.'
       );
     },
     MAX_EXPECTED_WEB2_SERVICES_TIME
@@ -212,7 +212,7 @@ describe('web3telegram.sendTelegram()', () => {
     async () => {
       //create valid protected data with blank order to not have: datasetorder is fully consumed error from iexec sdk
       const protectedData = await dataProtector.protectData({
-        data: { chatId: '12345' },
+        data: { telegram_chatId: '1461320872' },
         name: 'test do not use',
       });
       await waitSubgraphIndexing();
@@ -290,7 +290,7 @@ describe('web3telegram.sendTelegram()', () => {
     async () => {
       //create valid protected data
       const protectedDataForWhitelist = await dataProtector.protectData({
-        data: { chatId: 'example@test.com' },
+        data: { telegram_chatId: '1461320872' },
         name: 'test do not use',
       });
       await waitSubgraphIndexing();

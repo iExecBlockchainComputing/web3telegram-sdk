@@ -29,11 +29,11 @@ describe('web3telegram.fetchMyContacts()', () => {
 
     //create valid protected data
     protectedData1 = await dataProtector.protectData({
-      data: { chatId: '1234' },
+      data: { telegram_chatId: '1234' },
       name: 'test do not use',
     });
     protectedData2 = await dataProtector.protectData({
-      data: { chatId: '5678' },
+      data: { telegram_chatId: '5678' },
       name: 'test do not use',
     });
     await waitSubgraphIndexing();
