@@ -82,7 +82,7 @@ describe('web3telegram.sendTelegram()', () => {
       ...getTestConfig(providerWallet.privateKey)
     );
     validProtectedData = await dataProtector.protectData({
-      data: { telegram_chatId: '1461320872' },
+      data: { telegram_chatId: '12345' },
       name: 'test do not use',
     });
     //create invalid protected data
@@ -212,7 +212,7 @@ describe('web3telegram.sendTelegram()', () => {
     async () => {
       //create valid protected data with blank order to not have: datasetorder is fully consumed error from iexec sdk
       const protectedData = await dataProtector.protectData({
-        data: { telegram_chatId: '1461320872' },
+        data: { telegram_chatId: '12345' },
         name: 'test do not use',
       });
       await waitSubgraphIndexing();
@@ -290,7 +290,7 @@ describe('web3telegram.sendTelegram()', () => {
     async () => {
       //create valid protected data
       const protectedDataForWhitelist = await dataProtector.protectData({
-        data: { telegram_chatId: '1461320872' },
+        data: { telegram_chatId: '12345' },
         name: 'test do not use',
       });
       await waitSubgraphIndexing();

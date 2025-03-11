@@ -26,7 +26,7 @@ describe('web3telegram.fetchMyContacts()', () => {
     dataProtector = new IExecDataProtector(...getTestConfig(wallet.privateKey));
     web3telegram = new IExecWeb3telegram(...getTestConfig(wallet.privateKey));
     protectedData = await dataProtector.core.protectData({
-      data: { chatId: '1461320872' },
+      data: { telegram_chatId: '12345' },
       name: 'test do not use',
     });
     await waitSubgraphIndexing();
