@@ -763,7 +763,7 @@ steps:
 
   - name: get scone fingerprint (prod)
     # /!\: maintain the version here
-    image: iexechub/web3telegram-dapp:0.0.1-alpha-sconify-5.7.6-v15-production
+    image: iexechub/web3telegram-dapp:0.0.2-alpha-sconify-5.7.6-v15-production
     commands:
       - SCONE_HASH=1 node > deployment-dapp/.scone-fingerprint
     when:
