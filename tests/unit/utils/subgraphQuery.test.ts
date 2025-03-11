@@ -64,7 +64,7 @@ describe('getValidContact', () => {
     expect(graphQLClient.request).toHaveBeenCalledWith(
       expect.anything(),
       expect.objectContaining({
-        requiredSchema: ['chatId:string'],
+        requiredSchema: ['telegram_chatId:string'],
         id: ['address1', 'address2', 'address3'],
         start: expect.any(Number),
         range: 1000,
