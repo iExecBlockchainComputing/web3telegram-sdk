@@ -41,7 +41,7 @@ export const getValidContact = async (
 
     do {
       const variables = {
-        requiredSchema: ['chatId:string'],
+        requiredSchema: ['telegram_chatId:string'],
         id: contactsAddresses,
         start,
         range,
@@ -88,7 +88,7 @@ export const checkProtectedDataValidity = async (
 ): Promise<boolean> => {
   try {
     const variables = {
-      requiredSchema: ['chatId:string'],
+      requiredSchema: ['telegram_chatId:string'],
       id: [protectedData],
       start: 0,
       range: 1,

@@ -104,7 +104,7 @@ export const sendTelegram = async ({
     );
     if (!isValidProtectedData) {
       throw new Error(
-        'This protected data does not contain "chatId:string" in its schema.'
+        'This protected data does not contain "telegram_chatId:string" in its schema.'
       );
     }
     const requesterAddress = await iexec.wallet.getAddress();
