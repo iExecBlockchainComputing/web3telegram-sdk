@@ -22,11 +22,9 @@ async function writeTaskOutput(path, message) {
 async function start() {
   const { IEXEC_OUT, IEXEC_APP_DEVELOPER_SECRET, IEXEC_REQUESTER_SECRET_1 } =
     process.env;
-  console.log('DEBUG:process.env: ', process.env);
 
   // Check worker env
   const workerEnv = validateWorkerEnv({ IEXEC_OUT });
-  console.log('DEBUG:workerEnv: ', workerEnv);
   // Parse the app developer secret environment variable
   let appDeveloperSecret;
   try {

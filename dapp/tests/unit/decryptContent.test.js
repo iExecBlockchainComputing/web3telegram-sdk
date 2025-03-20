@@ -1,6 +1,7 @@
 /* eslint-disable import/no-unresolved */
 /* eslint-disable import/extensions */
 
+import { IExec } from 'iexec';
 import {
   decryptContent,
   downloadEncryptedContent,
@@ -8,7 +9,6 @@ import {
 
 const DEFAULT_IPFS_GATEWAY = 'https://ipfs-gateway.v8-bellecour.iex.ec';
 
-const { IExec } = await import('iexec');
 describe('decryptContent', () => {
   it('should decrypt message correctly', async () => {
     const iexec = new IExec({
