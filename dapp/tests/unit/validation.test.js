@@ -1,9 +1,9 @@
-const {
-  validateWorkerEnv,
+import {
   validateAppSecret,
-  validateRequesterSecret,
   validateProtectedData,
-} = require('../../src/validation');
+  validateRequesterSecret,
+  validateWorkerEnv,
+} from '../../src/validation';
 
 describe('validateWorkerEnv function', () => {
   it('should pass if all input values are valid', () => {
@@ -16,7 +16,7 @@ describe('validateWorkerEnv function', () => {
 
   it('should throw an error if any required input is missing', () => {
     expect(() => validateWorkerEnv({})).toThrow(
-      Error('Worker environment error: "IEXEC_OUT" is required')
+      new Error('Worker environment error: "IEXEC_OUT" is required')
     );
   });
 });
@@ -27,12 +27,15 @@ describe('validateAppSecret function', () => {
       /"TELEGRAM_BOT_TOKEN" is required/i
     );
   });
+
   it('should throw an error if botToken is not a string', () => {
     expect(() =>
       validateAppSecret({
         TELEGRAM_BOT_TOKEN: 123,
       })
-    ).toThrow(Error('App secret error: "TELEGRAM_BOT_TOKEN" must be a string'));
+    ).toThrow(
+      new Error('App secret error: "TELEGRAM_BOT_TOKEN" must be a string')
+    );
   });
 });
 
@@ -66,7 +69,7 @@ describe('validateRequesterSecret function', () => {
       ...testedObj,
       senderName: undefined,
     });
-    expect(res.senderName === undefined);
+    expect(res.senderName).toBeUndefined();
   });
 
   it('should not accept an empty senderName', () => {
@@ -76,14 +79,16 @@ describe('validateRequesterSecret function', () => {
         senderName: '',
       })
     ).toThrow(
-      Error('Requester secret error: "senderName" is not allowed to be empty')
+      new Error(
+        'Requester secret error: "senderName" is not allowed to be empty'
+      )
     );
   });
 
   it('should throw an error if the telegramContentMultiAddr value is not a valid multiAddr', () => {
     testedObj.telegramContentMultiAddr = 'not a multiAddr';
     expect(() => validateRequesterSecret(testedObj)).toThrow(
-      Error(
+      new Error(
         'Requester secret error: "telegramContentMultiAddr" must be a multiAddr'
       )
     );
@@ -92,7 +97,7 @@ describe('validateRequesterSecret function', () => {
   it('should throw an error if the telegramContentEncryptionKey value is not a valid base64 string', () => {
     testedObj.telegramContentEncryptionKey = 'not a base64 string';
     expect(() => validateRequesterSecret(testedObj)).toThrow(
-      Error(
+      new Error(
         'Requester secret error: "telegramContentEncryptionKey" must be a valid base64 string'
       )
     );
@@ -102,7 +107,7 @@ describe('validateRequesterSecret function', () => {
     testedObj.telegramContentEncryptionKey = 'not a base64 string';
     testedObj.telegramContentMultiAddr = 'not a multiAddr';
     expect(() => validateRequesterSecret(testedObj)).toThrow(
-      Error(
+      new Error(
         'Requester secret error: "telegramContentMultiAddr" must be a multiAddr; "telegramContentEncryptionKey" must be a valid base64 string'
       )
     );
@@ -127,7 +132,7 @@ describe('validateProtectedData function', () => {
 
   it('should throw an error if any required input is missing', () => {
     expect(() => validateProtectedData({})).toThrow(
-      Error('ProtectedData error: "chatId" is required')
+      new Error('ProtectedData error: "chatId" is required')
     );
   });
 
@@ -137,7 +142,9 @@ describe('validateProtectedData function', () => {
         chatId: '@#123',
       })
     ).toThrow(
-      Error(`ProtectedData error: "chatId" must be a valid Telegram chat ID`)
+      new Error(
+        `ProtectedData error: "chatId" must be a valid Telegram chat ID`
+      )
     );
   });
 });
