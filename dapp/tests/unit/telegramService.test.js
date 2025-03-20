@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { jest } from '@jest/globals';
 
 await jest.unstable_mockModule('node-telegram-bot-api', () => ({
@@ -8,7 +9,7 @@ await jest.unstable_mockModule('node-telegram-bot-api', () => ({
 
 const TelegramBot = (await import('node-telegram-bot-api')).default;
 
-const sendTelegram = (await import('../../src/telegramService.js')).default;
+const sendTelegram = (await import('../../src/telegramService')).default;
 
 describe('sendTelegram', () => {
   const chatId = '123456';

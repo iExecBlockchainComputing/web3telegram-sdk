@@ -2,15 +2,11 @@
 /* eslint-disable import/extensions */
 
 import { IExec } from 'iexec';
-import {
-  decryptContent,
-  downloadEncryptedContent,
-} from '../../src/decryptContent';
-
-const DEFAULT_IPFS_GATEWAY = 'https://ipfs-gateway.v8-bellecour.iex.ec';
+import { decryptContent, downloadEncryptedContent } from '../../src/decryptContent';
 
 describe('decryptContent', () => {
   it('should decrypt message correctly', async () => {
+
     const iexec = new IExec({
       ethProvider: 'bellecour',
     });

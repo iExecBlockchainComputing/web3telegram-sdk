@@ -1,6 +1,8 @@
+/* eslint-disable no-unused-vars */
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { jest } from '@jest/globals';
 
-await jest.unstable_mockModule('../../src/validation.js', () => ({
+jest.unstable_mockModule('../../src/validation.js', () => ({
   validateWorkerEnv: jest.fn().mockReturnValue({
     IEXEC_APP_DEVELOPER_SECRET: {
       TELEGRAM_BOT_TOKEN: 'fake-bot-token',
@@ -23,39 +25,39 @@ await jest.unstable_mockModule('../../src/validation.js', () => ({
   validateProtectedData: jest.fn().mockReturnValue({ chatId: 'mock-chat-id' }), // ✅ Fix 1: Ensure `chatId` is returned
 }));
 
-await jest.unstable_mockModule('../../src/decryptContent.js', () => ({
+jest.unstable_mockModule('../../src/decryptContent.js', () => ({
   downloadEncryptedContent: jest.fn(),
   decryptContent: jest.fn(),
 }));
 
-await jest.unstable_mockModule('../../src/telegramService.js', () => ({
+jest.unstable_mockModule('../../src/telegramService.js', () => ({
   default: jest.fn().mockResolvedValue({
     message: 'Your telegram message has been sent successfully.',
     status: 200,
   }),
 }));
-await jest.unstable_mockModule('@iexec/dataprotector-deserializer', () => ({
+jest.unstable_mockModule('@iexec/dataprotector-deserializer', () => ({
   IExecDataProtectorDeserializer: jest.fn().mockImplementation(() => ({
     getValue: jest.fn().mockResolvedValue('mock-chat-id'),
   })),
 }));
-await jest.unstable_mockModule('fs', () => ({
+jest.unstable_mockModule('fs', () => ({
   promises: {
     writeFile: jest.fn().mockResolvedValue(undefined),
   },
 }));
 const { validateRequesterSecret, validateProtectedData } = await import(
-  '../../src/validation.js'
+  '../../src/validation'
 );
 const { IExecDataProtectorDeserializer } = await import(
   '@iexec/dataprotector-deserializer'
 );
 const { downloadEncryptedContent, decryptContent } = await import(
-  '../../src/decryptContent.js'
+  '../../src/decryptContent'
 );
-const sendTelegram = (await import('../../src/telegramService.js')).default;
+const sendTelegram = (await import('../../src/telegramService')).default;
 const { promises: fs } = await import('fs');
-const start = (await import('../../src/executeTask.js')).default;
+const start = (await import('../../src/executeTask')).default;
 
 describe('start function', () => {
   beforeEach(() => {
