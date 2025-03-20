@@ -2,11 +2,13 @@
 /* eslint-disable import/extensions */
 
 import { IExec } from 'iexec';
-import { decryptContent, downloadEncryptedContent } from '../../src/decryptContent';
+import {
+  decryptContent,
+  downloadEncryptedContent,
+} from '../../src/decryptContent';
 
 describe('decryptContent', () => {
   it('should decrypt message correctly', async () => {
-
     const iexec = new IExec({
       ethProvider: 'bellecour',
     });
