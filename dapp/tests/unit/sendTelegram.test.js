@@ -1,32 +1,17 @@
-const fs = require('fs').promises;
-const sendTelegram = require('../../src/telegramService');
-const {
-  downloadEncryptedContent,
-  decryptContent,
-} = require('../../src/decryptContent');
-const start = require('../../src/executeTask');
+import { jest } from '@jest/globals';
 
-jest.mock('fs', () => ({
-  promises: {
-    writeFile: jest.fn(),
-  },
-}));
-
-jest.mock('@iexec/dataprotector-deserializer', () => ({
-  IExecDataProtectorDeserializer: jest.fn().mockImplementation(() => ({
-    getValue: jest.fn().mockResolvedValue('mock-chat-id'),
-  })),
-}));
-
-jest.mock('../../src/telegramService', () =>
-  jest.fn().mockResolvedValue({
-    message: 'Your telegram message has been sent successfully.',
-    status: 200,
-  })
-);
-
-jest.mock('../../src/validation', () => ({
-  validateWorkerEnv: jest.fn().mockReturnValue({ IEXEC_OUT: '/mock/output' }),
+await jest.unstable_mockModule('../../src/validation.js', () => ({
+  validateWorkerEnv: jest.fn().mockReturnValue({
+    IEXEC_APP_DEVELOPER_SECRET: {
+      TELEGRAM_BOT_TOKEN: 'fake-bot-token',
+    },
+    IEXEC_REQUESTER_SECRET_1: {
+      senderName: 'TestUser',
+      telegramContentMultiAddr: 'mock-multiaddr',
+      telegramContentEncryptionKey: 'mock-encryption-key',
+    },
+    IEXEC_OUT: '/mock/output',
+  }),
   validateAppSecret: jest
     .fn()
     .mockReturnValue({ TELEGRAM_BOT_TOKEN: 'fake-bot-token' }),
@@ -35,13 +20,42 @@ jest.mock('../../src/validation', () => ({
     telegramContentMultiAddr: 'mock-multiaddr',
     telegramContentEncryptionKey: 'mock-encryption-key',
   }),
-  validateProtectedData: jest.fn().mockReturnValue({ chatId: 'mock-chat-id' }),
+  validateProtectedData: jest.fn().mockReturnValue({ chatId: 'mock-chat-id' }), // ✅ Fix 1: Ensure `chatId` is returned
 }));
 
-jest.mock('../../src/decryptContent', () => ({
+await jest.unstable_mockModule('../../src/decryptContent.js', () => ({
   downloadEncryptedContent: jest.fn(),
   decryptContent: jest.fn(),
 }));
+
+await jest.unstable_mockModule('../../src/telegramService.js', () => ({
+  default: jest.fn().mockResolvedValue({
+    message: 'Your telegram message has been sent successfully.',
+    status: 200,
+  }),
+}));
+await jest.unstable_mockModule('@iexec/dataprotector-deserializer', () => ({
+  IExecDataProtectorDeserializer: jest.fn().mockImplementation(() => ({
+    getValue: jest.fn().mockResolvedValue('mock-chat-id'),
+  })),
+}));
+await jest.unstable_mockModule('fs', () => ({
+  promises: {
+    writeFile: jest.fn().mockResolvedValue(undefined),
+  },
+}));
+const { validateRequesterSecret, validateProtectedData } = await import(
+  '../../src/validation.js'
+);
+const { IExecDataProtectorDeserializer } = await import(
+  '@iexec/dataprotector-deserializer'
+);
+const { downloadEncryptedContent, decryptContent } = await import(
+  '../../src/decryptContent.js'
+);
+const sendTelegram = (await import('../../src/telegramService.js')).default;
+const { promises: fs } = await import('fs');
+const start = (await import('../../src/executeTask.js')).default;
 
 describe('start function', () => {
   beforeEach(() => {
@@ -57,7 +71,6 @@ describe('start function', () => {
       }),
       IEXEC_OUT: '/mock/output',
     };
-
     downloadEncryptedContent.mockResolvedValue('mock-encrypted-content');
     decryptContent.mockReturnValue('Decrypted message');
   });
@@ -123,7 +136,7 @@ describe('start function', () => {
   });
 
   test('should exit when writeTaskOutput fails', async () => {
-    fs.writeFile.mockRejectedValueOnce(new Error('Write error'));
+    fs.writeFile.mockRejectedValueOnce(new Error('Write error')); // ✅ Fix 2: Ensure mockRejectedValueOnce is available
 
     const mockExit = jest.spyOn(process, 'exit').mockImplementation(() => {});
 
@@ -135,8 +148,18 @@ describe('start function', () => {
   });
 
   test('should fail when sendTelegram fails', async () => {
-    sendTelegram.mockRejectedValue(new Error('Telegram API Error'));
+    sendTelegram.mockRejectedValue(new Error('Telegram API Error')); // ✅ Fix 3: Ensure sendTelegram mock is correct
 
     await expect(start()).rejects.toThrow('Telegram API Error');
+  });
+
+  test('should fail validation if requester secret is invalid', async () => {
+    validateRequesterSecret.mockImplementation(() => {
+      throw new Error('Requester secret error: invalid data');
+    });
+
+    await expect(start()).rejects.toThrow(
+      'Requester secret error: invalid data'
+    );
   });
 });
