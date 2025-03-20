@@ -1,10 +1,10 @@
-const Joi = require('joi');
+import Joi from 'joi';
 
 const workerEnvSchema = Joi.object({
   IEXEC_OUT: Joi.string().required(),
 });
 
-function validateWorkerEnv(envVars) {
+export function validateWorkerEnv(envVars) {
   const { error, value } = workerEnvSchema.validate(envVars, {
     abortEarly: false,
   });
@@ -19,7 +19,7 @@ const appSecretSchema = Joi.object({
   TELEGRAM_BOT_TOKEN: Joi.string().required(),
 });
 
-function validateAppSecret(obj) {
+export function validateAppSecret(obj) {
   const { error, value } = appSecretSchema.validate(obj, {
     abortEarly: false,
   });
@@ -42,7 +42,7 @@ const protectedDataChatIdSchema = Joi.object({
     .required(),
 });
 
-function validateProtectedData(obj) {
+export function validateProtectedData(obj) {
   const { error, value } = protectedDataChatIdSchema.validate(obj, {
     abortEarly: false,
   });
@@ -62,7 +62,7 @@ const requesterSecretSchema = Joi.object({
   senderName: Joi.string().min(3).max(20),
 });
 
-function validateRequesterSecret(obj) {
+export function validateRequesterSecret(obj) {
   const { error, value } = requesterSecretSchema.validate(obj, {
     abortEarly: false,
   });
@@ -72,10 +72,3 @@ function validateRequesterSecret(obj) {
   }
   return value;
 }
-
-module.exports = {
-  validateWorkerEnv,
-  validateAppSecret,
-  validateRequesterSecret,
-  validateProtectedData,
-};

@@ -1,18 +1,13 @@
-const { promises: fs } = require('fs');
-const {
-  IExecDataProtectorDeserializer,
-} = require('@iexec/dataprotector-deserializer');
-const sendTelegram = require('./telegramService');
-const {
-  validateWorkerEnv,
+import { IExecDataProtectorDeserializer } from '@iexec/dataprotector-deserializer';
+import { promises as fs } from 'fs';
+import { decryptContent, downloadEncryptedContent } from './decryptContent';
+import sendTelegram from './telegramService';
+import {
   validateAppSecret,
-  validateRequesterSecret,
   validateProtectedData,
-} = require('./validation');
-const {
-  downloadEncryptedContent,
-  decryptContent,
-} = require('./decryptContent');
+  validateRequesterSecret,
+  validateWorkerEnv,
+} from './validation';
 
 async function writeTaskOutput(path, message) {
   try {
@@ -27,10 +22,11 @@ async function writeTaskOutput(path, message) {
 async function start() {
   const { IEXEC_OUT, IEXEC_APP_DEVELOPER_SECRET, IEXEC_REQUESTER_SECRET_1 } =
     process.env;
+  console.log('DEBUG:process.env: ', process.env);
 
   // Check worker env
   const workerEnv = validateWorkerEnv({ IEXEC_OUT });
-
+  console.log('DEBUG:workerEnv: ', workerEnv);
   // Parse the app developer secret environment variable
   let appDeveloperSecret;
   try {
@@ -51,7 +47,7 @@ async function start() {
   }
   requesterSecret = validateRequesterSecret(requesterSecret);
 
-  // parse the protected data and get the requester secret (chatId)
+  // Parse the protected data and get the requester secret (chatId)
   let protectedData;
   try {
     const deserializer = new IExecDataProtectorDeserializer();
@@ -61,7 +57,7 @@ async function start() {
   } catch (e) {
     throw Error(`Failed to parse ProtectedData: ${e.message}`);
   }
-  // validate the protected data (chatId)
+  // Validate the protected data (chatId)
   validateProtectedData(protectedData);
 
   const encryptedTelegramContent = await downloadEncryptedContent(
@@ -79,7 +75,6 @@ async function start() {
     botToken: appDeveloperSecret.TELEGRAM_BOT_TOKEN,
     senderName: requesterSecret.senderName,
   });
-
   await writeTaskOutput(
     `${workerEnv.IEXEC_OUT}/result.txt`,
     JSON.stringify(response, null, 2)
@@ -92,4 +87,4 @@ async function start() {
   );
 }
 
-module.exports = start;
+export default start;

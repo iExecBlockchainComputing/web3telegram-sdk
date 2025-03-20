@@ -1,10 +1,10 @@
-const { Buffer } = require('buffer');
-const forge = require('node-forge');
-const fetch = require('node-fetch');
+import { Buffer } from 'buffer';
+import fetch from 'node-fetch';
+import forge from 'node-forge';
 
 const DEFAULT_IPFS_GATEWAY = 'https://ipfs-gateway.v8-bellecour.iex.ec';
 
-const downloadEncryptedContent = async (
+export const downloadEncryptedContent = async (
   multiaddr,
   { ipfsGateway = DEFAULT_IPFS_GATEWAY } = {}
 ) => {
@@ -22,7 +22,7 @@ const downloadEncryptedContent = async (
   }
 };
 
-const decryptContent = (encryptedContent, encryptionKey) => {
+export const decryptContent = (encryptedContent, encryptionKey) => {
   const ivBytes = encryptedContent.slice(0, 16);
   let ciphertextBytes = encryptedContent.slice(16);
   const key = forge.util.createBuffer(Buffer.from(encryptionKey, 'base64'));
@@ -53,5 +53,3 @@ const decryptContent = (encryptedContent, encryptionKey) => {
 
   return decryptedBuffer.toString();
 };
-
-module.exports = { downloadEncryptedContent, decryptContent };
