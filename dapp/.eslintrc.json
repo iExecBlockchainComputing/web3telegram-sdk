@@ -2,7 +2,7 @@
   "root": true,
   "plugins": ["import", "sonarjs"],
   "parserOptions": {
-    "ecmaVersion": 2020
+    "ecmaVersion": 2022
   },
   "extends": ["airbnb-base", "prettier", "plugin:sonarjs/recommended"],
   "rules": {
