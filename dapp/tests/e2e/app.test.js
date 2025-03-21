@@ -122,6 +122,19 @@ describe('sendTelegram', () => {
     );
   });
 
+  it('should fail if not empty senderName', async () => {
+    process.env.IEXEC_REQUESTER_SECRET_1 = JSON.stringify({
+      senderName: '',
+      telegramContentMultiAddr:
+        '/ipfs/QmVodr1Bxa2bTiz1pLmWjDrCeTEdGPfe58qRMRwErJDcRu',
+      telegramContentEncryptionKey:
+        'rjUmm5KQTwZ5oraBKMnmpgh6QM/qRR33kVF+Ct0/K6c=',
+    });
+    await expect(() => start()).rejects.toThrow(
+      Error('Requester secret error: "senderName" is not allowed to be empty')
+    );
+  });
+
   it('should send the telegram if senderName is undefined and set the default senderName to "iExec web3telegram"', async () => {
     process.env.IEXEC_REQUESTER_SECRET_1 = JSON.stringify({
       telegramContentMultiAddr:
