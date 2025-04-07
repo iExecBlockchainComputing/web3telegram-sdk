@@ -6,7 +6,7 @@ export const WHITELIST_SMART_CONTRACT_ADDRESS =
 export const PROD_WORKERPOOL_ADDRESS = 'prod-v8-bellecour.main.pools.iexec.eth';
 
 export const DATAPROTECTOR_SUBGRAPH_ENDPOINT =
-  'https://thegraph-product.iex.ec/subgraphs/name/bellecour/dataprotector-v2';
+  'https://thegraph.iex.ec/subgraphs/name/bellecour/dataprotector-v2';
 
 export const MAX_DESIRED_DATA_ORDER_PRICE = 0;
 

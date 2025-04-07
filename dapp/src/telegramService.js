@@ -1,4 +1,4 @@
-const TelegramBot = require('node-telegram-bot-api');
+import TelegramBot from 'node-telegram-bot-api';
 
 async function sendTelegram({
   chatId,
@@ -35,4 +35,4 @@ async function sendTelegram({
   };
 }
 
-module.exports = sendTelegram;
+export default sendTelegram;
