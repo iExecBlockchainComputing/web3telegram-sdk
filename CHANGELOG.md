@@ -7,7 +7,7 @@ All notable changes to this project will be documented in this file.
 ### Changed
 
 - Migrated the iApp codebase to ES Modules (ESM).
-- Migrated Bellecour subgraph URL to `https://thegraph.iex.ec` (previously `https://v8.subgraph.iex.ec`).
+- Migrated Bellecour subgraph URL to `https://thegraph.iex.ec`.
 
 ## [0.0.2-alpha] - 2025-03-11
 
