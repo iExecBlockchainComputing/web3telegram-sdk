@@ -23,7 +23,7 @@ Web3Telegram is composed of 3 methods:
 
 ## Installation
 
-Web3Telegram will be available as an [npm package](https://www.npmjs.com/package/@iexec/web3telegram).
+Web3Telegram is available as an [npm package](https://www.npmjs.com/package/@iexec/web3telegram).
 
 **npm:**
 
