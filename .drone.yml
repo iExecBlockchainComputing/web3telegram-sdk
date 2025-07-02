@@ -362,7 +362,7 @@ trigger:
   target:
     - sdk-nightly
   branch:
-    - develop
+    - main
 
 steps:
   - name: install
@@ -439,7 +439,7 @@ steps:
       - set-version-nightly
     when:
       branch:
-        - develop
+        - main
 
 ---
 # sdk @iexec/web3telegram publish npm latest pipeline
@@ -584,7 +584,7 @@ trigger:
   target:
     - dapp-dev-non-tee
   branch:
-    - develop
+    - main
 
 steps:
   - name: install
@@ -747,7 +747,6 @@ trigger:
     - dapp-dev
     - dapp-prod
   branch:
-    - develop
     - main
 
 steps:
@@ -758,8 +757,6 @@ steps:
     when:
       target:
         - dapp-dev
-      branch:
-        - develop
 
   - name: get scone fingerprint (prod)
     # /!\: maintain the version here
@@ -769,8 +766,6 @@ steps:
     when:
       target:
         - dapp-prod
-      branch:
-        - main
 
   - name: install deps
     image: node:18.19
@@ -841,7 +836,7 @@ steps:
       target:
         - dapp-dev
       branch:
-        - develop
+        - main
 
   - name: add resource to whitelist prod
     image: node:18.12.1
@@ -885,7 +880,6 @@ trigger:
     - dapp-publish-sell-order-dev
     - dapp-publish-sell-order-prod
   branch:
-    - develop
     - main
 
 steps:
@@ -925,7 +919,6 @@ trigger:
     - dapp-revoke-sell-order-dev
     - dapp-revoke-sell-order-prod
   branch:
-    - develop
     - main
 
 steps:
@@ -963,7 +956,6 @@ trigger:
     - dapp-push-secret-dev
     - dapp-push-secret-prod
   branch:
-    - develop
     - main
 steps:
   - name: install deps
@@ -987,8 +979,6 @@ steps:
     when:
       target:
         - dapp-push-secret-dev
-      branch:
-        - develop
 
   - name: push dapp secret prod
     image: node:18.19
@@ -1004,8 +994,6 @@ steps:
     when:
       target:
         - dapp-push-secret-prod
-      branch:
-        - main
     commands:
       - cd deployment-dapp
       - npm run push-dapp-secret
@@ -1022,7 +1010,6 @@ trigger:
     - add-resource-to-whitelist-dev
     - add-resource-to-whitelist-prod
   branch:
-    - develop
     - main
 
 steps:
@@ -1051,8 +1038,6 @@ steps:
     when:
       target:
         - add-resource-to-whitelist-dev
-      branch:
-        - develop
 
   - name: add resource to whitelist prod
     image: node:18.12.1
@@ -1084,7 +1069,6 @@ trigger:
     - remove-resource-from-whitelist-dev
     - remove-resource-from-whitelist-prod
   branch:
-    - develop
     - main
 
 steps:
@@ -1113,8 +1097,6 @@ steps:
     when:
       target:
         - remove-resource-from-whitelist-dev
-      branch:
-        - develop
 
   - name: remove resource from whitelist prod
     image: node:18.12.1
@@ -1146,7 +1128,6 @@ trigger:
     - transfer-ownership-whitelist-smart-contract-dev
     - transfer-ownership-whitelist-smart-contract-prod
   branch:
-    - develop
     - main
 
 steps:
@@ -1176,7 +1157,7 @@ steps:
       target:
         - transfer-ownership-whitelist-smart-contract-dev
       branch:
-        - develop
+        - main
 
   - name: transfer ownsership prod
     image: node:18.12.1
@@ -1260,7 +1241,6 @@ trigger:
     - configure-ens-dev
     - configure-ens-prod
   branch:
-    - develop
     - main
 
 steps:
