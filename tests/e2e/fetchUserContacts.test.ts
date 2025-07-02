@@ -4,7 +4,7 @@ import {
 } from '@iexec/dataprotector';
 import { beforeAll, describe, expect, it } from '@jest/globals';
 import { HDNodeWallet, Wallet } from 'ethers';
-import { WEB3TELEGRAM_DAPP_ADDRESS } from '../../src/config/config.js';
+import { CHAIN_CONFIG, CHAIN_IDS } from '../../src/config/config.js';
 import { IExecWeb3telegram, WorkflowError } from '../../src/index.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
@@ -45,13 +45,13 @@ describe('web3telegram.fetchMyContacts()', () => {
       const user1 = Wallet.createRandom().address;
       const user2 = Wallet.createRandom().address;
       await dataProtector.grantAccess({
-        authorizedApp: WEB3TELEGRAM_DAPP_ADDRESS,
+        authorizedApp: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].dappAddress,
         protectedData: protectedData1.address,
         authorizedUser: user1,
       });
 
       await dataProtector.grantAccess({
-        authorizedApp: WEB3TELEGRAM_DAPP_ADDRESS,
+        authorizedApp: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].dappAddress,
         protectedData: protectedData2.address,
         authorizedUser: user2,
       });
@@ -72,7 +72,7 @@ describe('web3telegram.fetchMyContacts()', () => {
     async () => {
       const userWithAccess = Wallet.createRandom().address;
       await dataProtector.grantAccess({
-        authorizedApp: WEB3TELEGRAM_DAPP_ADDRESS,
+        authorizedApp: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].dappAddress,
         protectedData: protectedData1.address,
         authorizedUser: userWithAccess,
       });
