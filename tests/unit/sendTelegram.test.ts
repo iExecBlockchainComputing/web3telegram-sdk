@@ -1,14 +1,16 @@
 import { expect, it, jest } from '@jest/globals';
 import { type SendTelegram } from '../../src/web3telegram/sendTelegram.js';
-import { getRandomAddress, TEST_CHAIN } from '../test-utils.js';
-import {
-  WEB3TELEGRAM_DAPP_ADDRESS,
-  WHITELIST_SMART_CONTRACT_ADDRESS,
-} from '../../src/config/config.js';
+import { getRandomAddress } from '../test-utils.js';
+import { CHAIN_CONFIG, CHAIN_IDS } from '../../src/config/config.js';
 import { mockAllForSendTelegram } from '../utils/mockAllForSendTelegram.js';
 
 jest.unstable_mockModule('../../src/utils/subgraphQuery.js', () => ({
   checkProtectedDataValidity: jest.fn(),
+}));
+
+jest.unstable_mockModule('../../src/utils/ipfs-service.js', () => ({
+  add: jest.fn(() => Promise.resolve('QmSBoN71925mWJ6acehqDLQrrxihxX55EXrqHxpYja4HCG')),
+  get: jest.fn(() => Promise.resolve(new ArrayBuffer(8))),
 }));
 
 describe('sendTelegram', () => {
@@ -33,10 +35,13 @@ describe('sendTelegram', () => {
 
         await expect(
           sendTelegram({
-            // @ts-expect-error No need for graphQLClient here
-            graphQLClient: {},
-            // @ts-expect-error No need for iexec here
-            iexec: {},
+            graphQLClient: { request: jest.fn() } as any,
+            iexec: mockAllForSendTelegram() as any,
+            workerpoolAddressOrEns: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].prodWorkerpoolAddress,
+            dappAddressOrENS: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].dappAddress,
+            dappWhitelistAddress: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].whitelistSmartContract,
+            ipfsNode: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].ipfsUploadUrl,
+            ipfsGateway: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].ipfsGateway,
             senderName: 'AB', // Trop court, déclenche l'erreur Yup
             ...sendTelegramParams,
           })
@@ -63,10 +68,13 @@ describe('sendTelegram', () => {
 
         await expect(
           sendTelegram({
-            // @ts-expect-error No need for graphQLClient here
-            graphQLClient: {},
-            // @ts-expect-error No need for iexec here
-            iexec: {},
+            graphQLClient: { request: jest.fn() } as any,
+            iexec: mockAllForSendTelegram() as any,
+            workerpoolAddressOrEns: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].prodWorkerpoolAddress,
+            dappAddressOrENS: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].dappAddress,
+            dappWhitelistAddress: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].whitelistSmartContract,
+            ipfsNode: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].ipfsUploadUrl,
+            ipfsGateway: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].ipfsGateway,
             senderName: 'AB', // Trop court, déclenche l'erreur Yup
             ...sendTelegramParams,
           })
@@ -93,10 +101,13 @@ describe('sendTelegram', () => {
 
         await expect(
           sendTelegram({
-            // @ts-expect-error No need for graphQLClient here
-            graphQLClient: {},
-            // @ts-expect-error No need for iexec here
-            iexec: {},
+            graphQLClient: { request: jest.fn() } as any,
+            iexec: mockAllForSendTelegram() as any,
+            workerpoolAddressOrEns: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].prodWorkerpoolAddress,
+            dappAddressOrENS: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].dappAddress,
+            dappWhitelistAddress: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].whitelistSmartContract,
+            ipfsNode: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].ipfsUploadUrl,
+            ipfsGateway: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].ipfsGateway,
             ...sendTelegramParams,
           })
         ).rejects.toMatchObject({
@@ -121,15 +132,16 @@ describe('sendTelegram', () => {
         };
 
         await expect(
-          // --- WHEN
           sendTelegram({
-            // @ts-expect-error No need for graphQLClient here
-            graphQLClient: {},
-            // @ts-expect-error No need for iexec here
-            iexec: {},
+            graphQLClient: { request: jest.fn() } as any,
+            iexec: mockAllForSendTelegram() as any,
+            workerpoolAddressOrEns: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].prodWorkerpoolAddress,
+            dappAddressOrENS: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].dappAddress,
+            dappWhitelistAddress: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].whitelistSmartContract,
+            ipfsNode: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].ipfsUploadUrl,
+            ipfsGateway: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].ipfsGateway,
             ...sendTelegramParams,
           })
-          // --- THEN
         ).rejects.toMatchObject({
           message: 'Failed to sendTelegram',
           cause: expect.objectContaining({
@@ -154,15 +166,16 @@ describe('sendTelegram', () => {
         };
 
         await expect(
-          // --- WHEN
           sendTelegram({
-            // @ts-expect-error No need for graphQLClient here
-            graphQLClient: {},
-            // @ts-expect-error No need for iexec here
-            iexec: {},
+            graphQLClient: { request: jest.fn() } as any,
+            iexec: mockAllForSendTelegram() as any,
+            workerpoolAddressOrEns: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].prodWorkerpoolAddress,
+            dappAddressOrENS: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].dappAddress,
+            dappWhitelistAddress: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].whitelistSmartContract,
+            ipfsNode: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].ipfsUploadUrl,
+            ipfsGateway: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].ipfsGateway,
             ...sendTelegramParams,
           })
-          // --- THEN
         ).rejects.toMatchObject({
           message: 'Failed to sendTelegram',
           cause: expect.objectContaining({
@@ -187,21 +200,19 @@ describe('sendTelegram', () => {
       checkProtectedDataValidity.mockResolvedValue(true);
 
       const protectedData = getRandomAddress().toLowerCase();
-      const iexec = mockAllForSendTelegram();
+      const iexec = mockAllForSendTelegram() as any;
 
       const userAddress = await iexec.wallet.getAddress();
 
       // --- WHEN
       await sendTelegram({
-        // @ts-expect-error No need for graphQLClient here
-        graphQLClient: {},
-        // @ts-expect-error No need for iexec here
+        graphQLClient: { request: jest.fn() } as any,
         iexec,
-        // // @ts-expect-error No need
-        // ipfsNode: "",
-        // ipfsGateway: this.ipfsGateway,
-        dappAddressOrENS: WEB3TELEGRAM_DAPP_ADDRESS,
-        dappWhitelistAddress: WHITELIST_SMART_CONTRACT_ADDRESS.toLowerCase(),
+        workerpoolAddressOrEns: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].prodWorkerpoolAddress,
+        dappAddressOrENS: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].dappAddress,
+        dappWhitelistAddress: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].whitelistSmartContract,
+        ipfsNode: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].ipfsUploadUrl,
+        ipfsGateway: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].ipfsGateway,
         telegramContent: 'e2e telegram content for test',
         protectedData,
       });
@@ -211,8 +222,8 @@ describe('sendTelegram', () => {
       expect(iexec.orderbook.fetchWorkerpoolOrderbook).toHaveBeenNthCalledWith(
         1,
         {
-          workerpool: TEST_CHAIN.prodWorkerpool,
-          app: WEB3TELEGRAM_DAPP_ADDRESS.toLowerCase(),
+          workerpool: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].prodWorkerpoolAddress,
+          app: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].dappAddress.toLowerCase(),
           dataset: protectedData,
           requester: userAddress,
           isRequesterStrict: false,
@@ -224,8 +235,8 @@ describe('sendTelegram', () => {
       expect(iexec.orderbook.fetchWorkerpoolOrderbook).toHaveBeenNthCalledWith(
         2,
         {
-          workerpool: TEST_CHAIN.prodWorkerpool,
-          app: WHITELIST_SMART_CONTRACT_ADDRESS.toLowerCase(),
+          workerpool: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].prodWorkerpoolAddress,
+          app: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].whitelistSmartContract.toLowerCase(),
           dataset: protectedData,
           requester: userAddress,
           isRequesterStrict: false,
@@ -237,8 +248,8 @@ describe('sendTelegram', () => {
       expect(iexec.orderbook.fetchWorkerpoolOrderbook).toHaveBeenNthCalledWith(
         2,
         {
-          workerpool: TEST_CHAIN.prodWorkerpool,
-          app: WHITELIST_SMART_CONTRACT_ADDRESS.toLowerCase(),
+          workerpool: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].prodWorkerpoolAddress,
+          app: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].whitelistSmartContract.toLowerCase(),
           dataset: protectedData,
           requester: userAddress,
           isRequesterStrict: false,
