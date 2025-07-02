@@ -242,7 +242,7 @@ export const ensureSufficientStake = async (
 
   if (BigInt(account.stake.toString()) < BigInt(requiredStake.toString())) {
     await setNRlcBalance(walletAddress, requiredStake);
-    await iexec.account.deposit(requiredStake);
+    await iexec.account.deposit(requiredStake.toString());
   }
 };
 
