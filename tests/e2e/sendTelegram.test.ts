@@ -4,10 +4,7 @@ import {
 } from '@iexec/dataprotector';
 import { beforeAll, describe, expect, it } from '@jest/globals';
 import { HDNodeWallet } from 'ethers';
-import {
-  WEB3TELEGRAM_DAPP_ADDRESS,
-  WHITELIST_SMART_CONTRACT_ADDRESS,
-} from '../../src/config/config.js';
+import { CHAIN_CONFIG, CHAIN_IDS } from '../../src/config/config.js';
 import { IExecWeb3telegram, WorkflowError } from '../../src/index.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
@@ -67,7 +64,7 @@ describe('web3telegram.sendTelegram()', () => {
     const resourceProvider = new IExec({ ethProvider }, iexecOptions);
     await createAndPublishAppOrders(
       resourceProvider,
-      WEB3TELEGRAM_DAPP_ADDRESS
+      CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].dappAddress
     );
 
     learnProdWorkerpoolAddress = await resourceProvider.ens.resolveName(
@@ -104,7 +101,7 @@ describe('web3telegram.sendTelegram()', () => {
       iexecOptions
     );
     await dataProtector.grantAccess({
-      authorizedApp: WEB3TELEGRAM_DAPP_ADDRESS,
+      authorizedApp: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].dappAddress,
       protectedData: validProtectedData.address,
       authorizedUser: consumerWallet.address, // consumer wallet
       numberOfAccess: 1000,
@@ -297,7 +294,7 @@ describe('web3telegram.sendTelegram()', () => {
 
       //grant access to whitelist
       await dataProtector.grantAccess({
-        authorizedApp: WHITELIST_SMART_CONTRACT_ADDRESS, //whitelist address
+        authorizedApp: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].whitelistSmartContract, //whitelist address
         protectedData: protectedDataForWhitelist.address,
         authorizedUser: consumerWallet.address, // consumer wallet
         numberOfAccess: 1000,
@@ -462,8 +459,8 @@ describe('web3telegram.sendTelegram()', () => {
           expect(sendTelegramResponse.taskId).toBeDefined();
         },
         2 * MAX_EXPECTED_BLOCKTIME +
-          MAX_EXPECTED_WEB2_SERVICES_TIME +
-          MAX_EXPECTED_SUBGRAPH_INDEXING_TIME
+        MAX_EXPECTED_WEB2_SERVICES_TIME +
+        MAX_EXPECTED_SUBGRAPH_INDEXING_TIME
       );
     });
 
@@ -519,8 +516,8 @@ describe('web3telegram.sendTelegram()', () => {
             );
           },
           2 * MAX_EXPECTED_BLOCKTIME +
-            MAX_EXPECTED_WEB2_SERVICES_TIME +
-            MAX_EXPECTED_SUBGRAPH_INDEXING_TIME
+          MAX_EXPECTED_WEB2_SERVICES_TIME +
+          MAX_EXPECTED_SUBGRAPH_INDEXING_TIME
         );
         it(
           'should create task if user approves the non sponsored amount',
@@ -570,8 +567,8 @@ describe('web3telegram.sendTelegram()', () => {
             expect(sendTelegramResponse.taskId).toBeDefined();
           },
           2 * MAX_EXPECTED_BLOCKTIME +
-            MAX_EXPECTED_WEB2_SERVICES_TIME +
-            MAX_EXPECTED_SUBGRAPH_INDEXING_TIME
+          MAX_EXPECTED_WEB2_SERVICES_TIME +
+          MAX_EXPECTED_SUBGRAPH_INDEXING_TIME
         );
       });
       describe('and workerpoolMaxPrice does NOT covers the non sponsored amount', () => {
@@ -623,8 +620,8 @@ describe('web3telegram.sendTelegram()', () => {
             );
           },
           2 * MAX_EXPECTED_BLOCKTIME +
-            MAX_EXPECTED_WEB2_SERVICES_TIME +
-            MAX_EXPECTED_SUBGRAPH_INDEXING_TIME
+          MAX_EXPECTED_WEB2_SERVICES_TIME +
+          MAX_EXPECTED_SUBGRAPH_INDEXING_TIME
         );
       });
     });

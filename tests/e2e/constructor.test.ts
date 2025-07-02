@@ -2,15 +2,12 @@
 // needed to access and assert IExecDataProtector's private properties
 import { describe, expect, it } from '@jest/globals';
 import { Wallet } from 'ethers';
-import {
-  DATAPROTECTOR_SUBGRAPH_ENDPOINT,
-  DEFAULT_IPFS_GATEWAY,
-} from '../../src/config/config.js';
 import { IExecWeb3telegram } from '../../src/index.js';
 import {
   getTestWeb3SignerProvider,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
 } from '../test-utils.js';
+import { CHAIN_CONFIG, CHAIN_IDS } from '../../src/config/config.js';
 
 describe('IExecWeb3telegram()', () => {
   it('instantiates with a valid ethProvider', async () => {
@@ -26,8 +23,9 @@ describe('IExecWeb3telegram()', () => {
     const web3telegram = new IExecWeb3telegram(
       getTestWeb3SignerProvider(wallet.privateKey)
     );
+    await web3telegram.init();
     const ipfsGateway = web3telegram['ipfsGateway'];
-    expect(ipfsGateway).toStrictEqual(DEFAULT_IPFS_GATEWAY);
+    expect(ipfsGateway).toStrictEqual(CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].ipfsGateway);
   });
 
   it('should use provided ipfs gateway url when ipfsGateway is provided', async () => {
@@ -39,6 +37,7 @@ describe('IExecWeb3telegram()', () => {
         ipfsGateway: customIpfsGateway,
       }
     );
+    await web3telegram.init();
     const ipfsGateway = web3telegram['ipfsGateway'];
     expect(ipfsGateway).toStrictEqual(customIpfsGateway);
   });
@@ -48,8 +47,9 @@ describe('IExecWeb3telegram()', () => {
     const web3telegram = new IExecWeb3telegram(
       getTestWeb3SignerProvider(wallet.privateKey)
     );
+    await web3telegram.init();
     const graphQLClientUrl = web3telegram['graphQLClient'];
-    expect(graphQLClientUrl['url']).toBe(DATAPROTECTOR_SUBGRAPH_ENDPOINT);
+    expect(graphQLClientUrl['url']).toBe(CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].dataProtectorSubgraph);
   });
 
   it('should use provided data Protector Subgraph URL when subgraphUrl is provided', async () => {
@@ -61,6 +61,7 @@ describe('IExecWeb3telegram()', () => {
         dataProtectorSubgraph: customSubgraphUrl,
       }
     );
+    await web3telegram.init();
     const graphQLClient = web3telegram['graphQLClient'];
     expect(graphQLClient['url']).toBe(customSubgraphUrl);
   });
@@ -89,6 +90,7 @@ describe('IExecWeb3telegram()', () => {
         dappWhitelistAddress: customDappWhitelistAddress,
       }
     );
+    await web3telegram.init();
     const graphQLClient = web3telegram['graphQLClient'];
     const ipfsNode = web3telegram['ipfsNode'];
     const ipfsGateway = web3telegram['ipfsGateway'];
@@ -100,7 +102,7 @@ describe('IExecWeb3telegram()', () => {
     expect(ipfsNode).toStrictEqual(customIpfsNode);
     expect(ipfsGateway).toStrictEqual(customIpfsGateway);
     expect(dappAddressOrENS).toStrictEqual(customDapp);
-    expect(whitelistAddress).toStrictEqual(customDappWhitelistAddress);
+    expect(whitelistAddress).toStrictEqual(customDappWhitelistAddress.toLowerCase());
     expect(await iexec.config.resolveSmsURL()).toBe(smsURL);
     expect(await iexec.config.resolveIexecGatewayURL()).toBe(iexecGatewayURL);
   });

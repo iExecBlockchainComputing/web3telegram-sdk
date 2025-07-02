@@ -74,19 +74,19 @@ export type SubgraphConsumer = {
 export type Web3TelegramConfigOptions = {
   /**
    * The Ethereum contract address or ENS (Ethereum Name Service) for the telegram sender dapp.
-   * If not provided, the default web3telegram address will be used.
+   * If not provided, the default web3telegram address for the detected chain will be used.
    */
   dappAddressOrENS?: AddressOrENS;
 
   /**
    * The Ethereum contract address for the whitelist.
-   * If not provided, the default whitelist smart contract address will be used.
+   * If not provided, the default whitelist smart contract address for the detected chain will be used.
    */
   dappWhitelistAddress?: Address;
 
   /**
    * The subgraph URL for querying data.
-   * If not provided, the default data protector subgraph URL will be used.
+   * If not provided, the default data protector subgraph URL for the detected chain will be used.
    */
   dataProtectorSubgraph?: string;
 
@@ -98,13 +98,13 @@ export type Web3TelegramConfigOptions = {
 
   /**
    * The IPFS node URL.
-   * If not provided, the default IPFS node URL will be used.
+   * If not provided, the default IPFS node URL for the detected chain will be used.
    */
   ipfsNode?: string;
 
   /**
    * The IPFS gateway URL.
-   * If not provided, the default IPFS gateway URL will be used.
+   * If not provided, the default IPFS gateway URL for the detected chain will be used.
    */
   ipfsGateway?: string;
 };

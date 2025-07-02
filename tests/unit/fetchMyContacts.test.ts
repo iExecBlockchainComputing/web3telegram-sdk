@@ -1,9 +1,6 @@
 import { describe, expect, it, jest } from '@jest/globals';
 import { Address } from 'iexec';
-import {
-  WEB3TELEGRAM_DAPP_ADDRESS,
-  WHITELIST_SMART_CONTRACT_ADDRESS,
-} from '../../src/config/config.js';
+import { CHAIN_CONFIG, CHAIN_IDS } from '../../src/config/config.js';
 import { type FetchMyContacts } from '../../src/web3telegram/fetchMyContacts.js';
 import { getRandomAddress } from '../test-utils.js';
 
@@ -78,15 +75,15 @@ describe('fetchMyContacts', () => {
       iexec: iexec,
       // @ts-expect-error No need for graphQLClient here
       graphQLClient: {},
-      dappAddressOrENS: WEB3TELEGRAM_DAPP_ADDRESS,
-      dappWhitelistAddress: WHITELIST_SMART_CONTRACT_ADDRESS,
+      dappAddressOrENS: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].dappAddress,
+      dappWhitelistAddress: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].whitelistSmartContract,
     });
     const userAddress = (await iexec.wallet.getAddress()).toLowerCase();
     expect(iexec.orderbook.fetchDatasetOrderbook).toHaveBeenNthCalledWith(
       1,
       'any',
       {
-        app: WEB3TELEGRAM_DAPP_ADDRESS.toLowerCase(),
+        app: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].dappAddress.toLowerCase(),
         requester: userAddress,
         isAppStrict: true,
         isRequesterStrict: false,
@@ -97,7 +94,7 @@ describe('fetchMyContacts', () => {
       2,
       'any',
       {
-        app: WHITELIST_SMART_CONTRACT_ADDRESS.toLowerCase(),
+        app: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].whitelistSmartContract.toLowerCase(),
         requester: userAddress,
         isAppStrict: true,
         isRequesterStrict: false,
@@ -143,8 +140,8 @@ describe('fetchMyContacts', () => {
       iexec: iexec,
       // @ts-expect-error No need for graphQLClient here
       graphQLClient: {},
-      dappAddressOrENS: WEB3TELEGRAM_DAPP_ADDRESS,
-      dappWhitelistAddress: WHITELIST_SMART_CONTRACT_ADDRESS,
+      dappAddressOrENS: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].dappAddress,
+      dappWhitelistAddress: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].whitelistSmartContract,
       isUserStrict: true,
     });
     const userAddress = (await iexec.wallet.getAddress()).toLowerCase();
@@ -152,7 +149,7 @@ describe('fetchMyContacts', () => {
       1,
       'any',
       {
-        app: WEB3TELEGRAM_DAPP_ADDRESS.toLowerCase(),
+        app: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].dappAddress.toLowerCase(),
         requester: userAddress,
         isAppStrict: true,
         isRequesterStrict: true,
@@ -163,7 +160,7 @@ describe('fetchMyContacts', () => {
       2,
       'any',
       {
-        app: WHITELIST_SMART_CONTRACT_ADDRESS.toLowerCase(),
+        app: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].whitelistSmartContract.toLowerCase(),
         requester: userAddress,
         isAppStrict: true,
         isRequesterStrict: true,
