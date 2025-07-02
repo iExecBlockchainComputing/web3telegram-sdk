@@ -7,7 +7,7 @@ import { IExec, utils } from 'iexec';
 import { randomInt } from 'crypto';
 import { getSignerFromPrivateKey } from 'iexec/utils';
 
-const TEST_CHAIN = {
+export const TEST_CHAIN = {
   rpcURL: 'http://localhost:8545',
   chainId: '134',
   smsURL: 'http://127.0.0.1:13300',
