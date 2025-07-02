@@ -1,0 +1,86 @@
+name: web3telegram SDK - CI
+
+on:
+  pull_request:
+    branches:
+      - '*'
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'tsconfig*.json'
+      - '.eslintrc.json'
+      - '.prettierrc'
+
+concurrency:
+  group: ${{ github.ref }}-sdk-ci
+  cancel-in-progress: true
+
+jobs:
+  check-code:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Check formatting
+        run: npm run check-format
+
+      - name: Check types
+        run: npm run check-types
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Test unit
+        run: npm run test:unit
+
+      - name: Start e2e test stack
+        run: npm run start-test-stack
+
+      - name: Test e2e
+        run: npm run test:e2e
+
+      - name: Stop e2e test stack
+        if: always()
+        run: npm run stop-test-stack
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: publish dry-run
+        run: npm publish --dry-run

@@ -1,0 +1,89 @@
+name: web3telegram DApp - CI
+
+on:
+  pull_request:
+    branches:
+      - '*'
+    paths:
+      - 'dapp/**'
+      - 'dapp/package.json'
+      - 'dapp/package-lock.json'
+      - 'dapp/.eslintrc.json'
+      - 'dapp/.prettierrc'
+
+concurrency:
+  group: ${{ github.ref }}-dapp-ci
+  cancel-in-progress: true
+
+jobs:
+  check-code:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./dapp
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 14
+          cache: 'npm'
+          cache-dependency-path: dapp/package-lock.json
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Check formatting
+        run: npm run check-format
+
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./dapp
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 14
+          cache: 'npm'
+          cache-dependency-path: dapp/package-lock.json
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Test unit
+        run: npm run test
+
+      - name: Test with coverage
+        run: npm run ctest
+
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./dapp
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 14
+          cache: 'npm'
+          cache-dependency-path: dapp/package-lock.json
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Format check
+        run: npm run check-format
+
+      - name: Lint check
+        run: npm run lint
+
+      - name: Test build
+        run: npm run test
