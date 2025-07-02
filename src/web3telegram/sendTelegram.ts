@@ -3,7 +3,6 @@ import {
   MAX_DESIRED_APP_ORDER_PRICE,
   MAX_DESIRED_DATA_ORDER_PRICE,
   MAX_DESIRED_WORKERPOOL_ORDER_PRICE,
-  PROD_WORKERPOOL_ADDRESS,
 } from '../config/config.js';
 import { handleIfProtocolError, WorkflowError } from '../utils/errors.js';
 import { generateSecureUniqueId } from '../utils/generateUniqueId.js';
@@ -39,7 +38,7 @@ export type SendTelegram = typeof sendTelegram;
 export const sendTelegram = async ({
   graphQLClient = throwIfMissing(),
   iexec = throwIfMissing(),
-  workerpoolAddressOrEns = PROD_WORKERPOOL_ADDRESS,
+  workerpoolAddressOrEns = throwIfMissing(),
   dappAddressOrENS,
   dappWhitelistAddress,
   ipfsNode,
@@ -238,8 +237,8 @@ export const sendTelegram = async ({
     // Push telegram message to IPFS
     const cid = await ipfs
       .add(encryptedFile, {
-        ipfsNode: ipfsNode,
-        ipfsGateway: ipfsGateway,
+        ipfsNode,
+        ipfsGateway,
       })
       .catch((e) => {
         throw new WorkflowError({
