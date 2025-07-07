@@ -1,0 +1,163 @@
+name: Deploy DApp Contract
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        type: choice
+        options:
+          - dapp-dev
+          - dapp-prod
+      image-tag:
+        description: 'Tag for the dapp image to sconify'
+        required: true
+        type: string
+        default: 'latest'
+      sconify-version:
+        description: 'Version of the sconify image to use'
+        type: string
+        default: '5.7.6-v15'
+
+env:
+  DEPLOY_ENVIRONMENT: ${{ inputs.environment }}
+
+jobs:
+  sconify:
+    uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/sconify.yml@sconify-v1.0.0
+    with:
+      image-name: product/web3telegram-dapp
+      image-tag: ${{ inputs.image-tag }}
+      sconify-debug: false
+      sconify-prod: true
+      docker-registry: docker.io
+      sconify-version: ${{ inputs.sconify-version }}
+      binary: /usr/local/bin/node
+      command: node /app/src/app.js
+      host-path: |
+        /etc/hosts
+        /etc/resolv.conf
+      binary-fs: true
+      fs-dir: /app
+      heap: 1G
+      dlopen: 1
+      mprotect: 1
+      docker-username: ${{ vars.DOCKERHUB_USERNAME }}
+      scontain-username: ${{ secrets.SCONTAIN_REGISTRY_USERNAME }}
+    secrets:
+      docker-password: ${{ secrets.DOCKERHUB_PAT }}
+      scontain-password: ${{ secrets.SCONTAIN_REGISTRY_PAT }}
+      scone-signing-key: ${{ secrets.SCONIFY_SIGNING_PRIVATE_KEY }}
+
+  display-sconify-results:
+    runs-on: ubuntu-latest
+    needs: sconify
+    steps:
+      - name: Display Sconify Results
+        run: |
+          echo "## Sconify Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          echo "### Production Image" >> $GITHUB_STEP_SUMMARY
+          echo "- **Image**: ${{ needs.sconify.outputs.prod-image }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Checksum**: ${{ needs.sconify.outputs.prod-checksum }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **MrEnclave**: ${{ needs.sconify.outputs.prod-mrenclave }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          echo "### Summary" >> $GITHUB_STEP_SUMMARY
+          echo "Sconification completed successfully!" >> $GITHUB_STEP_SUMMARY
+
+  deploy-dapp:
+    runs-on: ubuntu-latest
+    needs: sconify
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.19'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          cd node_modules/whitelist-smart-contract
+          npm install --save-dev ts-node
+          cd ../../deployment-dapp
+          npm ci
+
+            - name: Create scone fingerprint file
+        run: |
+          MRENCLAVE="${{ needs.sconify.outputs.prod-mrenclave }}"
+          echo "$MRENCLAVE" > deployment-dapp/.scone-fingerprint
+
+      - name: Deploy dapp contract
+        env:
+          DEPLOY_ENVIRONMENT: ${{ inputs.environment }}
+          WALLET_PRIVATE_KEY_DEV: ${{ secrets.WEB3TELEGRAM_DAPP_OWNER_DEV_PRIVATEKEY }}
+          WALLET_PRIVATE_KEY_PROD: ${{ secrets.WEB3TELEGRAM_DAPP_OWNER_PROD_PRIVATEKEY }}
+          DOCKER_IMAGE_CHECKSUM_DEV: ${{ needs.sconify.outputs.prod-checksum }}
+          DOCKER_IMAGE_CHECKSUM_PROD: ${{ needs.sconify.outputs.prod-checksum }}
+        run: |
+          cd deployment-dapp
+          npm run deploy-dapp
+
+      - name: Push dapp secret
+        env:
+          DEPLOY_ENVIRONMENT: ${{ inputs.environment }}
+          WALLET_PRIVATE_KEY_DEV: ${{ secrets.WEB3TELEGRAM_DAPP_OWNER_DEV_PRIVATEKEY }}
+          WALLET_PRIVATE_KEY_PROD: ${{ secrets.WEB3TELEGRAM_DAPP_OWNER_PROD_PRIVATEKEY }}
+          TELEGRAM_BOT_TOKEN_DEV: ${{ secrets.TELEGRAM_BOT_TOKEN_DEV }}
+          TELEGRAM_BOT_TOKEN_PROD: ${{ secrets.TELEGRAM_BOT_TOKEN_PROD }}
+        run: |
+          cd deployment-dapp
+          npm run push-dapp-secret
+
+      - name: Publish free sell order
+        env:
+          DEPLOY_ENVIRONMENT: ${{ inputs.environment }}
+          WALLET_PRIVATE_KEY_DEV: ${{ secrets.WEB3TELEGRAM_DAPP_OWNER_DEV_PRIVATEKEY }}
+          WALLET_PRIVATE_KEY_PROD: ${{ secrets.WEB3TELEGRAM_DAPP_OWNER_PROD_PRIVATEKEY }}
+          PRICE: '0'
+          VOLUME: '1000000000'
+        run: |
+          cd deployment-dapp
+          npm run publish-sell-order
+
+      - name: Add resource to whitelist (dev)
+        if: inputs.environment == 'dapp-dev'
+        env:
+          WALLET_PRIVATE_KEY: ${{ secrets.DEPLOYER_DEV_PRIVATEKEY }}
+          CONTRACT_ADDRESS: ${{ secrets.WEB3TELEGRAM_WHITELIST_DEV_ADDRESS }}
+        run: |
+          cd node_modules/whitelist-smart-contract
+          export ADDRESS_TO_ADD=$(cat ../../deployment-dapp/.app-address) && npm run addResourceToWhitelist
+
+      - name: Add resource to whitelist (prod)
+        if: inputs.environment == 'dapp-prod'
+        env:
+          WALLET_PRIVATE_KEY: ${{ secrets.DEPLOYER_PROD_PRIVATEKEY }}
+          CONTRACT_ADDRESS: ${{ secrets.WEB3TELEGRAM_WHITELIST_PROD_ADDRESS }}
+        run: |
+          cd node_modules/whitelist-smart-contract
+          export ADDRESS_TO_ADD=$(cat ../../deployment-dapp/.app-address) && npm run addResourceToWhitelist
+
+      - name: Configure ENS
+        env:
+          DEPLOY_ENVIRONMENT: ${{ inputs.environment }}
+          WALLET_PRIVATE_KEY_DEV: ${{ secrets.WEB3TELEGRAM_DAPP_OWNER_DEV_PRIVATEKEY }}
+          WALLET_PRIVATE_KEY_PROD: ${{ secrets.WEB3TELEGRAM_DAPP_OWNER_PROD_PRIVATEKEY }}
+        run: |
+          cd deployment-dapp
+          npm run configure-ens
+
+      - name: Upload deployment artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployment-artifacts
+          path: |
+            deployment-dapp/.app-address
+            deployment-dapp/.scone-fingerprint

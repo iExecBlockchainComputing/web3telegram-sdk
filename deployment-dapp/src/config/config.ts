@@ -27,17 +27,19 @@ const dappVersion = JSON.parse(
 export const DOCKER_IMAGE_NAMESPACE = 'iexechub';
 export const DOCKER_IMAGE_REPOSITORY = 'web3telegram-dapp';
 export const DOCKER_IMAGE_PROD_TAG = `${dappVersion}-sconify-${SCONIFIER_VERSION}-production`;
-export const DOCKER_IMAGE_DEV_TAG = `dev-${process.env.DRONE_COMMIT}-sconify-${SCONIFIER_VERSION}-production`;
+export const DOCKER_IMAGE_DEV_TAG = `dev-${
+  process.env.GITHUB_SHA || 'latest'
+}-sconify-${SCONIFIER_VERSION}-production`;
 
-//drone target
-export const DRONE_TARGET_DEPLOY_DEV = 'dapp-dev';
-export const DRONE_TARGET_DEPLOY_PROD = 'dapp-prod';
-export const DRONE_TARGET_SELL_ORDER_DEV = 'dapp-publish-sell-order-dev';
-export const DRONE_TARGET_SELL_ORDER_PROD = 'dapp-publish-sell-order-prod';
-export const DRONE_TARGET_REVOKE_SELL_ORDER_DEV = 'dapp-revoke-sell-order-dev';
-export const DRONE_TARGET_REVOKE_SELL_ORDER_PROD =
+//deployment targets for GitHub Actions
+export const DEPLOY_TARGET_DEV = 'dapp-dev';
+export const DEPLOY_TARGET_PROD = 'dapp-prod';
+export const DEPLOY_TARGET_SELL_ORDER_DEV = 'dapp-publish-sell-order-dev';
+export const DEPLOY_TARGET_SELL_ORDER_PROD = 'dapp-publish-sell-order-prod';
+export const DEPLOY_TARGET_REVOKE_SELL_ORDER_DEV = 'dapp-revoke-sell-order-dev';
+export const DEPLOY_TARGET_REVOKE_SELL_ORDER_PROD =
   'dapp-revoke-sell-order-prod';
-export const DRONE_TARGET_PUSH_SECRET_DEV = 'dapp-push-secret-dev';
-export const DRONE_TARGET_PUSH_SECRET_PROD = 'dapp-push-secret-prod';
-export const DRONE_TARGET_CONFIGURE_ENS_DEV = 'configure-ens-dev';
-export const DRONE_TARGET_CONFIGURE_ENS_PROD = 'configure-ens-prod';
+export const DEPLOY_TARGET_PUSH_SECRET_DEV = 'dapp-push-secret-dev';
+export const DEPLOY_TARGET_PUSH_SECRET_PROD = 'dapp-push-secret-prod';
+export const DEPLOY_TARGET_CONFIGURE_ENS_DEV = 'configure-ens-dev';
+export const DEPLOY_TARGET_CONFIGURE_ENS_PROD = 'configure-ens-prod';
