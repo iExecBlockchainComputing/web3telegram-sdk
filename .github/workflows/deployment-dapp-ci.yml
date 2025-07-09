@@ -1,0 +1,40 @@
+name: web3telegram Deployment DApp - CI
+
+on:
+  pull_request:
+    branches:
+      - '*'
+    paths:
+      - 'deployment-dapp/**'
+      - 'deployment-dapp/package.json'
+      - 'deployment-dapp/package-lock.json'
+      - 'deployment-dapp/.eslintrc.json'
+      - 'deployment-dapp/.prettierrc'
+
+concurrency:
+  group: ${{ github.ref }}-deployment-dapp-ci
+  cancel-in-progress: true
+
+jobs:
+  check-code:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./deployment-dapp
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+          cache-dependency-path: deployment-dapp/package-lock.json
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Check formatting
+        run: npm run check-format

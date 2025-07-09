@@ -9,8 +9,6 @@ import {
   toBeHex,
 } from 'ethers';
 
-const { DRONE } = process.env;
-
 const VOUCHER_HUB_ADDRESS = '0x3137B6DF4f36D338b82260eDBB2E7bab034AFEda';
 const TARGET_VOUCHER_MANAGER_WALLET =
   '0x44cA21A3c4efE9B1A0268e2e9B2547E7d9C8f19C'; // Should be same wallet as TEST_CHAIN.voucherManagerWallet
@@ -24,7 +22,7 @@ const PROD_WORKERPOOL_ENS = 'prod-v8-bellecour.main.pools.iexec.eth';
 // TODO change to prod ens  when it's available
 const WEB3_TELEGRAM_DAPP_ADDRESS_ENS = 'web3telegram.apps.iexec.eth';
 
-const rpcURL = DRONE ? 'http://bellecour-fork:8545' : 'http://127.0.0.1:8545';
+const rpcURL = 'http://localhost:8545';
 
 const provider = new JsonRpcProvider(
   rpcURL,
@@ -43,7 +41,7 @@ const WEB3_TELEGRAM_DAPP_ADDRESS = await provider.resolveName(
 );
 
 const setBalance = async (address, weiAmount) => {
-  fetch(rpcURL, {
+  await fetch(rpcURL, {
     method: 'POST',
     body: JSON.stringify({
       method: 'anvil_setBalance',
