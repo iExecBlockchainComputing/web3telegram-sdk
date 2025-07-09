@@ -89,7 +89,7 @@ jobs:
           cd ../../deployment-dapp
           npm ci
 
-            - name: Create scone fingerprint file
+      - name: Create scone fingerprint file
         run: |
           MRENCLAVE="${{ needs.sconify.outputs.prod-mrenclave }}"
           echo "$MRENCLAVE" > deployment-dapp/.scone-fingerprint
