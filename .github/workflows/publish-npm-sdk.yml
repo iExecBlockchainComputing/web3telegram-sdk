@@ -10,7 +10,6 @@ on:
         options:
           - latest
           - nightly
-          - beta
         default: nightly
 
 jobs:
