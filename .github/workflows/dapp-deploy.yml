@@ -25,7 +25,7 @@ env:
 
 jobs:
   sconify:
-    uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/sconify.yml@sconify-v1.0.0
+    uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/sconify.yml@sconify-v2
     with:
       image-name: product/web3telegram-dapp
       image-tag: ${{ inputs.image-tag }}
