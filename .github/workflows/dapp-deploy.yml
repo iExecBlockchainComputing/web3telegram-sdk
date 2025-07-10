@@ -43,12 +43,12 @@ jobs:
       heap: 1G
       dlopen: 1
       mprotect: 1
-      docker-username: ${{ vars.DOCKERHUB_USERNAME }}
-      scontain-username: ${{ secrets.SCONTAIN_REGISTRY_USERNAME }}
     secrets:
       docker-password: ${{ secrets.DOCKERHUB_PAT }}
       scontain-password: ${{ secrets.SCONTAIN_REGISTRY_PAT }}
       scone-signing-key: ${{ secrets.SCONIFY_SIGNING_PRIVATE_KEY }}
+      docker-username: ${{ secrets.DOCKERHUB_USERNAME }}
+      scontain-username: ${{ secrets.SCONTAIN_REGISTRY_USERNAME }}
 
   display-sconify-results:
     runs-on: ubuntu-latest
