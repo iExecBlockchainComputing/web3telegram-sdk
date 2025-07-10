@@ -13,7 +13,7 @@ on:
       sconify-version:
         description: 'Version of the sconify image to use'
         type: string
-        default: '5.7.6-v15'
+        default: '5.9.0-v15'
 
 env:
   DEPLOY_ENVIRONMENT: ${{ inputs.environment }}
