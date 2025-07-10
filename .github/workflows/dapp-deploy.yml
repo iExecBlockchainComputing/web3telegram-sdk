@@ -22,8 +22,8 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
     outputs:
-      image-name: ${{ steps.build.outputs.image-name }}
-      image-tag: ${{ steps.build.outputs.image-tag }}
+      image-name: ${{ steps.set-outputs.outputs.image-name }}
+      image-tag: ${{ steps.set-outputs.outputs.image-tag }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -55,6 +55,7 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Set outputs
+        id: set-outputs
         run: |
           echo "image-name=iexechub/web3telegram-dapp" >> $GITHUB_OUTPUT
           echo "image-tag=${{ steps.version.outputs.version }}-non-tee" >> $GITHUB_OUTPUT
