@@ -50,12 +50,14 @@ jobs:
         with:
           context: ./dapp
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/product/web3telegram-dapp:${{ steps.version.outputs.version }}-non-tee
+          tags: iexechub/web3telegram-dapp:${{ steps.version.outputs.version }}-non-tee
           cache-from: type=gha
           cache-to: type=gha,mode=max
-        outputs:
-          image-name: ${{ secrets.DOCKERHUB_USERNAME }}/product/web3telegram-dapp
-          image-tag: ${{ steps.version.outputs.version }}-non-tee
+
+      - name: Set outputs
+        run: |
+          echo "image-name=iexechub/web3telegram-dapp" >> $GITHUB_OUTPUT
+          echo "image-tag=${{ steps.version.outputs.version }}-non-tee" >> $GITHUB_OUTPUT
 
   sconify:
     needs: build-and-push
