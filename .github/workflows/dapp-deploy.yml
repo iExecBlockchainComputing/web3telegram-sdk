@@ -106,7 +106,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
 
           echo "### Production Image" >> $GITHUB_STEP_SUMMARY
-          echo "- **Image**: ${{ needs.sconify.outputs.prod-image }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Image Tag**: ${{ needs.sconify.outputs.prod-image-tag }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Checksum**: ${{ needs.sconify.outputs.prod-checksum }}" >> $GITHUB_STEP_SUMMARY
           echo "- **MrEnclave**: ${{ needs.sconify.outputs.prod-mrenclave }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
@@ -140,16 +140,6 @@ jobs:
           MRENCLAVE="${{ needs.sconify.outputs.prod-mrenclave }}"
           echo "$MRENCLAVE" > deployment-dapp/.scone-fingerprint
 
-      - name: Create sconified image tag
-        id: sconified-tag
-        run: |
-          VERSION=$(node -p "require('./dapp/package.json').version")
-          if [ "${{ inputs.environment }}" = "dapp-dev" ]; then
-            echo "sconified-tag=dev-${VERSION}-scone-prod-${{ inputs.sconify-version }}" >> $GITHUB_OUTPUT
-          else
-            echo "sconified-tag=${VERSION}-scone-prod-${{ inputs.sconify-version }}" >> $GITHUB_OUTPUT
-          fi
-
       - name: Deploy dapp contract
         env:
           DEPLOY_ENVIRONMENT: ${{ inputs.environment }}
@@ -157,7 +147,7 @@ jobs:
           WALLET_PRIVATE_KEY_PROD: ${{ secrets.WEB3TELEGRAM_DAPP_OWNER_PROD_PRIVATEKEY }}
           DOCKER_IMAGE_CHECKSUM_DEV: ${{ needs.sconify.outputs.prod-checksum }}
           DOCKER_IMAGE_CHECKSUM_PROD: ${{ needs.sconify.outputs.prod-checksum }}
-          SCONIFIED_IMAGE_TAG: ${{ steps.sconified-tag.outputs.sconified-tag }}
+          SCONIFIED_IMAGE_TAG: ${{ needs.sconify.outputs.prod-image-tag }}
         run: |
           cd deployment-dapp
           npm run deploy-dapp

@@ -1,5 +1,3 @@
-import { readFileSync } from 'fs';
-
 //hosting url
 export const HOST = 'https://bellecour.iex.ec';
 
