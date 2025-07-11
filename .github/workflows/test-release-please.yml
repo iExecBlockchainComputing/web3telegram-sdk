@@ -30,7 +30,7 @@ jobs:
           node -p "require('./dapp/package.json').version"
           echo ""
           echo "Release-please manifest:"
-          cat .release-please-manifest.json
+          cat release-please-manifest.json
           echo ""
 
       - name: Debug release-please config
