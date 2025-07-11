@@ -1,0 +1,61 @@
+name: Test Release Please
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - test/release-please-debug
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  debug-release-please:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Debug package.json versions
+        run: |
+          echo "=== Package.json Versions ==="
+          echo "Root package.json version:"
+          node -p "require('./package.json').version"
+          echo ""
+          echo "DApp package.json version:"
+          node -p "require('./dapp/package.json').version"
+          echo ""
+          echo "Release-please manifest:"
+          cat .release-please-manifest.json
+          echo ""
+
+      - name: Debug release-please config
+        run: |
+          echo "=== Release-Please Config ==="
+          cat release-please-config.json
+          echo ""
+
+      - name: Debug recent commits
+        run: |
+          echo "=== Recent Commits ==="
+          git log --oneline -5
+          echo ""
+
+      - name: Test release-please dry run
+        uses: googleapis/release-please-action@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          target-branch: test/release-please-debug
+          dry-run: true
+          debug: true
+
+      - name: Test release-please with debug output
+        if: always()
+        run: |
+          echo "=== Release-Please Debug Output ==="
+          echo "This step will show any error messages from the previous step"
+          echo "Check the logs above for detailed error information"

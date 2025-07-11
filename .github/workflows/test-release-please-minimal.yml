@@ -1,0 +1,47 @@
+name: Test Release Please (Minimal Config)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  test-minimal-config:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Backup original config
+        run: |
+          cp release-please-config.json release-please-config-backup.json
+
+      - name: Use minimal config
+        run: |
+          cp release-please-config-test.json release-please-config.json
+
+      - name: Debug with minimal config
+        run: |
+          echo "=== Testing with minimal config ==="
+          cat release-please-config.json
+          echo ""
+          echo "Package version:"
+          node -p "require('./package.json').version"
+
+      - name: Test release-please minimal
+        uses: googleapis/release-please-action@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          target-branch: test/release-please-debug
+          dry-run: true
+          debug: true
+
+      - name: Restore original config
+        if: always()
+        run: |
+          cp release-please-config-backup.json release-please-config.json
