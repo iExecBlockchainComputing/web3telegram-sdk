@@ -26,18 +26,20 @@
     ".": {
       "release-type": "node",
       "changelog-path": "CHANGELOG.md",
+      "include-v-in-tag": true,
+
       "prerelease": true,
-      "prerelease-type": "alpha",
-      "bump-minor-pre-major": true,
-      "bump-patch-for-minor-pre-major": true
+      "prerelease-type": "beta",
+      "versioning": "prerelease"
     },
     "dapp": {
       "release-type": "node",
       "changelog-path": "dapp/CHANGELOG.md",
+      "include-v-in-tag": true,
+
       "prerelease": true,
-      "prerelease-type": "alpha",
-      "bump-minor-pre-major": true,
-      "bump-patch-for-minor-pre-major": true
+      "prerelease-type": "beta",
+      "versioning": "prerelease"
     }
   }
 } 
