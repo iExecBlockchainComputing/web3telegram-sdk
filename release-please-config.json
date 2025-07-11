@@ -30,14 +30,6 @@
       "prerelease": true,
       "prerelease-type": "alpha",
       "versioning": "prerelease"
-    },
-    "dapp": {
-      "release-type": "node",
-      "changelog-path": "dapp/CHANGELOG.md",
-      "include-v-in-tag": true,
-      "prerelease": true,
-      "prerelease-type": "alpha",
-      "versioning": "prerelease"
     }
   }
 } 
