@@ -71,7 +71,7 @@ jobs:
 
   sconify:
     needs: build-and-push
-    uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/sconify.yml@sconify-v2
+    uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/sconify.yml@sconify-v2.0.0
     with:
       image-name: ${{ needs.build-and-push.outputs.image-name }}
       image-tag: ${{ needs.build-and-push.outputs.image-tag }}
