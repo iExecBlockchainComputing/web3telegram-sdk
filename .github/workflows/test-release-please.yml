@@ -20,31 +20,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Debug package.json versions
-        run: |
-          echo "=== Package.json Versions ==="
-          echo "Root package.json version:"
-          node -p "require('./package.json').version"
-          echo ""
-          echo "DApp package.json version:"
-          node -p "require('./dapp/package.json').version"
-          echo ""
-          echo "Release-please manifest:"
-          cat release-please-manifest.json
-          echo ""
-
-      - name: Debug release-please config
-        run: |
-          echo "=== Release-Please Config ==="
-          cat release-please-config.json
-          echo ""
-
-      - name: Debug recent commits
-        run: |
-          echo "=== Recent Commits ==="
-          git log --oneline -5
-          echo ""
-
       - name: Test release-please dry run
         uses: googleapis/release-please-action@v4
         with:
