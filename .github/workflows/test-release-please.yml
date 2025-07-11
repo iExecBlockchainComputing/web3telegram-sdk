@@ -57,5 +57,4 @@ jobs:
         if: always()
         run: |
           echo "=== Release-Please Debug Output ==="
-          echo "This step will show any error messages from the previous step"
           echo "Check the logs above for detailed error information"
