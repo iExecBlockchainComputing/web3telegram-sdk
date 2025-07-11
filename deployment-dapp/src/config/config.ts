@@ -18,18 +18,12 @@ export const WEB3_TELEGRAM_ENS_DOMAIN = 'apps.iexec.eth';
 export const WEB3_TELEGRAM_ENS_NAME_DEV = `web3telegram-test.${WEB3_TELEGRAM_ENS_DOMAIN}`;
 export const WEB3_TELEGRAM_ENS_NAME_PROD = `web3telegram.${WEB3_TELEGRAM_ENS_DOMAIN}`;
 
-//scone image
-const SCONIFIER_VERSION = '5.7.6-v15';
-const dappVersion = JSON.parse(
-  readFileSync('../dapp/package.json', 'utf-8')
-).version;
-
 export const DOCKER_IMAGE_NAMESPACE = 'iexechub';
 export const DOCKER_IMAGE_REPOSITORY = 'web3telegram-dapp';
-export const DOCKER_IMAGE_PROD_TAG = `${dappVersion}-sconify-${SCONIFIER_VERSION}-production`;
-export const DOCKER_IMAGE_DEV_TAG = `dev-${
-  process.env.GITHUB_SHA || 'latest'
-}-sconify-${SCONIFIER_VERSION}-production`;
+
+// Use environment variable for sconified image tag if provided, otherwise fallback to computed tags
+export const DOCKER_IMAGE_PROD_TAG = process.env.SCONIFIED_IMAGE_TAG;
+export const DOCKER_IMAGE_DEV_TAG = process.env.SCONIFIED_IMAGE_TAG;
 
 //deployment targets for GitHub Actions
 export const DEPLOY_TARGET_DEV = 'dapp-dev';

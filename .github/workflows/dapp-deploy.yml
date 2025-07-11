@@ -44,13 +44,22 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "dapp-version=$VERSION"
 
+      - name: Set image tag
+        id: image-tag
+        run: |
+          if [ "${{ inputs.environment }}" = "dapp-dev" ]; then
+            echo "image-tag=dev-${{ steps.version.outputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "image-tag=${{ steps.version.outputs.version }}" >> $GITHUB_OUTPUT
+          fi
+
       - name: Build and push Docker image
         id: build
         uses: docker/build-push-action@v5
         with:
           context: ./dapp
           push: true
-          tags: iexechub/web3telegram-dapp:${{ steps.version.outputs.version }}-non-tee
+          tags: iexechub/web3telegram-dapp:${{ steps.image-tag.outputs.image-tag }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -58,7 +67,7 @@ jobs:
         id: set-outputs
         run: |
           echo "image-name=iexechub/web3telegram-dapp" >> $GITHUB_OUTPUT
-          echo "image-tag=${{ steps.version.outputs.version }}-non-tee" >> $GITHUB_OUTPUT
+          echo "image-tag=${{ steps.image-tag.outputs.image-tag }}" >> $GITHUB_OUTPUT
 
   sconify:
     needs: build-and-push
@@ -131,6 +140,16 @@ jobs:
           MRENCLAVE="${{ needs.sconify.outputs.prod-mrenclave }}"
           echo "$MRENCLAVE" > deployment-dapp/.scone-fingerprint
 
+      - name: Create sconified image tag
+        id: sconified-tag
+        run: |
+          VERSION=$(node -p "require('./dapp/package.json').version")
+          if [ "${{ inputs.environment }}" = "dapp-dev" ]; then
+            echo "sconified-tag=dev-${VERSION}-scone-prod-${{ inputs.sconify-version }}" >> $GITHUB_OUTPUT
+          else
+            echo "sconified-tag=${VERSION}-scone-prod-${{ inputs.sconify-version }}" >> $GITHUB_OUTPUT
+          fi
+
       - name: Deploy dapp contract
         env:
           DEPLOY_ENVIRONMENT: ${{ inputs.environment }}
@@ -138,6 +157,7 @@ jobs:
           WALLET_PRIVATE_KEY_PROD: ${{ secrets.WEB3TELEGRAM_DAPP_OWNER_PROD_PRIVATEKEY }}
           DOCKER_IMAGE_CHECKSUM_DEV: ${{ needs.sconify.outputs.prod-checksum }}
           DOCKER_IMAGE_CHECKSUM_PROD: ${{ needs.sconify.outputs.prod-checksum }}
+          SCONIFIED_IMAGE_TAG: ${{ steps.sconified-tag.outputs.sconified-tag }}
         run: |
           cd deployment-dapp
           npm run deploy-dapp
