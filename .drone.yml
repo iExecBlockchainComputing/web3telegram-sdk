@@ -172,7 +172,7 @@ trigger:
 
 steps:
   - name: install
-    image: node:14-alpine3.11
+    image: node:20-alpine3.22
     pull: always
     commands:
       - cd dapp
@@ -181,7 +181,7 @@ steps:
       - npm ci
 
   - name: format
-    image: node:14-alpine3.11
+    image: node:20-alpine3.22
     commands:
       - cd dapp
       - npm run check-format
@@ -193,7 +193,7 @@ steps:
       - npm run lint
 
   - name: test
-    image: node:14-alpine3.11
+    image: node:20-alpine3.22
     environment:
       TELEGRAM_BOT_TOKEN:
         from_secret: telegram-bot-token-dev
@@ -236,7 +236,7 @@ trigger:
 
 steps:
   - name: install
-    image: node:14-alpine3.11
+    image: node:20-alpine3.22
     pull: always
     commands:
       - cd dapp
@@ -245,7 +245,7 @@ steps:
       - npm ci
 
   - name: format
-    image: node:14-alpine3.11
+    image: node:20-alpine3.22
     commands:
       - cd dapp
       - npm run check-format
@@ -257,7 +257,7 @@ steps:
       - npm run lint
 
   - name: test
-    image: node:14-alpine3.11
+    image: node:20-alpine3.22
     environment:
       TELEGRAM_BOT_TOKEN:
         from_secret: telegram-bot-token-prod
