@@ -89,14 +89,14 @@ The `versioning: 'prerelease'` field should be **REMOVED** when:
 
 Since your packages are currently at:
 
-- Main package: `0.0.1-alpha.0`
-- Dapp package: `0.0.1-alpha.0`
+- Main package: `0.1.0-alpha.0`
+- Dapp package: `0.1.0-alpha.0`
 
 ### Summary
 
 | Package Version | Config Field               | Action                |
 | --------------- | -------------------------- | --------------------- |
-| `0.0.3-alpha.0` | `versioning: 'prerelease'` | ✅ **KEEP** (working) |
+| `0.1.0-alpha.0` | `versioning: 'prerelease'` | ✅ **KEEP** (working) |
 | `1.0.0`         | `versioning: 'prerelease'` | ❌ **REMOVE**         |
 
 **Remember**: The `versioning` field works fine for prereleases but should be removed when transitioning to stable versions!
