@@ -4,10 +4,6 @@
   "description": "",
   "main": "index.js",
   "type": "module",
-  "engines": {
-    "node": ">=14.0.0 <15.0.0",
-    "npm": ">=6.0.0 <7.0.0"
-  },
   "scripts": {
     "start": "node src/app.js",
     "start-local": "node -r dotenv/config src/app.js",
