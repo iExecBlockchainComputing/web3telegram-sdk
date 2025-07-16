@@ -1,7 +1,7 @@
 on:
   push:
     branches:
-      - main
+      - test/release-please-test-monorepo # TODO main branch
 
 permissions:
   contents: write
