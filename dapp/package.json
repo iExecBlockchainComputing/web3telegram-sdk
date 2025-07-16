@@ -1,7 +1,6 @@
 {
   "name": "dapp",
-  "version": "0.0.2-alpha",
-  "description": "",
+  "version": "0.0.2-alpha.0",
   "main": "index.js",
   "type": "module",
   "engines": {

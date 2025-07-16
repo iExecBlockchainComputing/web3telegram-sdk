@@ -30,7 +30,7 @@
       "prerelease": true,
       "prerelease-type": "alpha",
       "versioning": "prerelease",
-      "exclude-paths": ["dapp/**/*"]
+      "exclude-paths": ["dapp"]
     },
     "dapp": {
       "release-type": "node",
