@@ -8,7 +8,6 @@ import {
   MAX_EXPECTED_WEB2_SERVICES_TIME,
 } from '../test-utils.js';
 import {
-  CHAIN_CONFIG,
   DEFAULT_CHAIN_ID,
   getChainDefaultConfig,
 } from '../../src/config/config.js';

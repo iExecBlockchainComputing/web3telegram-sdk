@@ -14,7 +14,7 @@ import {
   Web3SignerProvider,
   FetchMyContactsParams,
 } from './types.js';
-import { CHAIN_CONFIG, getChainDefaultConfig } from '../config/config.js';
+import { getChainDefaultConfig } from '../config/config.js';
 import { isValidProvider } from '../utils/validators.js';
 import { getChainIdFromProvider } from '../utils/getChainId.js';
 
