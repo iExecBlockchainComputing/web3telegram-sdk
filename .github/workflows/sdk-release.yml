@@ -1,0 +1,14 @@
+name: publish-npm-sdk-latest
+
+on:
+  push:
+    tags:
+      - 'web3telegram-v*'
+
+jobs:
+  publish-npm:
+    uses: ./.github/workflows/publish-npm-sdk.yml
+    with:
+      tag: 'latest'
+    secrets:
+      npm-token: ${{ secrets.NPM_TOKEN }}
