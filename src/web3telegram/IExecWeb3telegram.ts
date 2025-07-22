@@ -14,7 +14,7 @@ import {
   Web3SignerProvider,
   FetchMyContactsParams,
 } from './types.js';
-import { CHAIN_CONFIG } from '../config/config.js';
+import { CHAIN_CONFIG, getChainDefaultConfig } from '../config/config.js';
 import { isValidProvider } from '../utils/validators.js';
 import { getChainIdFromProvider } from '../utils/getChainId.js';
 
@@ -122,7 +122,9 @@ export class IExecWeb3telegram {
 
   private async resolveConfig(): Promise<Web3telegramResolvedConfig> {
     const chainId = await getChainIdFromProvider(this.ethProvider);
-    const chainDefaultConfig = CHAIN_CONFIG[chainId];
+    const chainDefaultConfig = getChainDefaultConfig(chainId, {
+      allowExperimentalNetworks: this.options.allowExperimentalNetworks,
+    });
 
     const subgraphUrl =
       this.options?.dataProtectorSubgraph ||
@@ -162,6 +164,7 @@ export class IExecWeb3telegram {
         {
           ipfsGatewayURL: ipfsGateway,
           ...this.options?.iexecOptions,
+          allowExperimentalNetworks: this.options.allowExperimentalNetworks,
         }
       );
     } catch (e: any) {
