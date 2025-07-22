@@ -111,6 +111,7 @@ jobs:
           WALLET_PRIVATE_KEY: ${{ secrets.WEB3TELEGRAM_DAPP_OWNER_PRIVATEKEY }}
           PRICE: ${{ vars.SELL_ORDER_PRICE }}
           VOLUME: ${{ vars.SELL_ORDER_VOLUME }}
+          RPC_URL: ${{ secrets.RPC_URL }}
         run: |
           cd deployment-dapp
           npm run publish-sell-order
