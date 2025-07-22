@@ -2,12 +2,16 @@
 // needed to access and assert IExecDataProtector's private properties
 import { describe, expect, it } from '@jest/globals';
 import { Wallet } from 'ethers';
-import { IExecWeb3telegram } from '../../src/index.js';
+import { getWeb3Provider, IExecWeb3telegram } from '../../src/index.js';
 import {
   getTestWeb3SignerProvider,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
 } from '../test-utils.js';
-import { CHAIN_CONFIG, CHAIN_IDS } from '../../src/config/config.js';
+import {
+  CHAIN_CONFIG,
+  DEFAULT_CHAIN_ID,
+  getChainDefaultConfig,
+} from '../../src/config/config.js';
 
 describe('IExecWeb3telegram()', () => {
   it('instantiates with a valid ethProvider', async () => {
@@ -25,7 +29,9 @@ describe('IExecWeb3telegram()', () => {
     );
     await web3telegram.init();
     const ipfsGateway = web3telegram['ipfsGateway'];
-    expect(ipfsGateway).toStrictEqual(CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].ipfsGateway);
+    const defaultConfig = getChainDefaultConfig(DEFAULT_CHAIN_ID);
+    expect(defaultConfig).not.toBeNull();
+    expect(ipfsGateway).toStrictEqual(defaultConfig!.ipfsGateway);
   });
 
   it('should use provided ipfs gateway url when ipfsGateway is provided', async () => {
@@ -48,8 +54,10 @@ describe('IExecWeb3telegram()', () => {
       getTestWeb3SignerProvider(wallet.privateKey)
     );
     await web3telegram.init();
-    const graphQLClientUrl = web3telegram['graphQLClient'];
-    expect(graphQLClientUrl['url']).toBe(CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].dataProtectorSubgraph);
+    const graphQLClient = web3telegram['graphQLClient'];
+    const defaultConfig = getChainDefaultConfig(DEFAULT_CHAIN_ID);
+    expect(defaultConfig).not.toBeNull();
+    expect(graphQLClient['url']).toBe(defaultConfig!.dataProtectorSubgraph);
   });
 
   it('should use provided data Protector Subgraph URL when subgraphUrl is provided', async () => {
@@ -102,9 +110,99 @@ describe('IExecWeb3telegram()', () => {
     expect(ipfsNode).toStrictEqual(customIpfsNode);
     expect(ipfsGateway).toStrictEqual(customIpfsGateway);
     expect(dappAddressOrENS).toStrictEqual(customDapp);
-    expect(whitelistAddress).toStrictEqual(customDappWhitelistAddress.toLowerCase());
+    expect(whitelistAddress).toStrictEqual(
+      customDappWhitelistAddress.toLowerCase()
+    );
     expect(await iexec.config.resolveSmsURL()).toBe(smsURL);
     expect(await iexec.config.resolveIexecGatewayURL()).toBe(iexecGatewayURL);
+  });
+
+  describe('When instantiating SDK with an experimental network', () => {
+    const experimentalNetworkSigner = getWeb3Provider(
+      Wallet.createRandom().privateKey,
+      {
+        host: 421614,
+        allowExperimentalNetworks: true,
+      }
+    );
+
+    describe('Without allowExperimentalNetworks', () => {
+      it('should throw a configuration error', async () => {
+        const web3mail = new IExecWeb3telegram(experimentalNetworkSigner);
+        await expect(web3mail.init()).rejects.toThrow(
+          'Missing required configuration for chainId 421614: dataProtectorSubgraph, dappAddress, whitelistSmartContract, ipfsGateway, prodWorkerpoolAddress, ipfsUploadUrl'
+        );
+      });
+    });
+
+    describe('With allowExperimentalNetworks: true', () => {
+      it('should resolve the configuration', async () => {
+        const web3mail = new IExecWeb3telegram(experimentalNetworkSigner, {
+          allowExperimentalNetworks: true,
+        });
+        await expect(web3mail.init()).resolves.toBeUndefined();
+        expect(web3mail).toBeInstanceOf(IExecWeb3telegram);
+      });
+
+      it('should use Arbitrum Sepolia default configuration', async () => {
+        const web3mail = new IExecWeb3telegram(experimentalNetworkSigner, {
+          allowExperimentalNetworks: true,
+        });
+        await web3mail.init();
+
+        const arbitrumSepoliaConfig = getChainDefaultConfig(421614, {
+          allowExperimentalNetworks: true,
+        });
+        expect(arbitrumSepoliaConfig).not.toBeNull();
+
+        expect(web3mail['ipfsGateway']).toBe(
+          arbitrumSepoliaConfig!.ipfsGateway
+        );
+        expect(web3mail['ipfsNode']).toBe(arbitrumSepoliaConfig!.ipfsUploadUrl);
+        expect(web3mail['dappAddressOrENS']).toBe(
+          arbitrumSepoliaConfig!.dappAddress
+        );
+        expect(web3mail['dappWhitelistAddress']).toBe(
+          arbitrumSepoliaConfig!.whitelistSmartContract.toLowerCase()
+        );
+        expect(web3mail['defaultWorkerpool']).toBe(
+          arbitrumSepoliaConfig!.prodWorkerpoolAddress
+        );
+        expect(web3mail['graphQLClient']['url']).toBe(
+          arbitrumSepoliaConfig!.dataProtectorSubgraph
+        );
+      });
+
+      it('should allow custom configuration override for Arbitrum Sepolia', async () => {
+        const customIpfsGateway = 'https://custom-arbitrum-ipfs.com';
+        const customDappAddress = 'custom.arbitrum.app.eth';
+
+        const web3mail = new IExecWeb3telegram(experimentalNetworkSigner, {
+          allowExperimentalNetworks: true,
+          ipfsGateway: customIpfsGateway,
+          dappAddressOrENS: customDappAddress,
+        });
+        await web3mail.init();
+
+        expect(web3mail['ipfsGateway']).toBe(customIpfsGateway);
+        expect(web3mail['dappAddressOrENS']).toBe(customDappAddress);
+
+        const arbitrumSepoliaConfig = getChainDefaultConfig(421614, {
+          allowExperimentalNetworks: true,
+        });
+        expect(arbitrumSepoliaConfig).not.toBeNull();
+        expect(web3mail['ipfsNode']).toBe(arbitrumSepoliaConfig!.ipfsUploadUrl);
+        expect(web3mail['dappWhitelistAddress']).toBe(
+          arbitrumSepoliaConfig!.whitelistSmartContract.toLowerCase()
+        );
+        expect(web3mail['defaultWorkerpool']).toBe(
+          arbitrumSepoliaConfig!.prodWorkerpoolAddress
+        );
+        expect(web3mail['graphQLClient']['url']).toBe(
+          arbitrumSepoliaConfig!.dataProtectorSubgraph
+        );
+      });
+    });
   });
 
   it(
