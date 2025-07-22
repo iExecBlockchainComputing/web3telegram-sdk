@@ -1,7 +1,10 @@
 import { expect, it, jest } from '@jest/globals';
 import { type SendTelegram } from '../../src/web3telegram/sendTelegram.js';
 import { getRandomAddress } from '../test-utils.js';
-import { CHAIN_CONFIG, CHAIN_IDS } from '../../src/config/config.js';
+import {
+  DEFAULT_CHAIN_ID,
+  getChainDefaultConfig,
+} from '../../src/config/config.js';
 import { mockAllForSendTelegram } from '../utils/mockAllForSendTelegram.js';
 
 jest.unstable_mockModule('../../src/utils/subgraphQuery.js', () => ({
@@ -9,13 +12,16 @@ jest.unstable_mockModule('../../src/utils/subgraphQuery.js', () => ({
 }));
 
 jest.unstable_mockModule('../../src/utils/ipfs-service.js', () => ({
-  add: jest.fn(() => Promise.resolve('QmSBoN71925mWJ6acehqDLQrrxihxX55EXrqHxpYja4HCG')),
+  add: jest.fn(() =>
+    Promise.resolve('QmSBoN71925mWJ6acehqDLQrrxihxX55EXrqHxpYja4HCG')
+  ),
   get: jest.fn(() => Promise.resolve(new ArrayBuffer(8))),
 }));
 
 describe('sendTelegram', () => {
   let testedModule: any;
   let sendTelegram: SendTelegram;
+  const defaultConfig = getChainDefaultConfig(DEFAULT_CHAIN_ID);
 
   beforeAll(async () => {
     // import tested module after all mocked modules
@@ -37,11 +43,11 @@ describe('sendTelegram', () => {
           sendTelegram({
             graphQLClient: { request: jest.fn() } as any,
             iexec: mockAllForSendTelegram() as any,
-            workerpoolAddressOrEns: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].prodWorkerpoolAddress,
-            dappAddressOrENS: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].dappAddress,
-            dappWhitelistAddress: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].whitelistSmartContract,
-            ipfsNode: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].ipfsUploadUrl,
-            ipfsGateway: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].ipfsGateway,
+            workerpoolAddressOrEns: defaultConfig.prodWorkerpoolAddress,
+            dappAddressOrENS: defaultConfig.dappAddress,
+            dappWhitelistAddress: defaultConfig.whitelistSmartContract,
+            ipfsNode: defaultConfig.ipfsUploadUrl,
+            ipfsGateway: defaultConfig.ipfsGateway,
             senderName: 'AB', // Trop court, déclenche l'erreur Yup
             ...sendTelegramParams,
           })
@@ -70,11 +76,11 @@ describe('sendTelegram', () => {
           sendTelegram({
             graphQLClient: { request: jest.fn() } as any,
             iexec: mockAllForSendTelegram() as any,
-            workerpoolAddressOrEns: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].prodWorkerpoolAddress,
-            dappAddressOrENS: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].dappAddress,
-            dappWhitelistAddress: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].whitelistSmartContract,
-            ipfsNode: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].ipfsUploadUrl,
-            ipfsGateway: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].ipfsGateway,
+            workerpoolAddressOrEns: defaultConfig.prodWorkerpoolAddress,
+            dappAddressOrENS: defaultConfig.dappAddress,
+            dappWhitelistAddress: defaultConfig.whitelistSmartContract,
+            ipfsNode: defaultConfig.ipfsUploadUrl,
+            ipfsGateway: defaultConfig.ipfsGateway,
             senderName: 'AB', // Trop court, déclenche l'erreur Yup
             ...sendTelegramParams,
           })
@@ -103,11 +109,11 @@ describe('sendTelegram', () => {
           sendTelegram({
             graphQLClient: { request: jest.fn() } as any,
             iexec: mockAllForSendTelegram() as any,
-            workerpoolAddressOrEns: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].prodWorkerpoolAddress,
-            dappAddressOrENS: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].dappAddress,
-            dappWhitelistAddress: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].whitelistSmartContract,
-            ipfsNode: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].ipfsUploadUrl,
-            ipfsGateway: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].ipfsGateway,
+            workerpoolAddressOrEns: defaultConfig.prodWorkerpoolAddress,
+            dappAddressOrENS: defaultConfig.dappAddress,
+            dappWhitelistAddress: defaultConfig.whitelistSmartContract,
+            ipfsNode: defaultConfig.ipfsUploadUrl,
+            ipfsGateway: defaultConfig.ipfsGateway,
             ...sendTelegramParams,
           })
         ).rejects.toMatchObject({
@@ -135,11 +141,11 @@ describe('sendTelegram', () => {
           sendTelegram({
             graphQLClient: { request: jest.fn() } as any,
             iexec: mockAllForSendTelegram() as any,
-            workerpoolAddressOrEns: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].prodWorkerpoolAddress,
-            dappAddressOrENS: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].dappAddress,
-            dappWhitelistAddress: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].whitelistSmartContract,
-            ipfsNode: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].ipfsUploadUrl,
-            ipfsGateway: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].ipfsGateway,
+            workerpoolAddressOrEns: defaultConfig.prodWorkerpoolAddress,
+            dappAddressOrENS: defaultConfig.dappAddress,
+            dappWhitelistAddress: defaultConfig.whitelistSmartContract,
+            ipfsNode: defaultConfig.ipfsUploadUrl,
+            ipfsGateway: defaultConfig.ipfsGateway,
             ...sendTelegramParams,
           })
         ).rejects.toMatchObject({
@@ -169,11 +175,11 @@ describe('sendTelegram', () => {
           sendTelegram({
             graphQLClient: { request: jest.fn() } as any,
             iexec: mockAllForSendTelegram() as any,
-            workerpoolAddressOrEns: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].prodWorkerpoolAddress,
-            dappAddressOrENS: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].dappAddress,
-            dappWhitelistAddress: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].whitelistSmartContract,
-            ipfsNode: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].ipfsUploadUrl,
-            ipfsGateway: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].ipfsGateway,
+            workerpoolAddressOrEns: defaultConfig.prodWorkerpoolAddress,
+            dappAddressOrENS: defaultConfig.dappAddress,
+            dappWhitelistAddress: defaultConfig.whitelistSmartContract,
+            ipfsNode: defaultConfig.ipfsUploadUrl,
+            ipfsGateway: defaultConfig.ipfsGateway,
             ...sendTelegramParams,
           })
         ).rejects.toMatchObject({
@@ -208,11 +214,11 @@ describe('sendTelegram', () => {
       await sendTelegram({
         graphQLClient: { request: jest.fn() } as any,
         iexec,
-        workerpoolAddressOrEns: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].prodWorkerpoolAddress,
-        dappAddressOrENS: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].dappAddress,
-        dappWhitelistAddress: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].whitelistSmartContract,
-        ipfsNode: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].ipfsUploadUrl,
-        ipfsGateway: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].ipfsGateway,
+        workerpoolAddressOrEns: defaultConfig.prodWorkerpoolAddress,
+        dappAddressOrENS: defaultConfig.dappAddress,
+        dappWhitelistAddress: defaultConfig.whitelistSmartContract,
+        ipfsNode: defaultConfig.ipfsUploadUrl,
+        ipfsGateway: defaultConfig.ipfsGateway,
         telegramContent: 'e2e telegram content for test',
         protectedData,
       });
@@ -222,8 +228,8 @@ describe('sendTelegram', () => {
       expect(iexec.orderbook.fetchWorkerpoolOrderbook).toHaveBeenNthCalledWith(
         1,
         {
-          workerpool: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].prodWorkerpoolAddress,
-          app: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].dappAddress.toLowerCase(),
+          workerpool: defaultConfig.prodWorkerpoolAddress,
+          app: defaultConfig.dappAddress.toLowerCase(),
           dataset: protectedData,
           requester: userAddress,
           isRequesterStrict: false,
@@ -235,8 +241,8 @@ describe('sendTelegram', () => {
       expect(iexec.orderbook.fetchWorkerpoolOrderbook).toHaveBeenNthCalledWith(
         2,
         {
-          workerpool: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].prodWorkerpoolAddress,
-          app: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].whitelistSmartContract.toLowerCase(),
+          workerpool: defaultConfig.prodWorkerpoolAddress,
+          app: defaultConfig.whitelistSmartContract.toLowerCase(),
           dataset: protectedData,
           requester: userAddress,
           isRequesterStrict: false,
@@ -248,8 +254,8 @@ describe('sendTelegram', () => {
       expect(iexec.orderbook.fetchWorkerpoolOrderbook).toHaveBeenNthCalledWith(
         2,
         {
-          workerpool: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].prodWorkerpoolAddress,
-          app: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].whitelistSmartContract.toLowerCase(),
+          workerpool: defaultConfig.prodWorkerpoolAddress,
+          app: defaultConfig.whitelistSmartContract.toLowerCase(),
           dataset: protectedData,
           requester: userAddress,
           isRequesterStrict: false,

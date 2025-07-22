@@ -1,6 +1,9 @@
 import { describe, expect, it, jest } from '@jest/globals';
 import { Address } from 'iexec';
-import { CHAIN_CONFIG, CHAIN_IDS } from '../../src/config/config.js';
+import {
+  DEFAULT_CHAIN_ID,
+  getChainDefaultConfig,
+} from '../../src/config/config.js';
 import { type FetchMyContacts } from '../../src/web3telegram/fetchMyContacts.js';
 import { getRandomAddress } from '../test-utils.js';
 
@@ -11,6 +14,7 @@ jest.unstable_mockModule('../../src/utils/subgraphQuery.js', () => ({
 describe('fetchMyContacts', () => {
   let testedModule: any;
   let fetchMyContacts: FetchMyContacts;
+  const defaultConfig = getChainDefaultConfig(DEFAULT_CHAIN_ID);
 
   beforeAll(async () => {
     // import tested module after all mocked modules
@@ -75,15 +79,15 @@ describe('fetchMyContacts', () => {
       iexec: iexec,
       // @ts-expect-error No need for graphQLClient here
       graphQLClient: {},
-      dappAddressOrENS: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].dappAddress,
-      dappWhitelistAddress: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].whitelistSmartContract,
+      dappAddressOrENS: defaultConfig.dappAddress,
+      dappWhitelistAddress: defaultConfig.whitelistSmartContract,
     });
     const userAddress = (await iexec.wallet.getAddress()).toLowerCase();
     expect(iexec.orderbook.fetchDatasetOrderbook).toHaveBeenNthCalledWith(
       1,
       'any',
       {
-        app: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].dappAddress.toLowerCase(),
+        app: defaultConfig.dappAddress.toLowerCase(),
         requester: userAddress,
         isAppStrict: true,
         isRequesterStrict: false,
@@ -94,7 +98,7 @@ describe('fetchMyContacts', () => {
       2,
       'any',
       {
-        app: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].whitelistSmartContract.toLowerCase(),
+        app: defaultConfig.whitelistSmartContract.toLowerCase(),
         requester: userAddress,
         isAppStrict: true,
         isRequesterStrict: false,
@@ -140,8 +144,8 @@ describe('fetchMyContacts', () => {
       iexec: iexec,
       // @ts-expect-error No need for graphQLClient here
       graphQLClient: {},
-      dappAddressOrENS: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].dappAddress,
-      dappWhitelistAddress: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].whitelistSmartContract,
+      dappAddressOrENS: defaultConfig.dappAddress,
+      dappWhitelistAddress: defaultConfig.whitelistSmartContract,
       isUserStrict: true,
     });
     const userAddress = (await iexec.wallet.getAddress()).toLowerCase();
@@ -149,7 +153,7 @@ describe('fetchMyContacts', () => {
       1,
       'any',
       {
-        app: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].dappAddress.toLowerCase(),
+        app: defaultConfig.dappAddress.toLowerCase(),
         requester: userAddress,
         isAppStrict: true,
         isRequesterStrict: true,
@@ -160,7 +164,7 @@ describe('fetchMyContacts', () => {
       2,
       'any',
       {
-        app: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].whitelistSmartContract.toLowerCase(),
+        app: defaultConfig.whitelistSmartContract.toLowerCase(),
         requester: userAddress,
         isAppStrict: true,
         isRequesterStrict: true,
