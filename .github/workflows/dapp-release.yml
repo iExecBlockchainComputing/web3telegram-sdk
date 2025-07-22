@@ -20,7 +20,7 @@ jobs:
   docker-publish:
     uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/docker-build.yml@docker-build-v2.3.1
     with:
-      image-name: 'iexechub/web3mail-dapp'
+      image-name: 'iexechub/web3telegram-dapp'
       registry: 'docker.io'
       dockerfile: 'dapp/Dockerfile'
       context: 'dapp'
@@ -37,7 +37,7 @@ jobs:
     uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/sconify.yml@sconify-v2.0.0
     needs: [docker-publish]
     with:
-      image-name: 'iexechub/web3mail-dapp'
+      image-name: 'iexechub/web3telegram-dapp'
       image-tag: ${{ needs.extract-tag.outputs.clean_tag }}
       sconify-debug: false
       sconify-prod: true
@@ -88,7 +88,7 @@ jobs:
 
       - name: Deploy dapp contract
         env:
-          WALLET_PRIVATE_KEY: ${{ secrets.WEB3MAIL_DAPP_OWNER_PRIVATEKEY }}
+          WALLET_PRIVATE_KEY: ${{ secrets.WEB3TELEGRAM_DAPP_OWNER_PRIVATEKEY }}
           DOCKER_IMAGE_TAG: ${{ needs.sconify.outputs.prod-image-tag }}
           CHECKSUM: ${{  needs.sconify.outputs.prod-checksum }}
           FINGERPRINT: ${{ needs.sconify.outputs.prod-mrenclave }}
@@ -108,7 +108,7 @@ jobs:
 
       - name: Publish free sell order
         env:
-          WALLET_PRIVATE_KEY: ${{ secrets.WEB3MAIL_DAPP_OWNER_PRIVATEKEY }}
+          WALLET_PRIVATE_KEY: ${{ secrets.WEB3TELEGRAM_DAPP_OWNER_PRIVATEKEY }}
           PRICE: ${{ vars.SELL_ORDER_PRICE }}
           VOLUME: ${{ vars.SELL_ORDER_VOLUME }}
         run: |
@@ -117,8 +117,8 @@ jobs:
 
       - name: Add resource to whitelist
         env:
-          CONTRACT_ADDRESS: ${{ secrets.WEB3MAIL_WHITELIST_CONTRACT_ADDRESS }}
-          WALLET_PRIVATE_KEY: ${{ secrets.WEB3MAIL_DAPP_OWNER_PRIVATEKEY }}
+          CONTRACT_ADDRESS: ${{ secrets.WEB3TELEGRAM_WHITELIST_CONTRACT_ADDRESS }}
+          WALLET_PRIVATE_KEY: ${{ secrets.WEB3TELEGRAM_DAPP_OWNER_PRIVATEKEY }}
         run: |
           cd node_modules/whitelist-smart-contract
           export ADDRESS_TO_ADD=$(cat ../../deployment-dapp/.app-address) && npm run addResourceToWhitelist
@@ -126,7 +126,7 @@ jobs:
       - name: Configure ENS
         if: ${{ vars.DAPP_ENS_NAME }}
         env:
-          WALLET_PRIVATE_KEY: ${{ secrets.WEB3MAIL_DAPP_OWNER_PRIVATEKEY }}
+          WALLET_PRIVATE_KEY: ${{ secrets.WEB3TELEGRAM_DAPP_OWNER_PRIVATEKEY }}
           DAPP_ENS_NAME: ${{ vars.DAPP_ENS_NAME }}
         run: |
           cd deployment-dapp
