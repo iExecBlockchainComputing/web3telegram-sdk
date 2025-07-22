@@ -5,10 +5,6 @@ import {
   DOCKER_IMAGE_NAMESPACE,
   DOCKER_IMAGE_REPOSITORY,
 } from '../config/config.js';
-import {
-  getDockerImageChecksum,
-  loadSconeFingerprint,
-} from '../utils/utils.js';
 
 export const deployApp = async ({
   iexec,
@@ -16,39 +12,31 @@ export const deployApp = async ({
   dockerRepository = DOCKER_IMAGE_REPOSITORY,
   dockerTag,
   checksum,
+  fingerprint,
 }: {
   iexec: IExec;
   dockerNamespace?: string;
   dockerRepository?: string;
   dockerTag: string;
   checksum?: string;
+  fingerprint?: string;
 }): Promise<string> => {
   const name = APP_NAME;
   const type = APP_TYPE;
 
-  // Use provided checksum or fetch from Docker Hub
-  const imageChecksum =
-    checksum ||
-    (await getDockerImageChecksum(
-      dockerNamespace,
-      dockerRepository,
-      dockerTag
-    ));
-
-  const fingerprint = await loadSconeFingerprint();
   const mrenclave = {
     framework: 'SCONE' as any, // workaround framework not auto capitalized
     version: 'v5',
     entrypoint: 'node /app/app.js',
     heapSize: 1073741824,
-    fingerprint: fingerprint,
+    fingerprint,
   };
   const app = {
     owner: await iexec.wallet.getAddress(),
     name,
     type,
     multiaddr: `${dockerNamespace}/${dockerRepository}:${dockerTag}`,
-    checksum: imageChecksum,
+    checksum,
     mrenclave,
   };
   console.log(`Deploying app:\n${JSON.stringify(app, undefined, 2)}`);
