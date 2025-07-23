@@ -116,6 +116,21 @@ describe('IExecWeb3telegram()', () => {
     expect(await iexec.config.resolveIexecGatewayURL()).toBe(iexecGatewayURL);
   });
 
+  it(
+    'When calling a read method should work as expected',
+    async () => {
+      // --- GIVEN
+      const web3telegram = new IExecWeb3telegram();
+      const wallet = Wallet.createRandom();
+
+      // --- WHEN/THEN
+      await expect(
+        web3telegram.fetchUserContacts({ userAddress: wallet.address })
+      ).resolves.not.toThrow();
+    },
+    MAX_EXPECTED_WEB2_SERVICES_TIME
+  );
+
   describe('When instantiating SDK with an experimental network', () => {
     const experimentalNetworkSigner = getWeb3Provider(
       Wallet.createRandom().privateKey,
@@ -157,10 +172,10 @@ describe('IExecWeb3telegram()', () => {
         expect(web3telegram['ipfsGateway']).toBe(
           arbitrumSepoliaConfig!.ipfsGateway
         );
-        expect(web3telegram['ipfsNode']).toBe(arbitrumSepoliaConfig!.ipfsUploadUrl);
-        expect(web3telegram['dappAddressOrENS']).toBe(
-          arbitrumSepoliaConfig!.dappAddress
+        expect(web3telegram['ipfsNode']).toBe(
+          arbitrumSepoliaConfig!.ipfsUploadUrl
         );
+        expect(web3telegram['dappAddressOrENS']).toMatch(/^0x[a-fA-F0-9]{40}$/); // resolved from Compass
         expect(web3telegram['dappWhitelistAddress']).toBe(
           arbitrumSepoliaConfig!.whitelistSmartContract.toLowerCase()
         );
@@ -190,7 +205,9 @@ describe('IExecWeb3telegram()', () => {
           allowExperimentalNetworks: true,
         });
         expect(arbitrumSepoliaConfig).not.toBeNull();
-        expect(web3telegram['ipfsNode']).toBe(arbitrumSepoliaConfig!.ipfsUploadUrl);
+        expect(web3telegram['ipfsNode']).toBe(
+          arbitrumSepoliaConfig!.ipfsUploadUrl
+        );
         expect(web3telegram['dappWhitelistAddress']).toBe(
           arbitrumSepoliaConfig!.whitelistSmartContract.toLowerCase()
         );
@@ -204,18 +221,26 @@ describe('IExecWeb3telegram()', () => {
     });
   });
 
-  it(
-    'When calling a read method should work as expected',
-    async () => {
-      // --- GIVEN
-      const web3telegram = new IExecWeb3telegram();
-      const wallet = Wallet.createRandom();
+  describe('When instantiating SDK with on a network backed by Compass', () => {
+    it('should resolve dapp address from Compass', async () => {
+      const chainId = 421614; // Arbitrum Sepolia Testnet ENS not supported
+      const chainConfig = getChainDefaultConfig(chainId, {
+        allowExperimentalNetworks: true,
+      });
+      expect(chainConfig.dappAddress).toBeUndefined(); // ENS not supported on this network
 
-      // --- WHEN/THEN
-      await expect(
-        web3telegram.fetchUserContacts({ userAddress: wallet.address })
-      ).resolves.not.toThrow();
-    },
-    MAX_EXPECTED_WEB2_SERVICES_TIME
-  );
+      const web3telegram = new IExecWeb3telegram(
+        getWeb3Provider(Wallet.createRandom().privateKey, {
+          host: chainId,
+          allowExperimentalNetworks: true,
+        }),
+        { allowExperimentalNetworks: true }
+      );
+      await web3telegram.init();
+
+      const dappAddressOrENS = web3telegram['dappAddressOrENS'];
+      expect(typeof dappAddressOrENS).toBe('string');
+      expect(dappAddressOrENS).toMatch(/^0x[a-fA-F0-9]{40}$/);
+    });
+  });
 });
