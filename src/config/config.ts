@@ -32,7 +32,7 @@ export const CHAIN_CONFIG: Record<number, ChainConfig> = {
     dappAddress: 'web3telegram.apps.iexec.eth',
     prodWorkerpoolAddress: '0x39c3cdd91a7f1c4ed59108a9da4e79de9a1c1b59',
     dataProtectorSubgraph:
-      'https://thegraph.iex.ec/subgraphs/name/bellecour/dataprotector-v2',
+      'https://thegraph.arbitrum-sepolia-testnet.iex.ec/api/subgraphs/id/5YjRPLtjS6GH6bB4yY55Qg4HzwtRGQ8TaHtGf9UBWWd',
     ipfsGateway: 'https://ipfs-gateway.arbitrum-sepolia-testnet.iex.ec',
     ipfsUploadUrl: 'https://ipfs-upload.arbitrum-sepolia-testnet.iex.ec',
     whitelistSmartContract: '0x7291ff96100DA6CF97933C225B86124ef95aEc9b', // TODO: add the correct address
