@@ -33,6 +33,7 @@
       "versioning": "prerelease",
       "exclude-paths": [
         ".github",
+        ".drone",
         "dapp",
         "deployment-dapp",
         "examples",
