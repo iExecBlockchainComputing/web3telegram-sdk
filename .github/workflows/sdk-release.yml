@@ -7,7 +7,7 @@ on:
 
 jobs:
   publish-npm:
-    uses: ./.github/workflows/publish-npm-sdk.yml
+    uses: ./.github/workflows/reusable-sdk-npm.yml
     with:
       tag: 'latest'
     secrets:
