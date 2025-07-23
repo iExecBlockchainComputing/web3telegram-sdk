@@ -2,6 +2,34 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.0-alpha.1](https://github.com/iExecBlockchainComputing/web3telegram-sdk/compare/web3telegram-v0.1.0-alpha.0...web3telegram-v0.1.0-alpha.1) (2025-07-23)
+
+
+### Added
+
+* add deployment-dapp CI workflow and remove dapp-deployment-default from drone.yml ([cad1c39](https://github.com/iExecBlockchainComputing/web3telegram-sdk/commit/cad1c3960524d9e1db87de0ef3254cb88fe152e9))
+* add release-please workflow for automated releases ([18782b4](https://github.com/iExecBlockchainComputing/web3telegram-sdk/commit/18782b44d70cde0616c81ddd6ea05e87624f39b5))
+* **config:** add CHAIN_CONFIG for multichain support ([206292b](https://github.com/iExecBlockchainComputing/web3telegram-sdk/commit/206292b17d0c0e20eff18a11ad1abaf6e3e3b48d))
+* migrate to GitHub Actions and enhance deployment workflow  ([7bab3dc](https://github.com/iExecBlockchainComputing/web3telegram-sdk/commit/7bab3dcb63198d688437806393a30ae70f40ccaf))
+* **utils:** add getChainIdFromProvider util ([ab33c42](https://github.com/iExecBlockchainComputing/web3telegram-sdk/commit/ab33c4259be46c3af4c4adc79d59e2cd3cd6d131))
+
+
+### Changed
+
+* correct release-please manifest format to resolve version parsing error ([3ee5244](https://github.com/iExecBlockchainComputing/web3telegram-sdk/commit/3ee5244c4f63c16e02eec0451b805e56f3491cd7))
+* **dapp version:** correct version to 0.0.2 ([acff8f1](https://github.com/iExecBlockchainComputing/web3telegram-sdk/commit/acff8f1b37d2faef7c52a6ee9027dc0014030a38))
+* **ipfs:** remove default node/gateway, use SDK config ([af97aab](https://github.com/iExecBlockchainComputing/web3telegram-sdk/commit/af97aab4f212e86380114e596d5852a71527c361))
+* migrate from develop branch to trunk-based development ([abe4896](https://github.com/iExecBlockchainComputing/web3telegram-sdk/commit/abe4896715eb5b14aa0aa462031980c95a94e8cb))
+* migrate from develop branch to trunk-based development ([ccaafab](https://github.com/iExecBlockchainComputing/web3telegram-sdk/commit/ccaafab2d8c4266293ab9635e75a01ac5e502cef))
+* remove sdk-default and dapp-default pipelines from drone.yml ([24b08f5](https://github.com/iExecBlockchainComputing/web3telegram-sdk/commit/24b08f5451aca3d09d037fe709cefadee169629a))
+* rollback debug logging changes from develop branch ([404ce33](https://github.com/iExecBlockchainComputing/web3telegram-sdk/commit/404ce33e7d0705c274155813951284cd1830a3d2))
+* **sdk:** IExecWeb3telegram uses async config and chain detection ([4cc2b8e](https://github.com/iExecBlockchainComputing/web3telegram-sdk/commit/4cc2b8e10877f5602bf12f9792caa754729c6373))
+* simplify release-please config to single package and remove invalid versioning field ([e4c7e36](https://github.com/iExecBlockchainComputing/web3telegram-sdk/commit/e4c7e36fd91d92c8d6497420945ffaca3db7fa87))
+* **types:** update Web3TelegramConfigOptions for multichain ([67cae09](https://github.com/iExecBlockchainComputing/web3telegram-sdk/commit/67cae0990fb7c09447cbd4f4ed68ce58e9e04409))
+* update error message for encryption failure ([f4cb2a7](https://github.com/iExecBlockchainComputing/web3telegram-sdk/commit/f4cb2a7001399e81bfa2d77b1b1670273920a9dc))
+* update kubo-rpc-client to version 4.1.3 ([#45](https://github.com/iExecBlockchainComputing/web3telegram-sdk/issues/45)) ([5d63f6e](https://github.com/iExecBlockchainComputing/web3telegram-sdk/commit/5d63f6ed9584628208ed7bb3fd8686bf337b3604))
+* update test:e2e script to run only e2e tests and fix test-utils configuration ([8b6734c](https://github.com/iExecBlockchainComputing/web3telegram-sdk/commit/8b6734c19af5eb2f67a58bc4ee3e4378d93a3cfc))
+
 ## [0.0.3-alpha] - 2025-04-04
 
 ### Changed
