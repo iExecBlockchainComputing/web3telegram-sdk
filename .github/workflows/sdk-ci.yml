@@ -82,5 +82,7 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: publish dry-run
-        run: npm publish --dry-run
+  npm-publish-dry-run:
+    uses: ./.github/workflows/reusable-sdk-npm.yml
+    with:
+      dry-run: true
