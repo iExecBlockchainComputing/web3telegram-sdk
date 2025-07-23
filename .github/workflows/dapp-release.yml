@@ -88,7 +88,7 @@ jobs:
 
       - name: Deploy dapp contract
         env:
-          WALLET_PRIVATE_KEY: ${{ secrets.WEB3TELEGRAM_DAPP_OWNER_PRIVATEKEY }}
+          WALLET_PRIVATE_KEY: ${{ secrets.WEB3TELEGRAM_APP_OWNER_PRIVATEKEY }}
           DOCKER_IMAGE_TAG: ${{ needs.sconify.outputs.prod-image-tag }}
           CHECKSUM: ${{  needs.sconify.outputs.prod-checksum }}
           FINGERPRINT: ${{ needs.sconify.outputs.prod-mrenclave }}
@@ -99,7 +99,7 @@ jobs:
 
       - name: Push dapp secret
         env:
-          WALLET_PRIVATE_KEY: ${{ secrets.WEB3TELEGRAM_DAPP_OWNER_PRIVATEKEY }}
+          WALLET_PRIVATE_KEY: ${{ secrets.WEB3TELEGRAM_APP_OWNER_PRIVATEKEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN_PROD }}
           RPC_URL: ${{ secrets.RPC_URL }}
         run: |
@@ -108,7 +108,7 @@ jobs:
 
       - name: Publish free sell order
         env:
-          WALLET_PRIVATE_KEY: ${{ secrets.WEB3TELEGRAM_DAPP_OWNER_PRIVATEKEY }}
+          WALLET_PRIVATE_KEY: ${{ secrets.WEB3TELEGRAM_APP_OWNER_PRIVATEKEY }}
           PRICE: ${{ vars.SELL_ORDER_PRICE }}
           VOLUME: ${{ vars.SELL_ORDER_VOLUME }}
           RPC_URL: ${{ secrets.RPC_URL }}
@@ -119,7 +119,7 @@ jobs:
       - name: Add resource to whitelist
         env:
           CONTRACT_ADDRESS: ${{ secrets.WEB3TELEGRAM_WHITELIST_CONTRACT_ADDRESS }}
-          WALLET_PRIVATE_KEY: ${{ secrets.WEB3TELEGRAM_DAPP_OWNER_PRIVATEKEY }}
+          WALLET_PRIVATE_KEY: ${{ secrets.WEB3TELEGRAM_APP_OWNER_PRIVATEKEY }}
         run: |
           cd node_modules/whitelist-smart-contract
           export ADDRESS_TO_ADD=$(cat ../../deployment-dapp/.app-address) && npm run addResourceToWhitelist
@@ -127,7 +127,7 @@ jobs:
       - name: Configure ENS
         if: ${{ vars.DAPP_ENS_NAME }}
         env:
-          WALLET_PRIVATE_KEY: ${{ secrets.WEB3TELEGRAM_DAPP_OWNER_PRIVATEKEY }}
+          WALLET_PRIVATE_KEY: ${{ secrets.WEB3TELEGRAM_APP_OWNER_PRIVATEKEY }}
           DAPP_ENS_NAME: ${{ vars.DAPP_ENS_NAME }}
         run: |
           cd deployment-dapp
