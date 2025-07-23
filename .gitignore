@@ -13,6 +13,7 @@
 /.env
 /*.log
 /*.env
+**/.env
 
 # TypeScript specific
 *.tsbuildinfo
