@@ -31,7 +31,13 @@
       "prerelease": true,
       "prerelease-type": "alpha",
       "versioning": "prerelease",
-      "exclude-paths": ["dapp", "deployment-dapp", "tests"]
+      "exclude-paths": [
+        ".github",
+        "dapp",
+        "deployment-dapp",
+        "examples",
+        "tests"
+      ]
     },
     "dapp": {
       "release-type": "node",
