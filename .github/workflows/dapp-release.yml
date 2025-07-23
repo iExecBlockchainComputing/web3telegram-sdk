@@ -1,25 +1,9 @@
-name: deploy-dapp
+name: dapp-release
 
 on:
-  workflow_dispatch:
-    inputs:
-      environment:
-        description: 'Deployment environment'
-        required: true
-        type: choice
-        options:
-          - bellecour-dev
-          - arbitrum-sepolia-dev
-      price:
-        description: 'Sell order price (optionnel)'
-        type: string
-        required: false
-        default: ''
-      volume:
-        description: 'Sell order volume (optionnel)'
-        type: string
-        required: false
-        default: ''
+  push:
+    tags:
+      - 'dapp-v*'
 
 jobs:
   extract-tag:
@@ -27,17 +11,14 @@ jobs:
     outputs:
       clean_tag: ${{ steps.tag.outputs.clean_tag }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
       - name: Extract tag
         id: tag
         run: |
-          echo "clean_tag=dev" | tee -a $GITHUB_OUTPUT
+          TAG=${GITHUB_REF#refs/tags/dapp-v}
+          echo "clean_tag=${TAG}" >> $GITHUB_OUTPUT
 
   docker-publish:
     uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/docker-build.yml@docker-build-v2.3.1
-    needs: [extract-tag]
     with:
       image-name: 'iexechub/web3telegram-dapp'
       registry: 'docker.io'
@@ -54,7 +35,7 @@ jobs:
 
   sconify:
     uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/sconify.yml@sconify-v2.0.0
-    needs: [docker-publish, extract-tag]
+    needs: [docker-publish]
     with:
       image-name: 'iexechub/web3telegram-dapp'
       image-tag: ${{ needs.extract-tag.outputs.clean_tag }}
@@ -79,10 +60,14 @@ jobs:
       scontain-password: ${{ secrets.SCONTAIN_REGISTRY_PAT }}
       scone-signing-key: ${{ secrets.SCONIFY_SIGNING_PRIVATE_KEY }}
 
-  deploy-dapp:
+  deploy-multi-env-prod:
+    strategy:
+      matrix:
+        # TODO: bellecour-prod already deployed add it back for next release
+        environment: [arbitrum-sepolia-prod, arbitrum-mainnet-prod]
     needs: [extract-tag, sconify]
     runs-on: ubuntu-latest
-    environment: ${{ inputs.environment }}
+    environment: ${{ matrix.environment }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -115,7 +100,7 @@ jobs:
       - name: Push dapp secret
         env:
           WALLET_PRIVATE_KEY: ${{ secrets.WEB3TELEGRAM_DAPP_OWNER_PRIVATEKEY }}
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN_DEV }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN_PROD }}
           RPC_URL: ${{ secrets.RPC_URL }}
         run: |
           cd deployment-dapp
@@ -124,8 +109,8 @@ jobs:
       - name: Publish free sell order
         env:
           WALLET_PRIVATE_KEY: ${{ secrets.WEB3TELEGRAM_DAPP_OWNER_PRIVATEKEY }}
-          PRICE: ${{ inputs.price || vars.SELL_ORDER_PRICE }}
-          VOLUME: ${{ inputs.volume || vars.SELL_ORDER_VOLUME }}
+          PRICE: ${{ vars.SELL_ORDER_PRICE }}
+          VOLUME: ${{ vars.SELL_ORDER_VOLUME }}
           RPC_URL: ${{ secrets.RPC_URL }}
         run: |
           cd deployment-dapp
