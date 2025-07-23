@@ -1,11 +1,11 @@
 import { describe, expect, it } from '@jest/globals';
 import { IExecDataProtector } from '@iexec/dataprotector';
 import { IExecWeb3telegram } from '../../src/index.js';
-import { CHAIN_CONFIG, CHAIN_IDS } from '../../src/config/config.js';
 import {
-  getTestConfig,
-  waitSubgraphIndexing,
-} from '../test-utils.js';
+  DEFAULT_CHAIN_ID,
+  getChainDefaultConfig,
+} from '../../src/config/config.js';
+import { getTestConfig, waitSubgraphIndexing } from '../test-utils.js';
 import { HDNodeWallet, Wallet } from 'ethers';
 import { NULL_ADDRESS } from 'iexec/utils';
 import {
@@ -22,6 +22,7 @@ describe('web3telegram.fetchMyContacts()', () => {
   let web3telegram: IExecWeb3telegram;
   let dataProtector: IExecDataProtector;
   let protectedData: any;
+  const defaultConfig = getChainDefaultConfig(DEFAULT_CHAIN_ID);
 
   beforeAll(async () => {
     wallet = Wallet.createRandom();
@@ -38,7 +39,7 @@ describe('web3telegram.fetchMyContacts()', () => {
     'pass with a granted access for a specific requester',
     async () => {
       await dataProtector.core.grantAccess({
-        authorizedApp: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].dappAddress,
+        authorizedApp: defaultConfig.dappAddress,
         protectedData: protectedData.address,
         authorizedUser: wallet.address,
       });
@@ -48,11 +49,11 @@ describe('web3telegram.fetchMyContacts()', () => {
       });
       expect(
         foundContactForASpecificRequester &&
-        foundContactForASpecificRequester.address
+          foundContactForASpecificRequester.address
       ).toBeDefined();
       expect(
         foundContactForASpecificRequester &&
-        foundContactForASpecificRequester.address
+          foundContactForASpecificRequester.address
       ).toBe(protectedData.address.toLocaleLowerCase());
     },
     MAX_EXPECTED_WEB2_SERVICES_TIME
@@ -63,7 +64,7 @@ describe('web3telegram.fetchMyContacts()', () => {
     async () => {
       const grantedAccessForAnyRequester = await dataProtector.core.grantAccess(
         {
-          authorizedApp: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].dappAddress,
+          authorizedApp: defaultConfig.dappAddress,
           protectedData: protectedData.address,
           authorizedUser: NULL_ADDRESS,
         }
@@ -103,7 +104,7 @@ describe('web3telegram.fetchMyContacts()', () => {
       const encryptionKey = await iexec.dataset.generateEncryptionKey();
       await iexec.dataset.pushDatasetSecret(dataset.address, encryptionKey);
       await dataProtector.core.grantAccess({
-        authorizedApp: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].dappAddress,
+        authorizedApp: defaultConfig.dappAddress,
         protectedData: dataset.address,
         authorizedUser: wallet.address,
       });
@@ -125,7 +126,7 @@ describe('web3telegram.fetchMyContacts()', () => {
       await waitSubgraphIndexing();
 
       await dataProtector.core.grantAccess({
-        authorizedApp: CHAIN_CONFIG[CHAIN_IDS.BELLECOUR].dappAddress,
+        authorizedApp: defaultConfig.dappAddress,
         protectedData: notValidProtectedData.address,
         authorizedUser: wallet.address,
       });
