@@ -134,14 +134,14 @@ jobs:
       - name: Add resource to whitelist
         env:
           CONTRACT_ADDRESS: ${{ vars.WEB3TELEGRAM_WHITELIST_CONTRACT_ADDRESS }}
-          WALLET_PRIVATE_KEY: ${{ secrets.WEB3TELEGRAM_APP_OWNER_PRIVATEKEY }}
+          PRIVATE_KEY: ${{ secrets.WEB3TELEGRAM_APP_OWNER_PRIVATEKEY }}
         run: |
           cd node_modules/whitelist-smart-contract
           export ADDRESS_TO_ADD=$(cat ../../deployment-dapp/.app-address)
           if [ "${{ inputs.environment }}" = "arbitrum-sepolia-dev" ]; then
             npm run addResourceToWhitelist -- --network arbitrumSepolia
           else
-            npm run addResourceToWhitelist
+            npm run addResourceToWhitelist -- --network bellecour
           fi
 
       - name: Configure ENS
