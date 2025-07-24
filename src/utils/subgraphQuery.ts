@@ -93,7 +93,6 @@ export const checkProtectedDataValidity = async (
       start: 0,
       range: 1,
     };
-
     const protectedDataResultQuery: GraphQLResponse =
       await graphQLClient.request(checkProtectedDataQuery, variables);
 

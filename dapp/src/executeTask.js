@@ -1,13 +1,13 @@
 import { IExecDataProtectorDeserializer } from '@iexec/dataprotector-deserializer';
 import { promises as fs } from 'fs';
-import { decryptContent, downloadEncryptedContent } from './decryptContent';
-import sendTelegram from './telegramService';
+import { decryptContent, downloadEncryptedContent } from './decryptContent.js';
+import sendTelegram from './telegramService.js';
 import {
   validateAppSecret,
   validateProtectedData,
   validateRequesterSecret,
   validateWorkerEnv,
-} from './validation';
+} from './validation.js';
 
 async function writeTaskOutput(path, message) {
   try {
