@@ -123,11 +123,7 @@ jobs:
         run: |
           cd node_modules/whitelist-smart-contract
           export ADDRESS_TO_ADD=$(cat ../../deployment-dapp/.app-address)
-          if [ "${{ matrix.environment }}" = "arbitrum-sepolia-prod" ]; then
-            npm run addResourceToWhitelist -- --network arbitrumSepolia
-          else
-            npm run addResourceToWhitelist -- --network bellecour
-          fi
+          npm run addResourceToWhitelist -- --network ${{ vars.WHITELIST_NETWORK_NAME }}
 
       - name: Configure ENS
         if: ${{ vars.DAPP_ENS_NAME }}
