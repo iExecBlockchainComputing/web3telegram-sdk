@@ -93,11 +93,8 @@ export const checkProtectedDataValidity = async (
       start: 0,
       range: 1,
     };
-    const headers = {
-      Authorization: 'Bearer e4ad354aca9d53f18458c970dcb2784e',
-    };
     const protectedDataResultQuery: GraphQLResponse =
-      await graphQLClient.request(checkProtectedDataQuery, variables, headers);
+      await graphQLClient.request(checkProtectedDataQuery, variables);
 
     const { protectedDatas } = protectedDataResultQuery;
 
