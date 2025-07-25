@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.0-alpha.2](https://github.com/iExecBlockchainComputing/web3telegram-sdk/compare/web3telegram-v0.1.0-alpha.1...web3telegram-v0.1.0-alpha.2) (2025-07-24)
+
+
+### Added
+
+* add multi-chain configuration and experimental networks support ([#46](https://github.com/iExecBlockchainComputing/web3telegram-sdk/issues/46)) ([26715d1](https://github.com/iExecBlockchainComputing/web3telegram-sdk/commit/26715d164bd574d41d01ba5b31853ee10ca6b37e))
+* dapp address resolution from compass ([#53](https://github.com/iExecBlockchainComputing/web3telegram-sdk/issues/53)) ([9895a48](https://github.com/iExecBlockchainComputing/web3telegram-sdk/commit/9895a482006e4f97d8195605559f8af17d89092c))
+
 ## [0.1.0-alpha.1](https://github.com/iExecBlockchainComputing/web3telegram-sdk/compare/web3telegram-v0.1.0-alpha.0...web3telegram-v0.1.0-alpha.1) (2025-07-23)
 
 
