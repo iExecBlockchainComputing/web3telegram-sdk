@@ -121,7 +121,7 @@ jobs:
       - name: Push dapp secret
         env:
           WALLET_PRIVATE_KEY: ${{ secrets.WEB3TELEGRAM_APP_OWNER_PRIVATEKEY }}
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN_DEV }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           RPC_URL: ${{ secrets.RPC_URL }}
         run: |
           cd deployment-dapp
