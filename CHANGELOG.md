@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.0-alpha.2](https://github.com/iExecBlockchainComputing/web3telegram-sdk/compare/web3telegram-v0.1.0-alpha.1...web3telegram-v0.1.0-alpha.2) (2025-07-30)
+
+
+### Added
+
+* add multi-chain configuration and experimental networks support ([#46](https://github.com/iExecBlockchainComputing/web3telegram-sdk/issues/46)) ([26715d1](https://github.com/iExecBlockchainComputing/web3telegram-sdk/commit/26715d164bd574d41d01ba5b31853ee10ca6b37e))
+* dapp address resolution from compass ([#53](https://github.com/iExecBlockchainComputing/web3telegram-sdk/issues/53)) ([9895a48](https://github.com/iExecBlockchainComputing/web3telegram-sdk/commit/9895a482006e4f97d8195605559f8af17d89092c))
+
+
+### Changed
+
+* add .js extensions to ES module imports ([#56](https://github.com/iExecBlockchainComputing/web3telegram-sdk/issues/56)) ([0a63891](https://github.com/iExecBlockchainComputing/web3telegram-sdk/commit/0a638918b08e7c2f9f62bf155609f267d39e3ba5))
+* move to latest arbitrum-sepolia-testnet deployment ([#61](https://github.com/iExecBlockchainComputing/web3telegram-sdk/issues/61)) ([d83605e](https://github.com/iExecBlockchainComputing/web3telegram-sdk/commit/d83605e369e75aff91690d2958b1345147cb367e))
+* prevent fetchUserContacts error when user has no contact ([#64](https://github.com/iExecBlockchainComputing/web3telegram-sdk/issues/64)) ([261dcb1](https://github.com/iExecBlockchainComputing/web3telegram-sdk/commit/261dcb1cec05641555966df85f58cceb78f3ad15))
+
 ## [0.1.0-alpha.1](https://github.com/iExecBlockchainComputing/web3telegram-sdk/compare/web3telegram-v0.1.0-alpha.0...web3telegram-v0.1.0-alpha.1) (2025-07-23)
 
 
