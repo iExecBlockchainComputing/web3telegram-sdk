@@ -42,115 +42,179 @@ describe('web3telegram.fetchMyContacts()', () => {
     await waitSubgraphIndexing();
   }, 4 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME);
 
-  it(
-    'Tow different user should have different contacts',
-    async () => {
-      const user1 = Wallet.createRandom().address;
-      const user2 = Wallet.createRandom().address;
-      const defaultConfig = getChainDefaultConfig(DEFAULT_CHAIN_ID);
-      await dataProtector.grantAccess({
-        authorizedApp: defaultConfig.dappAddress,
-        protectedData: protectedData1.address,
-        authorizedUser: user1,
-      });
+  describe('when no access is granted', () => {
+    it(
+      'should return an empty contact array',
+      async () => {
+        const noAccessUser = Wallet.createRandom().address;
 
-      await dataProtector.grantAccess({
-        authorizedApp: defaultConfig.dappAddress,
-        protectedData: protectedData2.address,
-        authorizedUser: user2,
-      });
+        const contacts = await web3telegram.fetchUserContacts({
+          userAddress: noAccessUser,
+          isUserStrict: true,
+        });
+        console.log('🚀 ~ contacts:', contacts);
 
-      const contactUser1 = await web3telegram.fetchUserContacts({
-        userAddress: user1,
-      });
-      const contactUser2 = await web3telegram.fetchUserContacts({
-        userAddress: user2,
-      });
-      expect(contactUser1).not.toEqual(contactUser2);
-    },
-    MAX_EXPECTED_WEB2_SERVICES_TIME
-  );
+        expect(contacts.length).toBe(0);
+      },
+      2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+    );
+  });
 
-  it(
-    'Test that the protected data can be accessed by authorized user',
-    async () => {
-      const userWithAccess = Wallet.createRandom().address;
-      const defaultConfig = getChainDefaultConfig(DEFAULT_CHAIN_ID);
-      await dataProtector.grantAccess({
-        authorizedApp: defaultConfig.dappAddress,
-        protectedData: protectedData1.address,
-        authorizedUser: userWithAccess,
-      });
+  describe('when access is granted', () => {
+    it(
+      'should return the user contacts for both app and whitelist',
+      async () => {
+        const userWithAccess = Wallet.createRandom().address;
+        const defaultConfig = getChainDefaultConfig(DEFAULT_CHAIN_ID);
+        expect(defaultConfig).not.toBeNull();
+        const authorizedApp = defaultConfig!.dappAddress;
+        const authorizedWhitelist = defaultConfig!.whitelistSmartContract;
 
-      const contacts = await web3telegram.fetchUserContacts({
-        userAddress: userWithAccess,
-      });
-      expect(contacts.length).toBeGreaterThan(0);
-    },
-    MAX_EXPECTED_WEB2_SERVICES_TIME
-  );
+        await dataProtector.grantAccess({
+          authorizedApp: authorizedApp,
+          protectedData: protectedData1.address,
+          authorizedUser: userWithAccess,
+        });
 
-  it(
-    'should throw a protocol error',
-    async () => {
-      // Call getTestConfig to get the default configuration
-      const [ethProvider, defaultOptions] = getTestConfig(wallet.privateKey);
-      const user1 = Wallet.createRandom().address;
+        await dataProtector.grantAccess({
+          authorizedApp: authorizedWhitelist,
+          protectedData: protectedData2.address,
+          authorizedUser: userWithAccess,
+        });
 
-      const options = {
-        ...defaultOptions,
-        iexecOptions: {
-          ...defaultOptions.iexecOptions,
-          iexecGatewayURL: 'https://test',
-        },
-      };
+        const contacts = await web3telegram.fetchUserContacts({
+          userAddress: userWithAccess,
+          isUserStrict: true,
+        });
+        expect(contacts.length).toBe(2);
+      },
+      MAX_EXPECTED_WEB2_SERVICES_TIME
+    );
 
-      // Pass the modified options to IExecWeb3telegram
-      const invalidWeb3telegram = new IExecWeb3telegram(ethProvider, options);
-      let error: WorkflowError | undefined;
+    it(
+      'Two different user should have different contacts',
+      async () => {
+        const user1 = Wallet.createRandom().address;
+        const user2 = Wallet.createRandom().address;
+        const defaultConfig = getChainDefaultConfig(DEFAULT_CHAIN_ID);
+        await dataProtector.grantAccess({
+          authorizedApp: defaultConfig.dappAddress,
+          protectedData: protectedData1.address,
+          authorizedUser: user1,
+        });
 
-      try {
-        await invalidWeb3telegram.fetchUserContacts({
+        await dataProtector.grantAccess({
+          authorizedApp: defaultConfig.dappAddress,
+          protectedData: protectedData2.address,
+          authorizedUser: user2,
+        });
+
+        const contactUser1 = await web3telegram.fetchUserContacts({
           userAddress: user1,
         });
-      } catch (err) {
-        error = err as WorkflowError;
-      }
+        const contactUser2 = await web3telegram.fetchUserContacts({
+          userAddress: user2,
+        });
+        expect(contactUser1).not.toEqual(contactUser2);
+      },
+      MAX_EXPECTED_WEB2_SERVICES_TIME
+    );
 
-      expect(error).toBeInstanceOf(WorkflowError);
-      expect(error?.message).toBe(
-        "A service in the iExec protocol appears to be unavailable. You can retry later or contact iExec's technical support for help."
-      );
-      expect(error?.isProtocolError).toBe(true);
-    },
-    2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
-  );
+    it(
+      'Test that the protected data can be accessed by authorized user',
+      async () => {
+        const userWithAccess = Wallet.createRandom().address;
+        const defaultConfig = getChainDefaultConfig(DEFAULT_CHAIN_ID);
+        await dataProtector.grantAccess({
+          authorizedApp: defaultConfig.dappAddress,
+          protectedData: protectedData1.address,
+          authorizedUser: userWithAccess,
+        });
 
-  it(
-    'should throw a fetchUserContacts error',
-    async () => {
-      // Call getTestConfig to get the default configuration
-      const [ethProvider, defaultOptions] = getTestConfig(wallet.privateKey);
+        const contacts = await web3telegram.fetchUserContacts({
+          userAddress: userWithAccess,
+        });
+        expect(contacts.length).toBeGreaterThan(0);
+      },
+      MAX_EXPECTED_WEB2_SERVICES_TIME
+    );
+  });
 
-      const options = {
-        ...defaultOptions,
-        dataProtectorSubgraph: 'https://test',
-      };
+  describe('when iexec market API is not reachable', () => {
+    it(
+      'should throw a protocol error',
+      async () => {
+        // Call getTestConfig to get the default configuration
+        const [ethProvider, defaultOptions] = getTestConfig(wallet.privateKey);
+        const user1 = Wallet.createRandom().address;
 
-      // Pass the modified options to IExecWeb3telegram
-      const invalidWeb3telegram = new IExecWeb3telegram(ethProvider, options);
-      let error: WorkflowError | undefined;
+        const options = {
+          ...defaultOptions,
+          iexecOptions: {
+            ...defaultOptions.iexecOptions,
+            iexecGatewayURL: 'https://test',
+          },
+        };
 
-      try {
-        await invalidWeb3telegram.fetchMyContacts();
-      } catch (err) {
-        error = err as WorkflowError;
-      }
+        // Pass the modified options to IExecWeb3telegram
+        const invalidWeb3telegram = new IExecWeb3telegram(ethProvider, options);
+        let error: WorkflowError | undefined;
 
-      expect(error).toBeInstanceOf(WorkflowError);
-      expect(error?.message).toBe('Failed to fetch user contacts');
-      expect(error?.isProtocolError).toBe(false);
-    },
-    2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
-  );
+        try {
+          await invalidWeb3telegram.fetchUserContacts({
+            userAddress: user1,
+          });
+        } catch (err) {
+          error = err as WorkflowError;
+        }
+
+        expect(error).toBeInstanceOf(WorkflowError);
+        expect(error?.message).toBe(
+          "A service in the iExec protocol appears to be unavailable. You can retry later or contact iExec's technical support for help."
+        );
+        expect(error?.isProtocolError).toBe(true);
+      },
+      2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+    );
+  });
+
+  describe('when subgraph is not reachable', () => {
+    it(
+      'should throw a fetchUserContacts error',
+      async () => {
+        // Call getTestConfig to get the default configuration
+        const [ethProvider, defaultOptions] = getTestConfig(wallet.privateKey);
+
+        const defaultConfig = getChainDefaultConfig(DEFAULT_CHAIN_ID);
+        expect(defaultConfig).not.toBeNull();
+        const authorizedApp = defaultConfig!.dappAddress;
+
+        await dataProtector.grantAccess({
+          authorizedApp: authorizedApp,
+          protectedData: protectedData1.address,
+          authorizedUser: ethProvider.address,
+        });
+
+        const options = {
+          ...defaultOptions,
+          dataProtectorSubgraph: 'https://test',
+        };
+
+        // Pass the modified options to IExecWeb3telegram
+        const invalidWeb3telegram = new IExecWeb3telegram(ethProvider, options);
+        let error: WorkflowError | undefined;
+
+        try {
+          await invalidWeb3telegram.fetchMyContacts();
+        } catch (err) {
+          error = err as WorkflowError;
+        }
+
+        expect(error).toBeInstanceOf(WorkflowError);
+        expect(error?.message).toBe('Failed to fetch user contacts');
+        expect(error?.isProtocolError).toBe(false);
+      },
+      2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+    );
+  });
 });
