@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.0-alpha.3](https://github.com/iExecBlockchainComputing/web3telegram-sdk/compare/web3telegram-v0.1.0-alpha.2...web3telegram-v0.1.0-alpha.3) (2025-07-31)
+
+
+### Added
+
+* add name, accessPrice and remainingAccess properties to Contact ([#66](https://github.com/iExecBlockchainComputing/web3telegram-sdk/issues/66)) ([a89bc58](https://github.com/iExecBlockchainComputing/web3telegram-sdk/commit/a89bc584e28d164282776af25b82061fbf7e54b9))
+
+
+### Changed
+
+* stop exporting internal types ([a89bc58](https://github.com/iExecBlockchainComputing/web3telegram-sdk/commit/a89bc584e28d164282776af25b82061fbf7e54b9))
+
 ## [0.1.0-alpha.2](https://github.com/iExecBlockchainComputing/web3telegram-sdk/compare/web3telegram-v0.1.0-alpha.1...web3telegram-v0.1.0-alpha.2) (2025-07-30)
 
 
