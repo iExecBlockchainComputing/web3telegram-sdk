@@ -10,14 +10,15 @@ import {
   isEnsTest,
   throwIfMissing,
 } from '../utils/validators.js';
+import { Contact, FetchUserContactsParams } from './types.js';
+import { IExec } from 'iexec';
+import { PublishedDatasetorder } from 'iexec/IExecOrderbookModule';
 import {
-  Contact,
   DappAddressConsumer,
   DappWhitelistAddressConsumer,
-  FetchUserContactsParams,
   IExecConsumer,
   SubgraphConsumer,
-} from './types.js';
+} from './internalTypes.js';
 
 export const fetchUserContacts = async ({
   graphQLClient = throwIfMissing(),
@@ -63,7 +64,7 @@ export const fetchUserContacts = async ({
       }),
     ]);
     const orders = dappOrders.concat(whitelistOrders);
-    const myContacts: Contact[] = [];
+    const myContacts: Omit<Contact, 'name'>[] = [];
     let web3DappResolvedAddress = vDappAddressOrENS;
     if (isEnsTest(vDappAddressOrENS)) {
       web3DappResolvedAddress = await iexec.ens.resolveName(vDappAddressOrENS);
@@ -78,6 +79,8 @@ export const fetchUserContacts = async ({
         const contact = {
           address: order.order.dataset.toLowerCase(),
           owner: order.signer.toLowerCase(),
+          remainingAccess: order.remaining,
+          accessPrice: order.order.datasetprice,
           accessGrantTimestamp: order.publicationTimestamp,
           isUserStrict: order.order.requesterrestrict !== ZeroAddress,
         };
@@ -102,7 +105,12 @@ async function fetchAllOrdersByApp({
   userAddress,
   appAddress,
   isUserStrict,
-}) {
+}: {
+  iexec: IExec;
+  userAddress: string;
+  appAddress: string;
+  isUserStrict: boolean;
+}): Promise<PublishedDatasetorder[]> {
   const ordersFirstPage = iexec.orderbook.fetchDatasetOrderbook(
     ANY_DATASET_ADDRESS,
     {

@@ -52,7 +52,6 @@ describe('web3telegram.fetchMyContacts()', () => {
           userAddress: noAccessUser,
           isUserStrict: true,
         });
-        console.log('🚀 ~ contacts:', contacts);
 
         expect(contacts.length).toBe(0);
       },
@@ -61,6 +60,33 @@ describe('web3telegram.fetchMyContacts()', () => {
   });
 
   describe('when access is granted', () => {
+    it('contacts should contain name, accessPrice, remainingAccess, owner, accessGrantTimestamp, and isUserStrict', async () => {
+      const userWithAccess = Wallet.createRandom().address;
+
+      await web3telegram.init();
+      // eslint-disable-next-line @typescript-eslint/dot-notation
+      const authorizedApp = web3telegram['dappAddressOrENS'];
+
+      await dataProtector.grantAccess({
+        authorizedApp: authorizedApp,
+        protectedData: protectedData1.address,
+        authorizedUser: userWithAccess,
+      });
+
+      const contacts = await web3telegram.fetchUserContacts({
+        userAddress: userWithAccess,
+        isUserStrict: true,
+      });
+      expect(contacts.length).toBe(1);
+      expect(contacts[0].address).toBe(protectedData1.address.toLowerCase());
+      expect(contacts[0].owner).toBeDefined();
+      expect(contacts[0].accessPrice).toBe(0);
+      expect(contacts[0].remainingAccess).toBe(1);
+      expect(contacts[0].accessGrantTimestamp).toBeDefined();
+      expect(contacts[0].isUserStrict).toBe(true);
+      expect(contacts[0].name).toBe('test do not use');
+    });
+
     it(
       'should return the user contacts for both app and whitelist',
       async () => {

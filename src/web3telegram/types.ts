@@ -1,12 +1,7 @@
-import { GraphQLClient } from 'graphql-request';
-import { EnhancedWallet, IExec } from 'iexec';
+import { EnhancedWallet } from 'iexec';
 import { IExecConfigOptions } from 'iexec/IExecConfig';
 
 export type Web3SignerProvider = EnhancedWallet;
-
-export type IExecConsumer = {
-  iexec: IExec;
-};
 
 export type ENS = string;
 
@@ -21,6 +16,9 @@ export type Contact = {
   owner: Address;
   accessGrantTimestamp: TimeStamp;
   isUserStrict: boolean;
+  name: string;
+  remainingAccess: number;
+  accessPrice: number;
 };
 
 export type SendTelegramParams = {
@@ -51,21 +49,6 @@ export type FetchUserContactsParams = {
 
 export type SendTelegramResponse = {
   taskId: string;
-};
-
-/**
- * Internal props for querying the subgraph
- */
-export type ProtectedDataQuery = {
-  id: string;
-};
-
-export type GraphQLResponse = {
-  protectedDatas: ProtectedDataQuery[];
-};
-
-export type SubgraphConsumer = {
-  graphQLClient: GraphQLClient;
 };
 
 /**
@@ -114,20 +97,4 @@ export type Web3TelegramConfigOptions = {
    * ⚠️ experimental networks are networks on which the iExec's stack is partially deployed, experimental networks can be subject to instabilities or discontinuity. Access is provided without warranties.
    */
   allowExperimentalNetworks?: boolean;
-};
-
-export type DappAddressConsumer = {
-  dappAddressOrENS: AddressOrENS;
-};
-
-export type IpfsNodeConfigConsumer = {
-  ipfsNode: string;
-};
-
-export type IpfsGatewayConfigConsumer = {
-  ipfsGateway: string;
-};
-
-export type DappWhitelistAddressConsumer = {
-  dappWhitelistAddress: string;
 };

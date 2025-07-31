@@ -18,20 +18,19 @@ import {
   senderNameSchema,
   booleanSchema,
 } from '../utils/validators.js';
+import { SendTelegramParams, SendTelegramResponse } from './types.js';
+import {
+  checkUserVoucher,
+  filterWorkerpoolOrders,
+} from '../utils/sendTelegram.models.js';
 import {
   DappAddressConsumer,
   DappWhitelistAddressConsumer,
   IExecConsumer,
   IpfsGatewayConfigConsumer,
   IpfsNodeConfigConsumer,
-  SendTelegramParams,
-  SendTelegramResponse,
   SubgraphConsumer,
-} from './types.js';
-import {
-  checkUserVoucher,
-  filterWorkerpoolOrders,
-} from '../utils/sendTelegram.models.js';
+} from './internalTypes.js';
 
 export type SendTelegram = typeof sendTelegram;
 
