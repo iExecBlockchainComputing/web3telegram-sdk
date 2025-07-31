@@ -4,10 +4,6 @@ import { IExecConfigOptions } from 'iexec/IExecConfig';
 
 export type Web3SignerProvider = EnhancedWallet;
 
-export type IExecConsumer = {
-  iexec: IExec;
-};
-
 export type ENS = string;
 
 export type AddressOrENS = Address | ENS;
@@ -21,6 +17,9 @@ export type Contact = {
   owner: Address;
   accessGrantTimestamp: TimeStamp;
   isUserStrict: boolean;
+  name: string;
+  remainingAccess: number;
+  accessPrice: number;
 };
 
 export type SendTelegramParams = {
@@ -51,17 +50,6 @@ export type FetchUserContactsParams = {
 
 export type SendTelegramResponse = {
   taskId: string;
-};
-
-/**
- * Internal props for querying the subgraph
- */
-export type ProtectedDataQuery = {
-  id: string;
-};
-
-export type GraphQLResponse = {
-  protectedDatas: ProtectedDataQuery[];
 };
 
 export type SubgraphConsumer = {
@@ -116,6 +104,8 @@ export type Web3TelegramConfigOptions = {
   allowExperimentalNetworks?: boolean;
 };
 
+// TODO move these internal types
+
 export type DappAddressConsumer = {
   dappAddressOrENS: AddressOrENS;
 };
@@ -130,4 +120,8 @@ export type IpfsGatewayConfigConsumer = {
 
 export type DappWhitelistAddressConsumer = {
   dappWhitelistAddress: string;
+};
+
+export type IExecConsumer = {
+  iexec: IExec;
 };
