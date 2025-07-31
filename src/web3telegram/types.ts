@@ -1,5 +1,4 @@
-import { GraphQLClient } from 'graphql-request';
-import { EnhancedWallet, IExec } from 'iexec';
+import { EnhancedWallet } from 'iexec';
 import { IExecConfigOptions } from 'iexec/IExecConfig';
 
 export type Web3SignerProvider = EnhancedWallet;
@@ -52,10 +51,6 @@ export type SendTelegramResponse = {
   taskId: string;
 };
 
-export type SubgraphConsumer = {
-  graphQLClient: GraphQLClient;
-};
-
 /**
  * Configuration options for web3telegram.
  */
@@ -102,26 +97,4 @@ export type Web3TelegramConfigOptions = {
    * ⚠️ experimental networks are networks on which the iExec's stack is partially deployed, experimental networks can be subject to instabilities or discontinuity. Access is provided without warranties.
    */
   allowExperimentalNetworks?: boolean;
-};
-
-// TODO move these internal types
-
-export type DappAddressConsumer = {
-  dappAddressOrENS: AddressOrENS;
-};
-
-export type IpfsNodeConfigConsumer = {
-  ipfsNode: string;
-};
-
-export type IpfsGatewayConfigConsumer = {
-  ipfsGateway: string;
-};
-
-export type DappWhitelistAddressConsumer = {
-  dappWhitelistAddress: string;
-};
-
-export type IExecConsumer = {
-  iexec: IExec;
 };

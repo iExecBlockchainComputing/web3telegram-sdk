@@ -10,16 +10,15 @@ import {
   isEnsTest,
   throwIfMissing,
 } from '../utils/validators.js';
-import {
-  Contact,
-  DappAddressConsumer,
-  DappWhitelistAddressConsumer,
-  FetchUserContactsParams,
-  IExecConsumer,
-  SubgraphConsumer,
-} from './types.js';
+import { Contact, FetchUserContactsParams } from './types.js';
 import { IExec } from 'iexec';
 import { PublishedDatasetorder } from 'iexec/IExecOrderbookModule';
+import {
+  DappAddressConsumer,
+  DappWhitelistAddressConsumer,
+  IExecConsumer,
+  SubgraphConsumer,
+} from './internalTypes.js';
 
 export const fetchUserContacts = async ({
   graphQLClient = throwIfMissing(),
