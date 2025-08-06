@@ -35,8 +35,18 @@ export const CHAIN_CONFIG: Record<number, ChainConfig> = {
       'https://thegraph.arbitrum-sepolia-testnet.iex.ec/api/subgraphs/id/5YjRPLtjS6GH6bB4yY55Qg4HzwtRGQ8TaHtGf9UBWWd',
     ipfsGateway: 'https://ipfs-gateway.arbitrum-sepolia-testnet.iex.ec',
     ipfsUploadUrl: 'https://ipfs-upload.arbitrum-sepolia-testnet.iex.ec',
-    whitelistSmartContract: '0x7291ff96100DA6CF97933C225B86124ef95aEc9b', // TODO: add the correct address
+    whitelistSmartContract: '0x7291ff96100DA6CF97933C225B86124ef95aEc9b',
     isExperimental: true,
+  },
+  42161: {
+    name: 'arbitrum-mainnet',
+    dappAddress: undefined, // ENS not supported on this network, address will be resolved from Compass
+    prodWorkerpoolAddress: '0x2C06263943180Cc024dAFfeEe15612DB6e5fD248',
+    dataProtectorSubgraph:
+      'https://thegraph.arbitrum.iex.ec/api/subgraphs/id/Ep5zs5zVr4tDiVuQJepUu51e5eWYJpka624X4DMBxe3u',
+    ipfsGateway: 'https://ipfs-gateway.arbitrum-mainnet.iex.ec',
+    ipfsUploadUrl: 'https://ipfs-upload.arbitrum-mainnet.iex.ec',
+    whitelistSmartContract: '0x53AFc09a647e7D5Fa9BDC784Eb3623385C45eF89',
   },
 };
 
