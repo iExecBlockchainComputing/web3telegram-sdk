@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.0-alpha.4](https://github.com/iExecBlockchainComputing/web3telegram-sdk/compare/web3telegram-v0.1.0-alpha.3...web3telegram-v0.1.0-alpha.4) (2025-08-07)
+
+
+### Added
+
+* add support arbitrum mainnet ([7cf7580](https://github.com/iExecBlockchainComputing/web3telegram-sdk/commit/7cf7580810b8a70079bec34a014507f279ea7f97))
+* add support arbitrum mainnet ([7cf7580](https://github.com/iExecBlockchainComputing/web3telegram-sdk/commit/7cf7580810b8a70079bec34a014507f279ea7f97))
+
 ## [0.1.0-alpha.3](https://github.com/iExecBlockchainComputing/web3telegram-sdk/compare/web3telegram-v0.1.0-alpha.2...web3telegram-v0.1.0-alpha.3) (2025-07-31)
 
 

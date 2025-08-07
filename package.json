@@ -1,6 +1,6 @@
 {
   "name": "@iexec/web3telegram",
-  "version": "0.1.0-alpha.3",
+  "version": "0.1.0-alpha.4",
   "description": "Enables secure, blockchain-based messaging by encrypting Telegram user IDs for privacy. It lets users message Ethereum account holders without knowing their Telegram details.",
   "main": "./dist/index.js",
   "type": "module",
