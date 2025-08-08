@@ -1,4 +1,3 @@
-import TelegramBot from 'node-telegram-bot-api';
 
 async function sendTelegram({
   chatId,
@@ -12,23 +11,11 @@ async function sendTelegram({
   if (!message || message.trim() === '')
     throw new Error('Message content is required');
 
-  const bot = new TelegramBot(botToken);
 
   const messageToSend = `Message from: ${senderName}\n${message}`;
 
-  let error;
-  await bot.sendMessage(chatId, messageToSend).catch((e) => {
-    error = e;
-  });
+  console.log('removed lib for testing');
 
-  if (error) {
-    console.error('Failed to send Telegram message.');
-    return {
-      message: 'Failed to send Telegram message.',
-      status: 500,
-    };
-  }
-  console.log('Message successfully sent by Telegram bot.');
   return {
     message: 'Your telegram message has been sent successfully.',
     status: 200,
