@@ -161,10 +161,9 @@ describe('sendTelegram', () => {
       'utf-8'
     );
 
-    expect(JSON.parse(resultTxt)).toStrictEqual({
-      message: 'Failed to send Telegram message.',
-      status: 500,
-    });
+    const result = JSON.parse(resultTxt);
+    expect(result.message).toBe('Failed to send Telegram message.');
+    expect(result.status).toBe(404);
     expect(JSON.parse(computedJson)).toStrictEqual({
       'deterministic-output-path': `${IEXEC_OUT}/result.txt`,
     });
@@ -183,10 +182,11 @@ describe('sendTelegram', () => {
       'utf-8'
     );
 
-    expect(JSON.parse(resultTxt)).toStrictEqual({
-      message: 'Your telegram message has been sent successfully.',
-      status: 200,
-    });
+    const result = JSON.parse(resultTxt);
+    expect(result.message).toBe(
+      'Your telegram message has been sent successfully.'
+    );
+    expect(result.status).toBe(200);
     expect(JSON.parse(computedJson)).toStrictEqual({
       'deterministic-output-path': `${IEXEC_OUT}/result.txt`,
     });

@@ -1,4 +1,3 @@
-
 async function sendTelegram({
   chatId,
   message,
@@ -14,26 +13,26 @@ async function sendTelegram({
   const messageToSend = `Message from: ${senderName}\n${message}`;
 
   try {
-    const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        chat_id: chatId,
-        text: messageToSend,
-        parse_mode: 'HTML'
-      })
-    });
-
-    const result = await response.json();
+    const response = await fetch(
+      `https://api.telegram.org/bot${botToken}/sendMessage`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: messageToSend,
+          parse_mode: 'HTML',
+        }),
+      }
+    );
 
     if (!response.ok) {
-      console.error('Telegram API Error:', result);
+      console.error('Telegram API Error');
       return {
         message: 'Failed to send Telegram message.',
         status: response.status,
-        error: result.description
       };
     }
 
@@ -41,14 +40,12 @@ async function sendTelegram({
     return {
       message: 'Your telegram message has been sent successfully.',
       status: 200,
-      result
     };
   } catch (error) {
-    console.error('Failed to send Telegram message:', error);
+    console.error('Failed to send Telegram message');
     return {
       message: 'Failed to send Telegram message.',
       status: 500,
-      error: error.message
     };
   }
 }
