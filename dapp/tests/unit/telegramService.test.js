@@ -1,13 +1,8 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { jest } from '@jest/globals';
 
-await jest.unstable_mockModule('node-telegram-bot-api', () => ({
-  default: jest.fn().mockImplementation(() => ({
-    sendMessage: jest.fn().mockResolvedValue({}),
-  })),
-}));
-
-const TelegramBot = (await import('node-telegram-bot-api')).default;
+// Mock fetch globally
+global.fetch = jest.fn();
 
 const sendTelegram = (await import('../../src/telegramService')).default;
 
@@ -22,10 +17,11 @@ describe('sendTelegram', () => {
   });
 
   it('sends a Telegram message successfully', async () => {
-    const mockSendMessage = jest.fn().mockResolvedValue({});
-    TelegramBot.mockImplementation(() => ({
-      sendMessage: mockSendMessage,
-    }));
+    const mockResponse = {
+      ok: true,
+      json: jest.fn().mockResolvedValue({ ok: true, result: {} }),
+    };
+    global.fetch.mockResolvedValue(mockResponse);
 
     const response = await sendTelegram({
       chatId,
@@ -34,11 +30,19 @@ describe('sendTelegram', () => {
       senderName,
     });
 
-    expect(TelegramBot).toHaveBeenCalledWith(botToken);
-
-    expect(mockSendMessage).toHaveBeenCalledWith(
-      chatId,
-      `Message from: ${senderName}\n${message}`
+    expect(global.fetch).toHaveBeenCalledWith(
+      `https://api.telegram.org/bot${botToken}/sendMessage`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: `Message from: ${senderName}\n${message}`,
+          parse_mode: 'HTML',
+        }),
+      }
     );
 
     expect(response).toEqual({
@@ -48,15 +52,15 @@ describe('sendTelegram', () => {
   });
 
   it('handles errors when sending a Telegram message', async () => {
-    const mockSendMessage = jest
-      .fn()
-      .mockRejectedValue(new Error('Network error'));
-
-    TelegramBot.mockImplementation(() => ({
-      sendMessage: mockSendMessage,
-    }));
-
-    console.error = jest.fn();
+    const mockResponse = {
+      ok: false,
+      status: 400,
+      json: jest.fn().mockResolvedValue({
+        ok: false,
+        description: 'Bad Request',
+      }),
+    };
+    global.fetch.mockResolvedValue(mockResponse);
 
     const response = await sendTelegram({
       chatId,
@@ -65,17 +69,21 @@ describe('sendTelegram', () => {
       senderName,
     });
 
-    // ✅ Fix: Only check `botToken` in the expectation
-    expect(TelegramBot).toHaveBeenCalledWith(botToken);
+    expect(response).toEqual({
+      message: 'Failed to send Telegram message.',
+      status: 400,
+    });
+  });
 
-    expect(mockSendMessage).toHaveBeenCalledWith(
+  it('handles network errors', async () => {
+    global.fetch.mockRejectedValue(new Error('Network error'));
+
+    const response = await sendTelegram({
       chatId,
-      `Message from: ${senderName}\n${message}`
-    );
-
-    expect(console.error).toHaveBeenCalledWith(
-      'Failed to send Telegram message.'
-    );
+      message,
+      botToken,
+      senderName,
+    });
 
     expect(response).toEqual({
       message: 'Failed to send Telegram message.',
@@ -102,24 +110,14 @@ describe('sendTelegram', () => {
   });
 
   it('should not throw an error when sender name is undefined', async () => {
-    const mockSendMessage = jest.fn().mockResolvedValue({});
-    TelegramBot.mockImplementation(() => ({
-      sendMessage: mockSendMessage,
-    }));
+    const mockResponse = {
+      ok: true,
+      json: jest.fn().mockResolvedValue({ ok: true, result: {} }),
+    };
+    global.fetch.mockResolvedValue(mockResponse);
 
     await expect(
       sendTelegram({ chatId, message, botToken })
-    ).resolves.not.toThrow();
-  });
-
-  it('should not throw an error when sender name is undefined', async () => {
-    const mockSendMessage = jest.fn().mockResolvedValue({});
-    TelegramBot.mockImplementation(() => ({
-      sendMessage: mockSendMessage,
-    }));
-
-    await expect(
-      sendTelegram({ chatId, message, botToken, senderName: undefined })
     ).resolves.not.toThrow();
   });
 });

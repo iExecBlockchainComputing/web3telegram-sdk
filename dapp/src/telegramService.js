@@ -1,5 +1,3 @@
-import TelegramBot from 'node-telegram-bot-api';
-
 async function sendTelegram({
   chatId,
   message,
@@ -12,27 +10,44 @@ async function sendTelegram({
   if (!message || message.trim() === '')
     throw new Error('Message content is required');
 
-  const bot = new TelegramBot(botToken);
-
   const messageToSend = `Message from: ${senderName}\n${message}`;
 
-  let error;
-  await bot.sendMessage(chatId, messageToSend).catch((e) => {
-    error = e;
-  });
+  try {
+    const response = await fetch(
+      `https://api.telegram.org/bot${botToken}/sendMessage`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: messageToSend,
+          parse_mode: 'HTML',
+        }),
+      }
+    );
 
-  if (error) {
-    console.error('Failed to send Telegram message.');
+    if (!response.ok) {
+      console.error('Telegram API Error');
+      return {
+        message: 'Failed to send Telegram message.',
+        status: response.status,
+      };
+    }
+
+    console.log('Message successfully sent by Telegram bot.');
+    return {
+      message: 'Your telegram message has been sent successfully.',
+      status: 200,
+    };
+  } catch (error) {
+    console.error('Failed to send Telegram message');
     return {
       message: 'Failed to send Telegram message.',
       status: 500,
     };
   }
-  console.log('Message successfully sent by Telegram bot.');
-  return {
-    message: 'Your telegram message has been sent successfully.',
-    status: 200,
-  };
 }
 
 export default sendTelegram;
