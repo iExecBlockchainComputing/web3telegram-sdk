@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.0-alpha.2](https://github.com/iExecBlockchainComputing/web3telegram-sdk/compare/dapp-v0.1.0-alpha.1...dapp-v0.1.0-alpha.2) (2025-08-08)
+
+
+### Added
+
+* implement Telegram API integration and fix TEE memory usage ([#71](https://github.com/iExecBlockchainComputing/web3telegram-sdk/issues/71)) ([00a8e67](https://github.com/iExecBlockchainComputing/web3telegram-sdk/commit/00a8e675d0d4146238e23315663cd49a7534a070))
+
 ## [0.1.0-alpha.1](https://github.com/iExecBlockchainComputing/web3telegram-sdk/compare/dapp-v0.1.0-alpha.0...dapp-v0.1.0-alpha.1) (2025-07-28)
 
 ### Changed
