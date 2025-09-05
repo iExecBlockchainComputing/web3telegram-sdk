@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.0-alpha.3](https://github.com/iExecBlockchainComputing/web3telegram-sdk/compare/dapp-v0.1.0-alpha.2...dapp-v0.1.0-alpha.3) (2025-09-05)
+
+
+### Changed
+
+* remove mprotect option and optimize memory configuration ([#73](https://github.com/iExecBlockchainComputing/web3telegram-sdk/issues/73)) ([d479e16](https://github.com/iExecBlockchainComputing/web3telegram-sdk/commit/d479e16286937732aa737eb082c1de25d02d38e5))
+
 ## [0.1.0-alpha.2](https://github.com/iExecBlockchainComputing/web3telegram-sdk/compare/dapp-v0.1.0-alpha.1...dapp-v0.1.0-alpha.2) (2025-08-08)
 
 
