@@ -101,7 +101,7 @@ The project uses 3 categories of workflows:
 **Whitelist** - Add app to a whitelist already deployed on whitelist-smartcontract repo and transfer ownership to web3telegram wallet
 
 - **Trigger** : `workflow_dispatch`
-- **Inputs** : `environment`, `app_address`, `whitelist_contract_address`
+- **Inputs** : `environment`, `app_address`, `whitelist_contract_address` (optional)
 
 ### `05-configure-ens.yml`
 
