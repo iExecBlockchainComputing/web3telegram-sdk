@@ -1,0 +1,73 @@
+name: 04-add-resource-whitelist.yml
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        type: choice
+        options:
+          # dev environments
+          - bellecour-dev
+          - arbitrum-sepolia-dev
+          # prod environments
+          - bellecour-prod
+          - arbitrum-sepolia-prod
+          - arbitrum-prod
+      app_address:
+        description: 'App contract address'
+        required: true
+        type: string
+      whitelist_contract_address:
+        description: 'Whitelist contract address'
+        required: true
+        type: string
+
+jobs:
+  add-to-whitelist:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.19.0'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          cd node_modules/whitelist-smart-contract
+          npm install --save-dev ts-node
+
+      - name: Determine network from environment
+        id: network
+        run: |
+          case "${{ inputs.environment }}" in
+            bellecour-dev|bellecour-prod)
+              echo "network_name=bellecour" >> $GITHUB_OUTPUT
+              ;;
+            arbitrum-sepolia-dev|arbitrum-sepolia-prod)
+              echo "network_name=arbitrum-sepolia" >> $GITHUB_OUTPUT
+              ;;
+            arbitrum-prod)
+              echo "network_name=arbitrum" >> $GITHUB_OUTPUT
+              ;;
+            *)
+              echo "Error: Unknown environment ${{ inputs.environment }}"
+              exit 1
+              ;;
+          esac
+
+      - name: Add resource to whitelist
+        env:
+          CONTRACT_ADDRESS: ${{ inputs.whitelist_contract_address }}
+          PRIVATE_KEY: ${{ secrets.WEB3TELEGRAM_APP_OWNER_PRIVATEKEY }}
+        run: |
+          cd node_modules/whitelist-smart-contract
+          export ADDRESS_TO_ADD=${{ inputs.app_address }}
+          npm run addResourceToWhitelist -- --network ${{ steps.network.outputs.network_name }}

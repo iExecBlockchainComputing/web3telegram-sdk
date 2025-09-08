@@ -1,0 +1,143 @@
+name: 01-deploy-dapp-contract
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        type: choice
+        options:
+          # dev environments
+          - bellecour-dev
+          - arbitrum-sepolia-dev
+          # prod environments (requires a tag starting with dapp-v)
+          - bellecour-prod
+          - arbitrum-sepolia-prod
+          - arbitrum-prod
+      # Optional inputs for manual override
+      docker_image_tag:
+        description: 'Docker image tag (if not provided, will build from scratch)'
+        required: false
+        type: string
+      checksum:
+        description: 'Docker image checksum (if not provided, will build from scratch)'
+        required: false
+        type: string
+      fingerprint:
+        description: 'Docker image fingerprint (if not provided, will build from scratch)'
+        required: false
+        type: string
+
+jobs:
+  extract-tag:
+    runs-on: ubuntu-latest
+    outputs:
+      clean_tag: ${{ steps.tag.outputs.clean_tag }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Check and extract tag
+        id: tag
+        run: |
+          if [[ "${{ github.event.inputs.environment }}" == *-prod ]]; then
+            if [[ "${GITHUB_REF}" != refs/tags/dapp-v* ]]; then
+              echo "Error: The ref must be a tag starting with 'dapp-v' for production deployments."
+              exit 1
+            fi
+            TAG=${GITHUB_REF#refs/tags/dapp-v}-$(date +%s)
+            echo "clean_tag=${TAG}" | tee -a $GITHUB_OUTPUT
+          else
+            echo "clean_tag=dev" | tee -a $GITHUB_OUTPUT
+          fi
+
+  docker-publish:
+    if: ${{ !github.event.inputs.docker_image_tag }}
+    uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/docker-build.yml@docker-build-v2.3.1
+    needs: [extract-tag]
+    with:
+      image-name: 'iexechub/web3telegram-dapp'
+      registry: 'docker.io'
+      dockerfile: 'dapp/Dockerfile'
+      context: 'dapp'
+      security-scan: true
+      security-report: 'sarif'
+      hadolint: true
+      push: true
+      image-tag: ${{ needs.extract-tag.outputs.clean_tag }}
+    secrets:
+      username: ${{ secrets.DOCKERHUB_USERNAME }}
+      password: ${{ secrets.DOCKERHUB_PAT }}
+
+  sconify:
+    if: ${{ !github.event.inputs.docker_image_tag }}
+    uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/sconify.yml@sconify-v2.0.0
+    needs: [docker-publish, extract-tag]
+    with:
+      image-name: 'iexechub/web3telegram-dapp'
+      image-tag: ${{ needs.extract-tag.outputs.clean_tag }}
+      sconify-debug: false
+      sconify-prod: true
+      docker-registry: docker.io
+      sconify-version: ${{ vars.SCONIFY_VERSION }}
+      binary: /usr/local/bin/node
+      command: node
+      host-path: |
+        /etc/hosts
+        /etc/resolv.conf
+      binary-fs: true
+      fs-dir: /app
+      heap: 1G
+      dlopen: 1
+      mprotect: 0
+    secrets:
+      docker-username: ${{ secrets.DOCKERHUB_USERNAME }}
+      docker-password: ${{ secrets.DOCKERHUB_PAT }}
+      scontain-username: ${{ secrets.SCONTAIN_REGISTRY_USERNAME }}
+      scontain-password: ${{ secrets.SCONTAIN_REGISTRY_PAT }}
+      scone-signing-key: ${{ secrets.SCONIFY_SIGNING_PRIVATE_KEY }}
+
+  deploy-dapp:
+    needs: [extract-tag, sconify]
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    outputs:
+      app_address: ${{ steps.deploy.outputs.app_address }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.19.0'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          cd node_modules/whitelist-smart-contract
+          npm install --save-dev ts-node
+          cd ../../deployment-dapp
+          npm ci
+
+      - name: Deploy dapp contract
+        id: deploy
+        env:
+          WALLET_PRIVATE_KEY: ${{ secrets.WEB3TELEGRAM_APP_OWNER_PRIVATEKEY }}
+          DOCKER_IMAGE_TAG: ${{ github.event.inputs.docker_image_tag || needs.sconify.outputs.prod-image-tag }}
+          CHECKSUM: ${{ github.event.inputs.checksum || needs.sconify.outputs.prod-checksum }}
+          FINGERPRINT: ${{ github.event.inputs.fingerprint || needs.sconify.outputs.prod-mrenclave }}
+          RPC_URL: ${{ secrets.RPC_URL }}
+          SCONIFY_VERSION: ${{ vars.SCONIFY_VERSION }}
+        run: |
+          cd deployment-dapp
+          npm run deploy-dapp
+          echo "app_address=$(cat .app-address)" >> $GITHUB_OUTPUT
+
+      - name: Upload app address artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-address
+          path: deployment-dapp/.app-address
+          retention-days: 30
