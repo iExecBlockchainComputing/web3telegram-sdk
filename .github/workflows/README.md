@@ -60,7 +60,7 @@ The project uses 3 categories of workflows:
 
 ## 🚀 Deployment Workflows
 
-### `deployment/dapp-deploy.yml` (Main)
+### `dapp-deploy.yml` (Main)
 
 **Complete Deployment**
 
@@ -74,7 +74,7 @@ The project uses 3 categories of workflows:
   5. Whitelist
   6. ENS configuration
 
-### `deployment/01-deploy-dapp-contract.yml`
+### `01-deploy-dapp-contract.yml`
 
 **Contract Deployment** - Deploy the smart contract
 
@@ -82,28 +82,28 @@ The project uses 3 categories of workflows:
 - **Inputs** : `environment`, `docker_image_tag`, `checksum`, `fingerprint`
 - **Outputs** : `app_address`
 
-### `deployment/02-push-dapp-secret.yml`
+### `02-push-dapp-secret.yml`
 
 **Push Secrets** - Push secrets to SMS (Secret Management Service)
 
 - **Trigger** : `workflow_dispatch`
 - **Inputs** : `environment`, `app_address`
 
-### `deployment/03-publish-sell-order.yml`
+### `03-publish-sell-order.yml`
 
 **Sell Order** - Publish a free sell order
 
 - **Trigger** : `workflow_dispatch`
 - **Inputs** : `environment`, `app_address`, `price`, `volume`
 
-### `deployment/04-add-resource-whitelist.yml`
+### `04-add-resource-whitelist.yml`
 
 **Whitelist** - Add app to a whitelist already deployed on whitelist-smartcontract repo and transfer ownership to web3telegram wallet
 
 - **Trigger** : `workflow_dispatch`
 - **Inputs** : `environment`, `app_address`, `whitelist_contract_address`
 
-### `deployment/05-configure-ens.yml`
+### `05-configure-ens.yml`
 
 **ENS Configuration** - Configure ENS name (only on bellecour environment)
 
@@ -131,7 +131,7 @@ The project uses 3 categories of workflows:
 ### Complete Deployment
 
 ```bash
-gh workflow run deployment/dapp-deploy.yml -f environment=bellecour-dev
+gh workflow run dapp-deploy.yml -f environment=bellecour-dev
 ```
 
 ### SDK Publication
@@ -166,14 +166,13 @@ git push origin web3telegram-v1.0.0
 ├── dapp-ci.yml                  # DApp CI
 ├── release.yml                  # Release Please
 ├── conventional-commits.yml     # Commit validation
-└── deployment/                  # Deployment workflows
-    ├── dapp-deploy.yml          # Main orchestrator
-    ├── 01-deploy-dapp-contract.yml
-    ├── 02-push-dapp-secret.yml
-    ├── 03-publish-sell-order.yml
-    ├── 04-add-resource-whitelist.yml
-    ├── 05-configure-ens.yml
-    └── deployment-dapp-ci.yml   # Deployment CI
+├── dapp-deploy.yml              # Main orchestrator
+├── 01-deploy-dapp-contract.yml  # Contract deployment
+├── 02-push-dapp-secret.yml      # Push secrets
+├── 03-publish-sell-order.yml    # Publish sell order
+├── 04-add-resource-whitelist.yml # Whitelist app
+├── 05-configure-ens.yml         # Configure ENS
+└── deployment-dapp-ci.yml       # Deployment CI
 ```
 
 ## ⚡ Benefits
