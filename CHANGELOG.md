@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.0-alpha.5](https://github.com/iExecBlockchainComputing/web3telegram-sdk/compare/web3telegram-v0.1.0-alpha.4...web3telegram-v0.1.0-alpha.5) (2025-10-14)
+
+
+### Added
+
+* Migrate `arbitrum-sepolia-testnet` from experimental to non-experimental network ([#78](https://github.com/iExecBlockchainComputing/web3telegram-sdk/issues/78)) ([1d2ee65](https://github.com/iExecBlockchainComputing/web3telegram-sdk/commit/1d2ee657760dce6d84daf3292924901f2b93a7db))
+
+
+### Changed
+
+* update dependencies and remove experimental flag from config ([1d2ee65](https://github.com/iExecBlockchainComputing/web3telegram-sdk/commit/1d2ee657760dce6d84daf3292924901f2b93a7db))
+
 ## [0.1.0-alpha.4](https://github.com/iExecBlockchainComputing/web3telegram-sdk/compare/web3telegram-v0.1.0-alpha.3...web3telegram-v0.1.0-alpha.4) (2025-08-07)
 
 
