@@ -108,38 +108,37 @@ async function start() {
   }
   requesterSecret = validateRequesterSecret(requesterSecret);
 
-  const bulkSize = parseInt(IEXEC_BULK_SLICE_SIZE) || 0;
+  const bulkSize = parseInt(IEXEC_BULK_SLICE_SIZE, 10) || 0;
   const results = [];
 
   if (bulkSize > 0) {
     // Process multiple protected data
-    for (let i = 1; i <= bulkSize; i++) {
+    const promises = [];
+    for (let i = 1; i <= bulkSize; i += 1) {
       const datasetFilename = process.env[`IEXEC_DATASET_${i}_FILENAME`];
-
-      try {
-        const result = await processProtectedData(i, {
-          IEXEC_IN,
-          IEXEC_OUT: workerEnv.IEXEC_OUT,
-          appDeveloperSecret,
-          requesterSecret,
-          datasetFilename,
-        });
-
-        results.push(result);
-      } catch (error) {
-        // Create an error result for this dataset
-        results.push({
-          index: i,
-          resultFileName: datasetFilename
-            ? `${datasetFilename}.txt`
-            : `dataset-${i}.txt`,
-          response: {
-            status: 500,
-            message: `Failed to process dataset ${i}: ${error.message}`,
-          },
-        });
-      }
+      
+      const promise = processProtectedData(i, {
+        IEXEC_IN,
+        IEXEC_OUT: workerEnv.IEXEC_OUT,
+        appDeveloperSecret,
+        requesterSecret,
+        datasetFilename,
+      }).then(result => result).catch(error => ({
+        index: i,
+        resultFileName: datasetFilename
+          ? `${datasetFilename}.txt`
+          : `dataset-${i}.txt`,
+        response: {
+          status: 500,
+          message: `Failed to process dataset ${i}: ${error.message}`,
+        },
+      }));
+      
+      promises.push(promise);
     }
+    
+    const bulkResults = await Promise.all(promises);
+    results.push(...bulkResults);
   } else {
     // Process single protected data
     const result = await processProtectedData(0, {
