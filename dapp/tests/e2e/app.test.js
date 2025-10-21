@@ -191,4 +191,119 @@ describe('sendTelegram', () => {
       'deterministic-output-path': `${IEXEC_OUT}/result.txt`,
     });
   });
+
+  describe('Bulk Processing', () => {
+    beforeEach(() => {
+      // Setup bulk processing environment
+      process.env.IEXEC_BULK_SLICE_SIZE = '2';
+      process.env.IEXEC_DATASET_1_FILENAME = 'data-chatId.zip';
+      process.env.IEXEC_DATASET_2_FILENAME = 'data-chatId.zip';
+    });
+
+    it('should process multiple datasets successfully', async () => {
+      await expect(start()).resolves.toBeUndefined();
+
+      const { IEXEC_OUT } = process.env;
+
+      // Check individual result files are NOT created for bulk processing
+      // Only result.txt and computed.json should exist
+
+      // Check result.txt (main output file)
+      const resultTxt = await fsPromises.readFile(
+        path.join(IEXEC_OUT, 'result.txt'),
+        'utf-8'
+      );
+
+      const result = JSON.parse(resultTxt);
+      expect(result).toStrictEqual({
+        message: 'Bulk processing completed: 2 successful, 0 failed',
+        status: 200,
+        'total-processed': 2,
+        'success-count': 2,
+        'error-count': 0,
+        'dataset-results': [
+          {
+            index: 1,
+            dataset: 'data-chatId.zip',
+            response: {
+              message: 'Your telegram message has been sent successfully.',
+              status: 200,
+            },
+          },
+          {
+            index: 2,
+            dataset: 'data-chatId.zip',
+            response: {
+              message: 'Your telegram message has been sent successfully.',
+              status: 200,
+            },
+          },
+        ],
+      });
+
+      // Check computed.json
+      const computedJson = await fsPromises.readFile(
+        path.join(IEXEC_OUT, 'computed.json'),
+        'utf-8'
+      );
+
+      const computed = JSON.parse(computedJson);
+      expect(computed).toStrictEqual({
+        'deterministic-output-path': `${IEXEC_OUT}/result.txt`,
+      });
+    });
+
+    it('should handle bulk processing with mixed results', async () => {
+      process.env.IEXEC_DATASET_1_FILENAME = 'data-chatId.zip'; // Valid dataset
+      process.env.IEXEC_DATASET_2_FILENAME = 'invalid-data.zip'; // Invalid dataset
+
+      await expect(start()).resolves.toBeUndefined();
+
+      const { IEXEC_OUT } = process.env;
+
+      // Check result.txt (main output file)
+      const resultTxt = await fsPromises.readFile(
+        path.join(IEXEC_OUT, 'result.txt'),
+        'utf-8'
+      );
+
+      const result = JSON.parse(resultTxt);
+      expect(result).toStrictEqual({
+        message: 'Bulk processing completed: 1 successful, 1 failed',
+        status: 200,
+        'total-processed': 2,
+        'success-count': 1,
+        'error-count': 1,
+        'dataset-results': [
+          {
+            index: 1,
+            dataset: 'data-chatId.zip',
+            response: {
+              message: 'Your telegram message has been sent successfully.',
+              status: 200,
+            },
+          },
+          {
+            index: 2,
+            dataset: 'invalid-data.zip',
+            response: {
+              status: 500,
+              message: expect.stringContaining('Failed to process dataset 2'),
+            },
+          },
+        ],
+      });
+
+      // Check computed.json
+      const computedJson = await fsPromises.readFile(
+        path.join(IEXEC_OUT, 'computed.json'),
+        'utf-8'
+      );
+
+      const computed = JSON.parse(computedJson);
+      expect(computed).toStrictEqual({
+        'deterministic-output-path': `${IEXEC_OUT}/result.txt`,
+      });
+    });
+  });
 });

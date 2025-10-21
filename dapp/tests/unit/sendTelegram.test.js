@@ -105,7 +105,11 @@ describe('start function', () => {
     );
     expect(fs.writeFile).toHaveBeenCalledWith(
       '/mock/output/computed.json',
-      JSON.stringify({ 'deterministic-output-path': '/mock/output/result.txt' })
+      JSON.stringify(
+        { 'deterministic-output-path': '/mock/output/result.txt' },
+        null,
+        2
+      )
     );
   });
 

@@ -1,6 +1,5 @@
 import { IExecDataProtectorDeserializer } from '@iexec/dataprotector-deserializer';
 import { promises as fs } from 'fs';
-import path from 'node:path';
 import { decryptContent, downloadEncryptedContent } from './decryptContent.js';
 import sendTelegram from './telegramService.js';
 import {
@@ -34,7 +33,7 @@ async function processProtectedData(
   let protectedData;
   try {
     const deserializerConfig = datasetFilename
-      ? { protectedDataPath: path.join(IEXEC_IN, datasetFilename) }
+      ? { protectedDataPath: `${IEXEC_IN}/${datasetFilename}` }
       : {};
 
     const deserializer = new IExecDataProtectorDeserializer(deserializerConfig);
@@ -66,29 +65,30 @@ async function processProtectedData(
     senderName: requesterSecret.senderName,
   });
 
-  // Write individual result file
-  const resultFileName = index > 0 ? `${datasetFilename}.txt` : 'result.txt';
-  await writeTaskOutput(
-    path.join(IEXEC_OUT, resultFileName),
-    JSON.stringify(response, null, 2)
-  );
+  // Write individual result file only for single processing
+  if (index === 0) {
+    await writeTaskOutput(
+      `${IEXEC_OUT}/result.txt`,
+      JSON.stringify(response, null, 2)
+    );
+  }
 
-  return { index, response, resultFileName };
+  return { index, response };
 }
 
 async function start() {
   const {
     IEXEC_OUT,
-    IEXEC_IN,
     IEXEC_APP_DEVELOPER_SECRET,
     IEXEC_REQUESTER_SECRET_1,
+    IEXEC_IN,
     IEXEC_BULK_SLICE_SIZE,
   } = process.env;
 
   // Check worker env
   const workerEnv = validateWorkerEnv({ IEXEC_OUT });
 
-  // Parse the app developer secret
+  // Parse the app developer secret environment variable
   let appDeveloperSecret;
   try {
     appDeveloperSecret = JSON.parse(IEXEC_APP_DEVELOPER_SECRET);
@@ -97,7 +97,7 @@ async function start() {
   }
   appDeveloperSecret = validateAppSecret(appDeveloperSecret);
 
-  // Parse the requester secret
+  // Parse the requester secret environment variable
   let requesterSecret;
   try {
     requesterSecret = IEXEC_REQUESTER_SECRET_1
@@ -109,7 +109,6 @@ async function start() {
   requesterSecret = validateRequesterSecret(requesterSecret);
 
   const bulkSize = parseInt(IEXEC_BULK_SLICE_SIZE) || 0;
-
   const results = [];
 
   if (bulkSize > 0) {
@@ -117,15 +116,29 @@ async function start() {
     for (let i = 1; i <= bulkSize; i++) {
       const datasetFilename = process.env[`IEXEC_DATASET_${i}_FILENAME`];
 
-      const result = await processProtectedData(i, {
-        IEXEC_IN,
-        IEXEC_OUT: workerEnv.IEXEC_OUT,
-        appDeveloperSecret,
-        requesterSecret,
-        datasetFilename,
-      });
+      try {
+        const result = await processProtectedData(i, {
+          IEXEC_IN,
+          IEXEC_OUT: workerEnv.IEXEC_OUT,
+          appDeveloperSecret,
+          requesterSecret,
+          datasetFilename,
+        });
 
-      results.push(result);
+        results.push(result);
+      } catch (error) {
+        // Create an error result for this dataset
+        results.push({
+          index: i,
+          resultFileName: datasetFilename
+            ? `${datasetFilename}.txt`
+            : `dataset-${i}.txt`,
+          response: {
+            status: 500,
+            message: `Failed to process dataset ${i}: ${error.message}`,
+          },
+        });
+      }
     }
   } else {
     // Process single protected data
@@ -139,20 +152,45 @@ async function start() {
     results.push(result);
   }
 
-  // Write computed.json with all results
-  const computedOutput = {
-    'deterministic-output-path': workerEnv.IEXEC_OUT,
-    'bulk-results': results.map((r) => ({
-      index: r.index,
-      file: r.resultFileName,
-      status: r.response.status === 200 ? 'success' : 'error',
-    })),
-    'total-processed': results.length,
-  };
+  // Generate computed.json - same format for both single and bulk
+
+  // Create result.txt for bulk processing (similar to single processing)
+  if (bulkSize > 0) {
+    const successCount = results.filter(
+      (r) => r.response.status === 200
+    ).length;
+    const errorCount = results.filter((r) => r.response.status !== 200).length;
+
+    const bulkResult = {
+      message: `Bulk processing completed: ${successCount} successful, ${errorCount} failed`,
+      status: 200,
+      'total-processed': results.length,
+      'success-count': successCount,
+      'error-count': errorCount,
+      'dataset-results': results.map((r) => ({
+        index: r.index,
+        dataset:
+          process.env[`IEXEC_DATASET_${r.index}_FILENAME`] ||
+          `dataset-${r.index}`,
+        response: r.response,
+      })),
+    };
+
+    await writeTaskOutput(
+      `${workerEnv.IEXEC_OUT}/result.txt`,
+      JSON.stringify(bulkResult, null, 2)
+    );
+  }
 
   await writeTaskOutput(
-    path.join(workerEnv.IEXEC_OUT, 'computed.json'),
-    JSON.stringify(computedOutput, null, 2)
+    `${workerEnv.IEXEC_OUT}/computed.json`,
+    JSON.stringify(
+      {
+        'deterministic-output-path': `${workerEnv.IEXEC_OUT}/result.txt`,
+      },
+      null,
+      2
+    )
   );
 }
 
