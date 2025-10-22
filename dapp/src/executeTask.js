@@ -116,27 +116,29 @@ async function start() {
     const promises = [];
     for (let i = 1; i <= bulkSize; i += 1) {
       const datasetFilename = process.env[`IEXEC_DATASET_${i}_FILENAME`];
-      
+
       const promise = processProtectedData(i, {
         IEXEC_IN,
         IEXEC_OUT: workerEnv.IEXEC_OUT,
         appDeveloperSecret,
         requesterSecret,
         datasetFilename,
-      }).then(result => result).catch(error => ({
-        index: i,
-        resultFileName: datasetFilename
-          ? `${datasetFilename}.txt`
-          : `dataset-${i}.txt`,
-        response: {
-          status: 500,
-          message: `Failed to process dataset ${i}: ${error.message}`,
-        },
-      }));
-      
+      })
+        .then((result) => result)
+        .catch((error) => ({
+          index: i,
+          resultFileName: datasetFilename
+            ? `${datasetFilename}.txt`
+            : `dataset-${i}.txt`,
+          response: {
+            status: 500,
+            message: `Failed to process dataset ${i}: ${error.message}`,
+          },
+        }));
+
       promises.push(promise);
     }
-    
+
     const bulkResults = await Promise.all(promises);
     results.push(...bulkResults);
   } else {
