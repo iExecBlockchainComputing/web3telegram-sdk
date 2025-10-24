@@ -1,3 +1,4 @@
+import { PrepareBulkRequestResponse } from '@iexec/dataprotector';
 import { EnhancedWallet } from 'iexec';
 import { IExecConfigOptions } from 'iexec/IExecConfig';
 
@@ -11,14 +12,28 @@ export type Address = string;
 
 export type TimeStamp = string;
 
+export type GrantedAccess = {
+  dataset: string;
+  datasetprice: string;
+  volume: string;
+  tag: string;
+  apprestrict: string;
+  workerpoolrestrict: string;
+  requesterrestrict: string;
+  salt: string;
+  sign: string;
+  remainingAccess: number;
+};
+
 export type Contact = {
   address: Address;
   owner: Address;
   accessGrantTimestamp: TimeStamp;
   isUserStrict: boolean;
-  name: string;
+  name?: string;
   remainingAccess: number;
   accessPrice: number;
+  grantedAccess: GrantedAccess;
 };
 
 export type SendTelegramParams = {

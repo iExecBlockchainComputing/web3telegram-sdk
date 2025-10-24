@@ -46,7 +46,7 @@ describe('fetchMyContacts', () => {
     // --- GIVEN
     const { getValidContact } = (await import(
       '../../src/utils/subgraphQuery.js'
-    )) as unknown as { getValidContact: jest.Mock<() => Promise<[]>> };
+    )) as unknown as { getValidContact: jest.Mock<() => Promise<any[]>> };
     getValidContact.mockResolvedValue([]);
 
     const mockFetchDatasetOrderbook: any = jest.fn().mockImplementation(() => {
@@ -111,7 +111,7 @@ describe('fetchMyContacts', () => {
     // --- GIVEN
     const { getValidContact } = (await import(
       '../../src/utils/subgraphQuery.js'
-    )) as unknown as { getValidContact: jest.Mock<() => Promise<[]>> };
+    )) as unknown as { getValidContact: jest.Mock<() => Promise<any[]>> };
     getValidContact.mockResolvedValue([]);
 
     const mockFetchDatasetOrderbook: any = jest.fn().mockImplementation(() => {
@@ -171,5 +171,65 @@ describe('fetchMyContacts', () => {
         pageSize: 1000,
       }
     );
+  });
+
+  it('should include grantedAccess property in returned contacts', async () => {
+    // --- GIVEN
+    const { getValidContact } = (await import(
+      '../../src/utils/subgraphQuery.js'
+    )) as unknown as { getValidContact: jest.Mock<() => Promise<any[]>> };
+
+    const mockContacts = [
+      {
+        address: '0x35396912Db97ff130411301Ec722Fc92Ac37B00d',
+        owner: '0xD52C27CC2c7D3fb5BA4440ffa825c12EA5658D60',
+        remainingAccess: 10,
+        accessPrice: 0,
+        accessGrantTimestamp: '2023-06-15T16:39:22.713Z',
+        isUserStrict: false,
+        grantedAccess: MOCK_ORDER.order,
+      },
+    ];
+    getValidContact.mockResolvedValue(mockContacts);
+
+    const mockFetchDatasetOrderbook: any = jest.fn().mockImplementation(() => {
+      return Promise.resolve({
+        ok: true,
+        count: 1,
+        nextPage: 1,
+        orders: [MOCK_ORDER],
+      });
+    });
+
+    const iexec = {
+      wallet: {
+        getAddress: jest
+          .fn<() => Promise<Address>>()
+          .mockResolvedValue(getRandomAddress()),
+      },
+      ens: {
+        resolveName: jest
+          .fn<() => Promise<Address>>()
+          .mockResolvedValue(getRandomAddress()),
+      },
+      orderbook: {
+        fetchDatasetOrderbook: mockFetchDatasetOrderbook,
+      },
+    };
+
+    // --- WHEN
+    const result = await fetchMyContacts({
+      // @ts-expect-error Minimal iexec implementation with only what's necessary for this test
+      iexec: iexec,
+      // @ts-expect-error No need for graphQLClient here
+      graphQLClient: {},
+      dappAddressOrENS: defaultConfig.dappAddress,
+      dappWhitelistAddress: defaultConfig.whitelistSmartContract,
+    });
+
+    // --- THEN
+    expect(result).toEqual(mockContacts);
+    expect(result[0]).toHaveProperty('grantedAccess');
+    expect(result[0].grantedAccess).toEqual(MOCK_ORDER.order);
   });
 });

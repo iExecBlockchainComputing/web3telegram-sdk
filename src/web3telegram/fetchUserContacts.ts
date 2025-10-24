@@ -10,7 +10,7 @@ import {
   isEnsTest,
   throwIfMissing,
 } from '../utils/validators.js';
-import { Contact, FetchUserContactsParams } from './types.js';
+import { Contact, FetchUserContactsParams, GrantedAccess } from './types.js';
 import { IExec } from 'iexec';
 import { PublishedDatasetorder } from 'iexec/IExecOrderbookModule';
 import {
@@ -72,17 +72,18 @@ export const fetchUserContacts = async ({
     orders.forEach((order) => {
       if (
         order.order.apprestrict.toLowerCase() ===
-          web3DappResolvedAddress.toLowerCase() ||
+        web3DappResolvedAddress.toLowerCase() ||
         order.order.apprestrict.toLowerCase() ===
-          vDappWhitelistAddress.toLowerCase()
+        vDappWhitelistAddress.toLowerCase()
       ) {
-        const contact = {
+        const contact: Contact = {
           address: order.order.dataset.toLowerCase(),
           owner: order.signer.toLowerCase(),
           remainingAccess: order.remaining,
           accessPrice: order.order.datasetprice,
           accessGrantTimestamp: order.publicationTimestamp,
           isUserStrict: order.order.requesterrestrict !== ZeroAddress,
+          grantedAccess: order.order as GrantedAccess,
         };
         myContacts.push(contact);
       }
