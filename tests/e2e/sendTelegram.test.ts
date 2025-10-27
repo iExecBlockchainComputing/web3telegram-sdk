@@ -1,6 +1,7 @@
 import {
   IExecDataProtectorCore,
   ProtectedDataWithSecretProps,
+  WorkflowError,
 } from '@iexec/dataprotector';
 import { beforeAll, describe, expect, it } from '@jest/globals';
 import { HDNodeWallet } from 'ethers';
@@ -8,7 +9,7 @@ import {
   DEFAULT_CHAIN_ID,
   getChainDefaultConfig,
 } from '../../src/config/config.js';
-import { IExecWeb3telegram, WorkflowError } from '../../src/index.js';
+import { IExecWeb3telegram, WorkflowError as Web3TelegramWorkflowError } from '../../src/index.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_SUBGRAPH_INDEXING_TIME,
@@ -148,7 +149,7 @@ describe('web3telegram.sendTelegram()', () => {
               workerpoolMaxPrice: prodWorkerpoolPublicPrice,
             })
             .catch((e) => (error = e));
-          expect(error).toBeInstanceOf(WorkflowError);
+          expect(error).toBeInstanceOf(Web3TelegramWorkflowError);
           expect(error.message).toBe('Failed to sendTelegram');
           expect(error.cause).toStrictEqual(
             Error(
@@ -188,7 +189,7 @@ describe('web3telegram.sendTelegram()', () => {
         })
       ).rejects.toThrow('Failed to sendTelegram');
 
-      let error: WorkflowError | undefined;
+      let error: Web3TelegramWorkflowError | undefined;
       try {
         await web3telegram.sendTelegram({
           telegramContent: 'e2e telegram content for test',
@@ -196,9 +197,9 @@ describe('web3telegram.sendTelegram()', () => {
           workerpoolAddressOrEns: learnProdWorkerpoolAddress,
         });
       } catch (err) {
-        error = err as WorkflowError;
+        error = err as Web3TelegramWorkflowError;
       }
-      expect(error).toBeInstanceOf(WorkflowError);
+      expect(error).toBeInstanceOf(Web3TelegramWorkflowError);
       expect(error?.message).toBe('Failed to sendTelegram');
       expect(error?.cause).toBeInstanceOf(Error);
       expect((error?.cause as Error).message).toBe(
@@ -291,13 +292,13 @@ describe('web3telegram.sendTelegram()', () => {
     async () => {
       //create valid protected data
       const protectedDataForWhitelist = await dataProtector.protectData({
-        data: { telegram_chatId: '12345' },
+        data: { telegram_chatId: '1461320872' },
         name: 'test do not use',
       });
       await waitSubgraphIndexing();
       //grant access to whitelist
       await dataProtector.grantAccess({
-        authorizedApp: defaultConfig.whitelistSmartContract, //whitelist address
+        authorizedApp: defaultConfig.dappAddress,
         protectedData: protectedDataForWhitelist.address,
         authorizedUser: consumerWallet.address, // consumer wallet
         numberOfAccess: 1000,
@@ -462,8 +463,8 @@ describe('web3telegram.sendTelegram()', () => {
           expect(sendTelegramResponse.taskId).toBeDefined();
         },
         2 * MAX_EXPECTED_BLOCKTIME +
-          MAX_EXPECTED_WEB2_SERVICES_TIME +
-          MAX_EXPECTED_SUBGRAPH_INDEXING_TIME
+        MAX_EXPECTED_WEB2_SERVICES_TIME +
+        MAX_EXPECTED_SUBGRAPH_INDEXING_TIME
       );
     });
 
@@ -519,8 +520,8 @@ describe('web3telegram.sendTelegram()', () => {
             );
           },
           2 * MAX_EXPECTED_BLOCKTIME +
-            MAX_EXPECTED_WEB2_SERVICES_TIME +
-            MAX_EXPECTED_SUBGRAPH_INDEXING_TIME
+          MAX_EXPECTED_WEB2_SERVICES_TIME +
+          MAX_EXPECTED_SUBGRAPH_INDEXING_TIME
         );
         it(
           'should create task if user approves the non sponsored amount',
@@ -570,8 +571,8 @@ describe('web3telegram.sendTelegram()', () => {
             expect(sendTelegramResponse.taskId).toBeDefined();
           },
           2 * MAX_EXPECTED_BLOCKTIME +
-            MAX_EXPECTED_WEB2_SERVICES_TIME +
-            MAX_EXPECTED_SUBGRAPH_INDEXING_TIME
+          MAX_EXPECTED_WEB2_SERVICES_TIME +
+          MAX_EXPECTED_SUBGRAPH_INDEXING_TIME
         );
       });
       describe('and workerpoolMaxPrice does NOT covers the non sponsored amount', () => {
@@ -623,8 +624,8 @@ describe('web3telegram.sendTelegram()', () => {
             );
           },
           2 * MAX_EXPECTED_BLOCKTIME +
-            MAX_EXPECTED_WEB2_SERVICES_TIME +
-            MAX_EXPECTED_SUBGRAPH_INDEXING_TIME
+          MAX_EXPECTED_WEB2_SERVICES_TIME +
+          MAX_EXPECTED_SUBGRAPH_INDEXING_TIME
         );
       });
     });

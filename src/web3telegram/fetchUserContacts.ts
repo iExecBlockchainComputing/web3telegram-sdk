@@ -83,7 +83,18 @@ export const fetchUserContacts = async ({
           accessPrice: order.order.datasetprice,
           accessGrantTimestamp: order.publicationTimestamp,
           isUserStrict: order.order.requesterrestrict !== ZeroAddress,
-          grantedAccess: order.order as GrantedAccess,
+          grantedAccess: {
+            dataset: order.order.dataset,
+            datasetprice: order.order.datasetprice.toString(),
+            volume: order.order.volume.toString(),
+            tag: order.order.tag,
+            apprestrict: order.order.apprestrict,
+            workerpoolrestrict: order.order.workerpoolrestrict,
+            requesterrestrict: order.order.requesterrestrict,
+            salt: order.order.salt,
+            sign: order.order.sign,
+            remainingAccess: order.remaining,
+          } as GrantedAccess,
         };
         myContacts.push(contact);
       }

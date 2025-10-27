@@ -1,5 +1,6 @@
 import { AbstractProvider, AbstractSigner, Eip1193Provider } from 'ethers';
 import { IExec } from 'iexec';
+import { IExecDataProtectorCore } from '@iexec/dataprotector';
 import { GraphQLClient } from 'graphql-request';
 import { fetchUserContacts } from './fetchUserContacts.js';
 import { fetchMyContacts } from './fetchMyContacts.js';
@@ -34,6 +35,7 @@ interface Web3telegramResolvedConfig {
   ipfsGateway: string;
   defaultWorkerpool: string;
   iexec: IExec;
+  dataProtector: IExecDataProtectorCore;
 }
 
 export class IExecWeb3telegram {
@@ -50,6 +52,8 @@ export class IExecWeb3telegram {
   private defaultWorkerpool!: string;
 
   private iexec!: IExec;
+
+  private dataProtector!: IExecDataProtectorCore;
 
   private initPromise: Promise<void> | null = null;
 
@@ -75,6 +79,7 @@ export class IExecWeb3telegram {
         this.ipfsGateway = config.ipfsGateway;
         this.defaultWorkerpool = config.defaultWorkerpool;
         this.iexec = config.iexec;
+        this.dataProtector = config.dataProtector;
       });
     }
     return this.initPromise;
@@ -113,6 +118,7 @@ export class IExecWeb3telegram {
       workerpoolAddressOrEns:
         args.workerpoolAddressOrEns || this.defaultWorkerpool,
       iexec: this.iexec,
+      dataProtector: this.dataProtector,
       ipfsNode: this.ipfsNode,
       ipfsGateway: this.ipfsGateway,
       dappAddressOrENS: this.dappAddressOrENS,
@@ -122,7 +128,7 @@ export class IExecWeb3telegram {
   }
 
   private async resolveConfig(): Promise<Web3telegramResolvedConfig> {
-    const chainId = await getChainIdFromProvider(this.ethProvider);
+    const chainId = await getChainIdFromProvider(this.ethProvider as any);
     const chainDefaultConfig = getChainDefaultConfig(chainId, {
       allowExperimentalNetworks: this.options.allowExperimentalNetworks,
     });
@@ -134,7 +140,7 @@ export class IExecWeb3telegram {
 
     try {
       iexec = new IExec(
-        { ethProvider: this.ethProvider },
+        { ethProvider: this.ethProvider as any },
         {
           ipfsGatewayURL: ipfsGateway,
           ...this.options?.iexecOptions,
@@ -185,6 +191,17 @@ export class IExecWeb3telegram {
       throw new Error(`Failed to create GraphQLClient: ${error.message}`);
     }
 
+    const dataProtector = new IExecDataProtectorCore(this.ethProvider, {
+      iexecOptions: {
+        ipfsGatewayURL: ipfsGateway,
+        ...this.options?.iexecOptions,
+        allowExperimentalNetworks: this.options.allowExperimentalNetworks,
+      },
+      ipfsGateway,
+      ipfsNode,
+      subgraphUrl,
+    });
+
     return {
       dappAddressOrENS,
       dappWhitelistAddress: dappWhitelistAddress.toLowerCase(),
@@ -193,6 +210,7 @@ export class IExecWeb3telegram {
       ipfsNode,
       ipfsGateway,
       iexec,
+      dataProtector,
     };
   }
 }

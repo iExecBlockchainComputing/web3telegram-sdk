@@ -18,10 +18,18 @@ jest.unstable_mockModule('../../src/utils/ipfs-service.js', () => ({
   get: jest.fn(() => Promise.resolve(new ArrayBuffer(8))),
 }));
 
+jest.unstable_mockModule('@iexec/dataprotector', () => ({
+  IExecDataProtectorCore: jest.fn(),
+}));
+
 describe('sendTelegram', () => {
   let testedModule: any;
   let sendTelegram: SendTelegram;
   const defaultConfig = getChainDefaultConfig(DEFAULT_CHAIN_ID);
+
+  const mockDataProtector = {
+    processProtectedData: jest.fn().mockResolvedValue({ taskId: 'task123' } as never),
+  };
 
   beforeAll(async () => {
     // import tested module after all mocked modules
@@ -43,6 +51,7 @@ describe('sendTelegram', () => {
           sendTelegram({
             graphQLClient: { request: jest.fn() } as any,
             iexec: mockAllForSendTelegram() as any,
+            dataProtector: mockDataProtector as any,
             workerpoolAddressOrEns: defaultConfig.prodWorkerpoolAddress,
             dappAddressOrENS: defaultConfig.dappAddress,
             dappWhitelistAddress: defaultConfig.whitelistSmartContract,
@@ -76,6 +85,7 @@ describe('sendTelegram', () => {
           sendTelegram({
             graphQLClient: { request: jest.fn() } as any,
             iexec: mockAllForSendTelegram() as any,
+            dataProtector: mockDataProtector as any,
             workerpoolAddressOrEns: defaultConfig.prodWorkerpoolAddress,
             dappAddressOrENS: defaultConfig.dappAddress,
             dappWhitelistAddress: defaultConfig.whitelistSmartContract,
@@ -109,6 +119,7 @@ describe('sendTelegram', () => {
           sendTelegram({
             graphQLClient: { request: jest.fn() } as any,
             iexec: mockAllForSendTelegram() as any,
+            dataProtector: mockDataProtector as any,
             workerpoolAddressOrEns: defaultConfig.prodWorkerpoolAddress,
             dappAddressOrENS: defaultConfig.dappAddress,
             dappWhitelistAddress: defaultConfig.whitelistSmartContract,
@@ -141,6 +152,7 @@ describe('sendTelegram', () => {
           sendTelegram({
             graphQLClient: { request: jest.fn() } as any,
             iexec: mockAllForSendTelegram() as any,
+            dataProtector: mockDataProtector as any,
             workerpoolAddressOrEns: defaultConfig.prodWorkerpoolAddress,
             dappAddressOrENS: defaultConfig.dappAddress,
             dappWhitelistAddress: defaultConfig.whitelistSmartContract,
@@ -175,6 +187,7 @@ describe('sendTelegram', () => {
           sendTelegram({
             graphQLClient: { request: jest.fn() } as any,
             iexec: mockAllForSendTelegram() as any,
+            dataProtector: mockDataProtector as any,
             workerpoolAddressOrEns: defaultConfig.prodWorkerpoolAddress,
             dappAddressOrENS: defaultConfig.dappAddress,
             dappWhitelistAddress: defaultConfig.whitelistSmartContract,
@@ -196,7 +209,7 @@ describe('sendTelegram', () => {
   });
 
   describe('Orders fetching', () => {
-    it('should call fetchWorkerpoolOrderbook for App & Whitelist', async () => {
+    it('should call processProtectedData from dataProtector', async () => {
       //  --- GIVEN
       const { checkProtectedDataValidity } = (await import(
         '../../src/utils/subgraphQuery.js'
@@ -208,12 +221,11 @@ describe('sendTelegram', () => {
       const protectedData = getRandomAddress().toLowerCase();
       const iexec = mockAllForSendTelegram() as any;
 
-      const userAddress = await iexec.wallet.getAddress();
-
       // --- WHEN
       await sendTelegram({
         graphQLClient: { request: jest.fn() } as any,
         iexec,
+        dataProtector: mockDataProtector as any,
         workerpoolAddressOrEns: defaultConfig.prodWorkerpoolAddress,
         dappAddressOrENS: defaultConfig.dappAddress,
         dappWhitelistAddress: defaultConfig.whitelistSmartContract,
@@ -224,45 +236,13 @@ describe('sendTelegram', () => {
       });
 
       // --- THEN
-      expect(iexec.orderbook.fetchWorkerpoolOrderbook).toHaveBeenCalledTimes(2);
-      expect(iexec.orderbook.fetchWorkerpoolOrderbook).toHaveBeenNthCalledWith(
-        1,
-        {
+      expect(mockDataProtector.processProtectedData).toHaveBeenCalledTimes(1);
+      expect(mockDataProtector.processProtectedData).toHaveBeenCalledWith(
+        expect.objectContaining({
+          protectedData: protectedData,
+          app: defaultConfig.dappAddress,
           workerpool: defaultConfig.prodWorkerpoolAddress,
-          app: defaultConfig.dappAddress.toLowerCase(),
-          dataset: protectedData,
-          requester: userAddress,
-          isRequesterStrict: false,
-          minTag: ['tee', 'scone'],
-          maxTag: ['tee', 'scone'],
-          category: 0,
-        }
-      );
-      expect(iexec.orderbook.fetchWorkerpoolOrderbook).toHaveBeenNthCalledWith(
-        2,
-        {
-          workerpool: defaultConfig.prodWorkerpoolAddress,
-          app: defaultConfig.whitelistSmartContract.toLowerCase(),
-          dataset: protectedData,
-          requester: userAddress,
-          isRequesterStrict: false,
-          minTag: ['tee', 'scone'],
-          maxTag: ['tee', 'scone'],
-          category: 0,
-        }
-      );
-      expect(iexec.orderbook.fetchWorkerpoolOrderbook).toHaveBeenNthCalledWith(
-        2,
-        {
-          workerpool: defaultConfig.prodWorkerpoolAddress,
-          app: defaultConfig.whitelistSmartContract.toLowerCase(),
-          dataset: protectedData,
-          requester: userAddress,
-          isRequesterStrict: false,
-          minTag: ['tee', 'scone'],
-          maxTag: ['tee', 'scone'],
-          category: 0,
-        }
+        })
       );
     });
   });
