@@ -85,8 +85,8 @@ describe('fetchMyContacts', () => {
     const userAddress = (await iexec.wallet.getAddress()).toLowerCase();
     expect(iexec.orderbook.fetchDatasetOrderbook).toHaveBeenNthCalledWith(
       1,
-      'any',
       {
+        dataset: 'any',
         app: defaultConfig.dappAddress.toLowerCase(),
         requester: userAddress,
         isAppStrict: true,
@@ -96,8 +96,8 @@ describe('fetchMyContacts', () => {
     );
     expect(iexec.orderbook.fetchDatasetOrderbook).toHaveBeenNthCalledWith(
       2,
-      'any',
       {
+        dataset: 'any',
         app: defaultConfig.whitelistSmartContract.toLowerCase(),
         requester: userAddress,
         isAppStrict: true,
@@ -151,8 +151,8 @@ describe('fetchMyContacts', () => {
     const userAddress = (await iexec.wallet.getAddress()).toLowerCase();
     expect(iexec.orderbook.fetchDatasetOrderbook).toHaveBeenNthCalledWith(
       1,
-      'any',
       {
+        dataset: 'any',
         app: defaultConfig.dappAddress.toLowerCase(),
         requester: userAddress,
         isAppStrict: true,
@@ -162,8 +162,8 @@ describe('fetchMyContacts', () => {
     );
     expect(iexec.orderbook.fetchDatasetOrderbook).toHaveBeenNthCalledWith(
       2,
-      'any',
       {
+        dataset: 'any',
         app: defaultConfig.whitelistSmartContract.toLowerCase(),
         requester: userAddress,
         isAppStrict: true,

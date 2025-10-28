@@ -72,9 +72,9 @@ export const fetchUserContacts = async ({
     orders.forEach((order) => {
       if (
         order.order.apprestrict.toLowerCase() ===
-        web3DappResolvedAddress.toLowerCase() ||
+          web3DappResolvedAddress.toLowerCase() ||
         order.order.apprestrict.toLowerCase() ===
-        vDappWhitelistAddress.toLowerCase()
+          vDappWhitelistAddress.toLowerCase()
       ) {
         const contact: Contact = {
           address: order.order.dataset.toLowerCase(),
@@ -123,17 +123,15 @@ async function fetchAllOrdersByApp({
   appAddress: string;
   isUserStrict: boolean;
 }): Promise<PublishedDatasetorder[]> {
-  const ordersFirstPage = iexec.orderbook.fetchDatasetOrderbook(
-    ANY_DATASET_ADDRESS,
-    {
-      app: appAddress,
-      requester: userAddress,
-      isAppStrict: true,
-      isRequesterStrict: isUserStrict,
-      // Use maxPageSize here to avoid too many round-trips (we want everything anyway)
-      pageSize: 1000,
-    }
-  );
+  const ordersFirstPage = iexec.orderbook.fetchDatasetOrderbook({
+    dataset: ANY_DATASET_ADDRESS,
+    app: appAddress,
+    requester: userAddress,
+    isAppStrict: true,
+    isRequesterStrict: isUserStrict,
+    // Use maxPageSize here to avoid too many round-trips (we want everything anyway)
+    pageSize: 1000,
+  });
   const { orders: allOrders } = await autoPaginateRequest({
     request: ordersFirstPage,
   });
