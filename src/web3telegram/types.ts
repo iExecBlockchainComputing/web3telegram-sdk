@@ -40,6 +40,11 @@ export type SendTelegramParams = {
   senderName?: string;
   telegramContent: string;
   protectedData: Address;
+  /**
+   * Bulk request to process.
+   * use prepareBulkRequest of dataprotector to create a bulk request.
+   */
+  bulkRequest?: PrepareBulkRequestResponse;
   label?: string;
   workerpoolAddressOrEns?: AddressOrENS;
   dataMaxPrice?: number;
@@ -62,7 +67,7 @@ export type FetchUserContactsParams = {
   userAddress: Address;
 } & FetchMyContactsParams;
 
-export type SendTelegramResponse = {
+export type SendTelegramSingleResponse = {
   taskId: string;
 };
 

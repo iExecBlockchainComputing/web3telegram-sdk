@@ -1,5 +1,5 @@
 import { Buffer } from 'buffer';
-import { IExecDataProtectorCore } from '@iexec/dataprotector';
+import { ProcessBulkRequestResponse } from '@iexec/dataprotector';
 import {
   MAX_DESIRED_APP_ORDER_PRICE,
   MAX_DESIRED_DATA_ORDER_PRICE,
@@ -17,7 +17,7 @@ import {
   senderNameSchema,
   booleanSchema,
 } from '../utils/validators.js';
-import { SendTelegramParams, SendTelegramResponse } from './types.js';
+import { SendTelegramParams, SendTelegramSingleResponse } from './types.js';
 import {
   DappAddressConsumer,
   DappWhitelistAddressConsumer,
@@ -36,7 +36,6 @@ export const sendTelegram = async ({
   dataProtector = throwIfMissing(),
   workerpoolAddressOrEns = throwIfMissing(),
   dappAddressOrENS,
-  dappWhitelistAddress,
   ipfsNode,
   ipfsGateway,
   senderName,
@@ -46,6 +45,7 @@ export const sendTelegram = async ({
   appMaxPrice = MAX_DESIRED_APP_ORDER_PRICE,
   workerpoolMaxPrice = MAX_DESIRED_WORKERPOOL_ORDER_PRICE,
   protectedData,
+  bulkRequest,
   useVoucher = false,
 }: IExecConsumer &
   SubgraphConsumer &
@@ -54,12 +54,30 @@ export const sendTelegram = async ({
   IpfsNodeConfigConsumer &
   IpfsGatewayConfigConsumer &
   SendTelegramParams &
-  DataProtectorConsumer): Promise<SendTelegramResponse> => {
+  DataProtectorConsumer): Promise<
+  ProcessBulkRequestResponse | SendTelegramSingleResponse
+> => {
   try {
-    const vDatasetAddress = addressOrEnsSchema()
+    const vUseVoucher = booleanSchema()
+      .label('useVoucher')
+      .validateSync(useVoucher);
+    const vWorkerpoolAddressOrEns = addressOrEnsSchema()
       .required()
-      .label('protectedData')
-      .validateSync(protectedData);
+      .label('WorkerpoolAddressOrEns')
+      .validateSync(workerpoolAddressOrEns);
+
+    if (bulkRequest) {
+      if (!bulkRequest.bulkRequest) {
+        throw new Error('bulkRequest is required');
+      }
+      const processBulkRequestResponse: ProcessBulkRequestResponse =
+        await dataProtector.processBulkRequest({
+          bulkRequest: bulkRequest.bulkRequest,
+          useVoucher: vUseVoucher,
+          workerpool: vWorkerpoolAddressOrEns,
+        });
+      return processBulkRequestResponse;
+    }
     const vSenderName = senderNameSchema()
       .label('senderName')
       .validateSync(senderName);
@@ -68,10 +86,7 @@ export const sendTelegram = async ({
       .label('telegramContent')
       .validateSync(telegramContent);
     const vLabel = labelSchema().label('label').validateSync(label);
-    const vWorkerpoolAddressOrEns = addressOrEnsSchema()
-      .required()
-      .label('WorkerpoolAddressOrEns')
-      .validateSync(workerpoolAddressOrEns);
+
     const vDappAddressOrENS = addressOrEnsSchema()
       .required()
       .label('dappAddressOrENS')
@@ -90,10 +105,11 @@ export const sendTelegram = async ({
     const vWorkerpoolMaxPrice = positiveNumberSchema()
       .label('workerpoolMaxPrice')
       .validateSync(workerpoolMaxPrice);
-    const vUseVoucher = booleanSchema()
-      .label('useVoucher')
-      .validateSync(useVoucher);
 
+    const vDatasetAddress = addressOrEnsSchema()
+      .required()
+      .label('protectedData')
+      .validateSync(protectedData);
     // Check protected data validity through subgraph
     const isValidProtectedData = await checkProtectedDataValidity(
       graphQLClient,

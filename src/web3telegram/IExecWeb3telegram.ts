@@ -1,6 +1,9 @@
 import { AbstractProvider, AbstractSigner, Eip1193Provider } from 'ethers';
 import { IExec } from 'iexec';
-import { IExecDataProtectorCore } from '@iexec/dataprotector';
+import {
+  IExecDataProtectorCore,
+  ProcessBulkRequestResponse,
+} from '@iexec/dataprotector';
 import { GraphQLClient } from 'graphql-request';
 import { fetchUserContacts } from './fetchUserContacts.js';
 import { fetchMyContacts } from './fetchMyContacts.js';
@@ -11,9 +14,9 @@ import {
   SendTelegramParams,
   AddressOrENS,
   Web3TelegramConfigOptions,
-  SendTelegramResponse,
   Web3SignerProvider,
   FetchMyContactsParams,
+  SendTelegramSingleResponse,
 } from './types.js';
 import { getChainDefaultConfig } from '../config/config.js';
 import { isValidProvider } from '../utils/validators.js';
@@ -110,7 +113,9 @@ export class IExecWeb3telegram {
     });
   }
 
-  async sendTelegram(args: SendTelegramParams): Promise<SendTelegramResponse> {
+  async sendTelegram(
+    args: SendTelegramParams
+  ): Promise<ProcessBulkRequestResponse | SendTelegramSingleResponse> {
     await this.init();
     await isValidProvider(this.iexec);
     return sendTelegram({

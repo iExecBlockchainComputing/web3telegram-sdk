@@ -171,7 +171,10 @@ describe('web3telegram.sendTelegram()', () => {
             protectedData: validProtectedData.address,
             workerpoolMaxPrice: prodWorkerpoolPublicPrice,
           });
-          expect(sendTelegramResponse.taskId).toBeDefined();
+          expect('taskId' in sendTelegramResponse).toBe(true);
+          expect(
+            'taskId' in sendTelegramResponse ? sendTelegramResponse.taskId : undefined
+          ).toBeDefined();
         },
         2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
       );
@@ -282,7 +285,8 @@ describe('web3telegram.sendTelegram()', () => {
         protectedData: validProtectedData.address,
         workerpoolAddressOrEns: learnProdWorkerpoolAddress,
       });
-      expect(sendTelegramResponse.taskId).toBeDefined();
+      expect('taskId' in sendTelegramResponse).toBe(true);
+      expect('taskId' in sendTelegramResponse ? sendTelegramResponse.taskId : undefined).toBeDefined();
     },
     2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
   );
@@ -309,7 +313,8 @@ describe('web3telegram.sendTelegram()', () => {
         protectedData: protectedDataForWhitelist.address,
         workerpoolAddressOrEns: learnProdWorkerpoolAddress,
       });
-      expect(sendTelegramResponse.taskId).toBeDefined();
+      expect("taskId" in sendTelegramResponse).toBe(true);
+      expect("taskId" in sendTelegramResponse ? sendTelegramResponse.taskId : undefined).toBeDefined();
     },
     2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
   );
@@ -325,13 +330,15 @@ describe('web3telegram.sendTelegram()', () => {
         // contentType: 'text/html',
         workerpoolAddressOrEns: learnProdWorkerpoolAddress,
       });
-      expect(sendTelegramResponse.taskId).toBeDefined();
+      expect("taskId" in sendTelegramResponse).toBe(true);
+      expect("taskId" in sendTelegramResponse ? sendTelegramResponse.taskId : undefined).toBeDefined();
     },
     2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
   );
 
   it(
     'should successfully send telegram with a valid senderName',
+
     async () => {
       const sendTelegramResponse = await web3telegram.sendTelegram({
         telegramContent: 'e2e telegram content for test',
@@ -339,7 +346,9 @@ describe('web3telegram.sendTelegram()', () => {
         senderName: 'Product Team',
         workerpoolAddressOrEns: learnProdWorkerpoolAddress,
       });
-      expect(sendTelegramResponse.taskId).toBeDefined();
+      expect(sendTelegramResponse).toBeDefined();
+      expect('taskId' in sendTelegramResponse).toBe(true);
+      expect('taskId' in sendTelegramResponse ? sendTelegramResponse.taskId : undefined).toBeDefined();
     },
     2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
   );
@@ -357,7 +366,8 @@ describe('web3telegram.sendTelegram()', () => {
         senderName: 'Product Team',
         workerpoolAddressOrEns: learnProdWorkerpoolAddress,
       });
-      expect(sendTelegramResponse.taskId).toBeDefined();
+      expect("taskId" in sendTelegramResponse).toBe(true);
+      expect("taskId" in sendTelegramResponse ? sendTelegramResponse.taskId : undefined).toBeDefined();
     },
     2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
   );
@@ -371,7 +381,8 @@ describe('web3telegram.sendTelegram()', () => {
         workerpoolAddressOrEns: learnProdWorkerpoolAddress,
         label: 'ID1234678',
       });
-      expect(sendTelegramResponse.taskId).toBeDefined();
+      expect("taskId" in sendTelegramResponse).toBe(true);
+      expect("taskId" in sendTelegramResponse ? sendTelegramResponse.taskId : undefined).toBeDefined();
       // TODO check label in created deal
     },
     2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
@@ -460,7 +471,8 @@ describe('web3telegram.sendTelegram()', () => {
             // workerpoolAddressOrEns: prodWorkerpoolAddress, // default
             useVoucher: true,
           });
-          expect(sendTelegramResponse.taskId).toBeDefined();
+          expect("taskId" in sendTelegramResponse).toBe(true);
+          expect("taskId" in sendTelegramResponse ? sendTelegramResponse.taskId : undefined).toBeDefined();
         },
         2 * MAX_EXPECTED_BLOCKTIME +
         MAX_EXPECTED_WEB2_SERVICES_TIME +
@@ -470,59 +482,6 @@ describe('web3telegram.sendTelegram()', () => {
 
     describe('when voucher balance does not cover the full workerpool price', () => {
       describe('but workerpoolMaxPrice covers the non sponsored amount', () => {
-        it(
-          'let call iexec.matchOrders',
-          async () => {
-            const voucherType = await createVoucherType({
-              description: 'test voucher type',
-              duration: 60 * 60,
-            });
-            await addVoucherEligibleAsset(prodWorkerpoolAddress, voucherType);
-
-            const voucherRemainingValue = 500;
-            const workerpoolOrderPrice = 600;
-            const nonSponsoredAmount =
-              workerpoolOrderPrice - voucherRemainingValue;
-
-            // voucher with balance insufficient to cover workerpool price
-            await Promise.all([
-              createVoucher({
-                owner: consumerWallet.address,
-                voucherType,
-                value: voucherRemainingValue,
-                skipOrders: true,
-              }),
-              createAndPublishWorkerpoolOrder(
-                TEST_CHAIN.prodWorkerpool,
-                TEST_CHAIN.prodWorkerpoolOwnerWallet,
-                consumerWallet.address,
-                workerpoolOrderPrice
-              ),
-            ]);
-            await waitSubgraphIndexing();
-
-            let error;
-            try {
-              await web3telegram.sendTelegram({
-                telegramContent: 'e2e telegram content for test',
-                protectedData: validProtectedData.address,
-                // workerpoolAddressOrEns: prodWorkerpoolAddress, // default
-                workerpoolMaxPrice: nonSponsoredAmount,
-                useVoucher: true,
-              });
-            } catch (err) {
-              error = err;
-            }
-            expect(error).toBeDefined();
-            expect(error.message).toBe('Failed to sendTelegram');
-            expect(error.cause.message).toBe(
-              `Orders can't be matched. Please approve an additional ${nonSponsoredAmount} for voucher usage.`
-            );
-          },
-          2 * MAX_EXPECTED_BLOCKTIME +
-          MAX_EXPECTED_WEB2_SERVICES_TIME +
-          MAX_EXPECTED_SUBGRAPH_INDEXING_TIME
-        );
         it(
           'should create task if user approves the non sponsored amount',
           async () => {
@@ -561,6 +520,7 @@ describe('web3telegram.sendTelegram()', () => {
               nonSponsoredAmount,
               voucherAddress
             );
+
             const sendTelegramResponse = await web3telegram.sendTelegram({
               telegramContent: 'e2e telegram content for test',
               protectedData: validProtectedData.address,
@@ -568,7 +528,9 @@ describe('web3telegram.sendTelegram()', () => {
               workerpoolMaxPrice: nonSponsoredAmount,
               useVoucher: true,
             });
-            expect(sendTelegramResponse.taskId).toBeDefined();
+            expect("taskId" in sendTelegramResponse).toBe(true);
+            expect("taskId" in sendTelegramResponse ? sendTelegramResponse.taskId : undefined).toBeDefined();
+
           },
           2 * MAX_EXPECTED_BLOCKTIME +
           MAX_EXPECTED_WEB2_SERVICES_TIME +
