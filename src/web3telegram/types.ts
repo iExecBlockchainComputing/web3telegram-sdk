@@ -1,4 +1,3 @@
-import { PrepareBulkRequestResponse } from '@iexec/dataprotector';
 import { EnhancedWallet } from 'iexec';
 import { IExecConfigOptions } from 'iexec/IExecConfig';
 
@@ -39,12 +38,14 @@ export type Contact = {
 export type SendTelegramParams = {
   senderName?: string;
   telegramContent: string;
-  protectedData: Address;
+  protectedData?: Address;
   /**
-   * Bulk request to process.
+   * Granted access to process.
    * use prepareBulkRequest of dataprotector to create a bulk request.
+   * if not provided, the single message will be processed.
    */
-  bulkRequest?: PrepareBulkRequestResponse;
+  grantedAccess?: GrantedAccess[];
+  maxProtectedDataPerTask?: number;
   label?: string;
   workerpoolAddressOrEns?: AddressOrENS;
   dataMaxPrice?: number;
@@ -58,6 +59,7 @@ export type FetchMyContactsParams = {
    * Get contacts for this specific user only
    */
   isUserStrict?: boolean;
+  bulkOnly?: boolean;
 };
 
 export type FetchUserContactsParams = {
