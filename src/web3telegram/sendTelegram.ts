@@ -45,7 +45,8 @@ export const sendTelegram = async ({
   appMaxPrice = MAX_DESIRED_APP_ORDER_PRICE,
   workerpoolMaxPrice = MAX_DESIRED_WORKERPOOL_ORDER_PRICE,
   protectedData,
-  bulkRequest,
+  grantedAccess,
+  maxProtectedDataPerTask,
   useVoucher = false,
 }: IExecConsumer &
   SubgraphConsumer &
@@ -65,19 +66,6 @@ export const sendTelegram = async ({
       .required()
       .label('WorkerpoolAddressOrEns')
       .validateSync(workerpoolAddressOrEns);
-
-    if (bulkRequest) {
-      if (!bulkRequest.bulkRequest) {
-        throw new Error('bulkRequest is required');
-      }
-      const processBulkRequestResponse: ProcessBulkRequestResponse =
-        await dataProtector.processBulkRequest({
-          bulkRequest: bulkRequest.bulkRequest,
-          useVoucher: vUseVoucher,
-          workerpool: vWorkerpoolAddressOrEns,
-        });
-      return processBulkRequestResponse;
-    }
     const vSenderName = senderNameSchema()
       .label('senderName')
       .validateSync(senderName);
@@ -105,21 +93,6 @@ export const sendTelegram = async ({
     const vWorkerpoolMaxPrice = positiveNumberSchema()
       .label('workerpoolMaxPrice')
       .validateSync(workerpoolMaxPrice);
-
-    const vDatasetAddress = addressOrEnsSchema()
-      .required()
-      .label('protectedData')
-      .validateSync(protectedData);
-    // Check protected data validity through subgraph
-    const isValidProtectedData = await checkProtectedDataValidity(
-      graphQLClient,
-      vDatasetAddress
-    );
-    if (!isValidProtectedData) {
-      throw new Error(
-        'This protected data does not contain "telegram_chatId:string" in its schema.'
-      );
-    }
 
     // Encrypt telegram content
     const telegramContentEncryptionKey = iexec.dataset.generateEncryptionKey();
@@ -160,10 +133,50 @@ export const sendTelegram = async ({
         telegramContentEncryptionKey,
       }),
     };
+    // Bulk processing
+    if (grantedAccess) {
+      const vMaxProtectedDataPerTask = positiveNumberSchema()
+        .label('maxProtectedDataPerTask')
+        .validateSync(maxProtectedDataPerTask);
+
+      const bulkRequest = await dataProtector.prepareBulkRequest({
+        app: vDappAddressOrENS,
+        appMaxPrice: vAppMaxPrice,
+        workerpoolMaxPrice: vWorkerpoolMaxPrice,
+        workerpool: vWorkerpoolAddressOrEns,
+        args: vLabel,
+        inputFiles: [],
+        secrets,
+        bulkOrders: grantedAccess,
+        maxProtectedDataPerTask: vMaxProtectedDataPerTask,
+      });
+      const processBulkRequestResponse: ProcessBulkRequestResponse =
+        await dataProtector.processBulkRequest({
+          bulkRequest: bulkRequest.bulkRequest,
+          useVoucher: vUseVoucher,
+          workerpool: vWorkerpoolAddressOrEns,
+        });
+      return processBulkRequestResponse;
+    }
+
+    // Single processing mode - protectedData is required
+    const vDatasetAddress = addressOrEnsSchema()
+      .required()
+      .label('protectedData')
+      .validateSync(protectedData);
+    // Check protected data validity through subgraph
+    const isValidProtectedData = await checkProtectedDataValidity(
+      graphQLClient,
+      vDatasetAddress
+    );
+    if (!isValidProtectedData) {
+      throw new Error(
+        'This protected data does not contain "telegram_chatId:string" in its schema.'
+      );
+    }
 
     // Use processProtectedData from dataprotector
     const result = await dataProtector.processProtectedData({
-      iexec,
       defaultWorkerpool: vWorkerpoolAddressOrEns,
       protectedData: vDatasetAddress,
       app: vDappAddressOrENS,
