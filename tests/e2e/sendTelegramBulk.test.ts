@@ -165,7 +165,7 @@ describe('web3telegram.sendTelegram() - Bulk Processing', () => {
                 };
 
                 // Prepare the bulk request using the contacts
-                const bulkRequest = await consumerDataProtectorInstance.prepareBulkRequest({
+                await consumerDataProtectorInstance.prepareBulkRequest({
                     bulkOrders,
                     app: defaultConfig.dappAddress,
                     workerpool: TEST_CHAIN.prodWorkerpool,
@@ -177,9 +177,10 @@ describe('web3telegram.sendTelegram() - Bulk Processing', () => {
 
                 // Process the bulk request
                 const result: ProcessBulkRequestResponse | SendTelegramSingleResponse = await web3telegram.sendTelegram({
-                    telegramContent: 'Bulk test message', // Required by types but ignored when bulkRequest is provided
-                    protectedData: validProtectedData1.address, // Required by types but ignored when bulkRequest is provided
-                    bulkRequest,
+                    telegramContent: 'Bulk test message',
+                    // protectedData is optional when grantedAccess is provided
+                    grantedAccess: bulkOrders,
+                    maxProtectedDataPerTask: 3,
                     workerpoolMaxPrice: prodWorkerpoolPublicPrice,
                 });
 
