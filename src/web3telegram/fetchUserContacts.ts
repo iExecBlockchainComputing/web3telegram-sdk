@@ -27,6 +27,7 @@ export const fetchUserContacts = async ({
   dappWhitelistAddress = throwIfMissing(),
   userAddress,
   isUserStrict = false,
+  bulkOnly = false,
 }: IExecConsumer &
   SubgraphConsumer &
   DappAddressConsumer &
@@ -48,6 +49,7 @@ export const fetchUserContacts = async ({
     const vIsUserStrict = booleanSchema()
       .label('isUserStrict')
       .validateSync(isUserStrict);
+    const vBulkOnly = booleanSchema().label('bulkOnly').validateSync(bulkOnly);
 
     const [dappOrders, whitelistOrders] = await Promise.all([
       fetchAllOrdersByApp({
@@ -55,12 +57,14 @@ export const fetchUserContacts = async ({
         userAddress: vUserAddress,
         appAddress: vDappAddressOrENS,
         isUserStrict: vIsUserStrict,
+        bulkOnly: vBulkOnly,
       }),
       fetchAllOrdersByApp({
         iexec,
         userAddress: vUserAddress,
         appAddress: vDappWhitelistAddress,
         isUserStrict: vIsUserStrict,
+        bulkOnly: vBulkOnly,
       }),
     ]);
     const orders = dappOrders.concat(whitelistOrders);
@@ -117,11 +121,13 @@ async function fetchAllOrdersByApp({
   userAddress,
   appAddress,
   isUserStrict,
+  bulkOnly,
 }: {
   iexec: IExec;
   userAddress: string;
   appAddress: string;
   isUserStrict: boolean;
+  bulkOnly?: boolean;
 }): Promise<PublishedDatasetorder[]> {
   const ordersFirstPage = iexec.orderbook.fetchDatasetOrderbook({
     dataset: ANY_DATASET_ADDRESS,
@@ -129,6 +135,7 @@ async function fetchAllOrdersByApp({
     requester: userAddress,
     isAppStrict: true,
     isRequesterStrict: isUserStrict,
+    bulkOnly,
     // Use maxPageSize here to avoid too many round-trips (we want everything anyway)
     pageSize: 1000,
   });
