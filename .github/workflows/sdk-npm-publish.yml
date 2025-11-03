@@ -15,7 +15,7 @@ on:
 jobs:
   set-publish-version:
     # Run only on main branch
-    if: github.ref == 'refs/heads/main'
+    # if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -38,7 +38,7 @@ jobs:
 
   publish-npm:
     # Run only on main branch
-    if: github.ref == 'refs/heads/main'
+    # if: github.ref == 'refs/heads/main'
     uses: ./.github/workflows/reusable-sdk-npm.yml
     needs: set-publish-version
     with:
