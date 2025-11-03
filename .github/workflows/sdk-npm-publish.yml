@@ -14,8 +14,7 @@ on:
 
 jobs:
   set-publish-version:
-    # Run only on main branch
-    # if: github.ref == 'refs/heads/main'
+    # Run on any branch (allows nightly releases from any branch)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -24,21 +23,21 @@ jobs:
         uses: actions/setup-node@v4
       - name: Set publish version
         id: set-publish-version
-        if: github.event.inputs.tag == 'nightly'
         run: |
-          if [ "${{ github.event.inputs.tag }}" == "nightly" ]; then
-            CURRENT_VERSION=$(npm pkg get version | tr -d '"')
+          CURRENT_VERSION=$(npm pkg get version | tr -d '"')
+          TAG="${{ github.event.inputs.tag || 'nightly' }}"
+          # For nightly tag, append commit SHA to version
+          if [ "$TAG" == "nightly" ]; then
             NIGHTLY_VERSION="${CURRENT_VERSION}-nightly-${GITHUB_SHA::7}"
             echo "VERSION=${NIGHTLY_VERSION}" >> $GITHUB_OUTPUT
           else
-            echo "VERSION=$(npm pkg get version | tr -d '"')" >> $GITHUB_OUTPUT
+            echo "VERSION=${CURRENT_VERSION}" >> $GITHUB_OUTPUT
           fi
     outputs:
       VERSION: ${{ steps.set-publish-version.outputs.VERSION }}
 
   publish-npm:
-    # Run only on main branch
-    # if: github.ref == 'refs/heads/main'
+    # Run on any branch (allows nightly releases from any branch)
     uses: ./.github/workflows/reusable-sdk-npm.yml
     needs: set-publish-version
     with:
