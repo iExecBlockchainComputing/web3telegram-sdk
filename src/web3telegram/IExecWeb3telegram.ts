@@ -3,6 +3,7 @@ import { IExec } from 'iexec';
 import {
   IExecDataProtectorCore,
   ProcessBulkRequestResponse,
+  ProcessBulkRequestParams,
 } from '@iexec/dataprotector';
 import { GraphQLClient } from 'graphql-request';
 import { fetchUserContacts } from './fetchUserContacts.js';
@@ -115,7 +116,10 @@ export class IExecWeb3telegram {
 
   async sendTelegram(
     args: SendTelegramParams
-  ): Promise<ProcessBulkRequestResponse | SendTelegramSingleResponse> {
+  ): Promise<
+    | ProcessBulkRequestResponse<ProcessBulkRequestParams>
+    | SendTelegramSingleResponse
+  > {
     await this.init();
     await isValidProvider(this.iexec);
     return sendTelegram({

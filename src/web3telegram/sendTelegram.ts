@@ -1,5 +1,8 @@
 import { Buffer } from 'buffer';
-import { ProcessBulkRequestResponse } from '@iexec/dataprotector';
+import {
+  ProcessBulkRequestResponse,
+  ProcessBulkRequestParams,
+} from '@iexec/dataprotector';
 import {
   MAX_DESIRED_APP_ORDER_PRICE,
   MAX_DESIRED_DATA_ORDER_PRICE,
@@ -56,7 +59,8 @@ export const sendTelegram = async ({
   IpfsGatewayConfigConsumer &
   SendTelegramParams &
   DataProtectorConsumer): Promise<
-  ProcessBulkRequestResponse | SendTelegramSingleResponse
+  | ProcessBulkRequestResponse<ProcessBulkRequestParams>
+  | SendTelegramSingleResponse
 > => {
   try {
     const vUseVoucher = booleanSchema()
@@ -147,10 +151,10 @@ export const sendTelegram = async ({
         args: vLabel,
         inputFiles: [],
         secrets,
-        bulkOrders: grantedAccess,
+        bulkAccesses: grantedAccess,
         maxProtectedDataPerTask: vMaxProtectedDataPerTask,
       });
-      const processBulkRequestResponse: ProcessBulkRequestResponse =
+      const processBulkRequestResponse: ProcessBulkRequestResponse<ProcessBulkRequestParams> =
         await dataProtector.processBulkRequest({
           bulkRequest: bulkRequest.bulkRequest,
           useVoucher: vUseVoucher,
