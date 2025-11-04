@@ -22,14 +22,12 @@ async function writeTaskOutput(path, message) {
 async function processProtectedData({
   index,
   IEXEC_IN,
-  IEXEC_OUT,
   appDeveloperSecret,
   requesterSecret,
 }) {
   const datasetFilename =
     index > 0 ? process.env[`IEXEC_DATASET_${index}_FILENAME`] : null;
 
-  // Parse the protected data
   let protectedData;
   try {
     const deserializerConfig = datasetFilename
@@ -44,10 +42,8 @@ async function processProtectedData({
     throw Error(`Failed to parse ProtectedData ${index}: ${e.message}`);
   }
 
-  // Validate the protected data
   validateProtectedData(protectedData);
 
-  // Download and decrypt content
   const encryptedTelegramContent = await downloadEncryptedContent(
     requesterSecret.telegramContentMultiAddr
   );
@@ -57,21 +53,12 @@ async function processProtectedData({
     requesterSecret.telegramContentEncryptionKey
   );
 
-  // Send telegram message
   const response = await sendTelegram({
     chatId: protectedData.chatId,
     message: telegramContent,
     botToken: appDeveloperSecret.TELEGRAM_BOT_TOKEN,
     senderName: requesterSecret.senderName,
   });
-
-  // Write individual result file only for single processing
-  if (index === 0) {
-    await writeTaskOutput(
-      `${IEXEC_OUT}/result.txt`,
-      JSON.stringify(response, null, 2)
-    );
-  }
 
   return { index, response };
 }
@@ -85,10 +72,8 @@ async function start() {
     IEXEC_BULK_SLICE_SIZE,
   } = process.env;
 
-  // Check worker env
   const workerEnv = validateWorkerEnv({ IEXEC_OUT });
 
-  // Parse the app developer secret environment variable
   let appDeveloperSecret;
   try {
     appDeveloperSecret = JSON.parse(IEXEC_APP_DEVELOPER_SECRET);
@@ -97,7 +82,6 @@ async function start() {
   }
   appDeveloperSecret = validateAppSecret(appDeveloperSecret);
 
-  // Parse the requester secret environment variable
   let requesterSecret;
   try {
     requesterSecret = IEXEC_REQUESTER_SECRET_1
@@ -111,14 +95,13 @@ async function start() {
   const bulkSize = parseInt(IEXEC_BULK_SLICE_SIZE, 10) || 0;
   const results = [];
 
+  // Process multiple protected data
   if (bulkSize > 0) {
-    // Process multiple protected data
     const promises = [];
     for (let index = 1; index <= bulkSize; index += 1) {
       const promise = processProtectedData({
         index,
         IEXEC_IN,
-        IEXEC_OUT: workerEnv.IEXEC_OUT,
         appDeveloperSecret,
         requesterSecret,
       })
@@ -143,23 +126,8 @@ async function start() {
 
     const bulkResults = await Promise.all(promises);
     results.push(...bulkResults);
-  } else {
-    // Process single protected data
-    const result = await processProtectedData({
-      index: 0,
-      IEXEC_IN,
-      IEXEC_OUT: workerEnv.IEXEC_OUT,
-      appDeveloperSecret,
-      requesterSecret,
-    });
 
-    results.push(result);
-  }
-
-  // Generate computed.json - same format for both single and bulk
-
-  // Create result.txt for bulk processing (similar to single processing)
-  if (bulkSize > 0) {
+    // Write result.txt for bulk processing
     const successCount = results.filter(
       (r) => r.response.status === 200
     ).length;
@@ -184,8 +152,24 @@ async function start() {
       `${workerEnv.IEXEC_OUT}/result.txt`,
       JSON.stringify(bulkResult, null, 2)
     );
+  } else {
+    // Process single protected data
+    const result = await processProtectedData({
+      index: 0,
+      IEXEC_IN,
+      appDeveloperSecret,
+      requesterSecret,
+    });
+
+    results.push(result);
+
+    await writeTaskOutput(
+      `${workerEnv.IEXEC_OUT}/result.txt`,
+      JSON.stringify(result.response, null, 2)
+    );
   }
 
+  // Generate computed.json - same format for both single and bulk
   await writeTaskOutput(
     `${workerEnv.IEXEC_OUT}/computed.json`,
     JSON.stringify(
