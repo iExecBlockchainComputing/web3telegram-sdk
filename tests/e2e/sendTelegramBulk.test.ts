@@ -1,7 +1,5 @@
 import {
     IExecDataProtectorCore,
-    ProcessBulkRequestResponse,
-    ProcessBulkRequestParams,
     ProtectedDataWithSecretProps,
 } from '@iexec/dataprotector';
 import { beforeAll, describe, expect, it } from '@jest/globals';
@@ -10,7 +8,7 @@ import {
     DEFAULT_CHAIN_ID,
     getChainDefaultConfig,
 } from '../../src/config/config.js';
-import { Contact, IExecWeb3telegram, SendTelegramSingleResponse } from '../../src/index.js';
+import { Contact, IExecWeb3telegram } from '../../src/index.js';
 import {
     MAX_EXPECTED_BLOCKTIME,
     MAX_EXPECTED_WEB2_SERVICES_TIME,
@@ -203,7 +201,7 @@ describe('web3telegram.sendTelegram() - Bulk Processing', () => {
                 }
 
                 // Process the bulk request
-                const result: ProcessBulkRequestResponse<ProcessBulkRequestParams> | SendTelegramSingleResponse = await web3telegram.sendTelegram({
+                const result = await web3telegram.sendTelegram({
                     telegramContent: 'Bulk test message',
                     // protectedData is optional when grantedAccess is provided
                     grantedAccess: bulkOrders,

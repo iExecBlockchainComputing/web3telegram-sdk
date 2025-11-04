@@ -1,10 +1,6 @@
 import { AbstractProvider, AbstractSigner, Eip1193Provider } from 'ethers';
 import { IExec } from 'iexec';
-import {
-  IExecDataProtectorCore,
-  ProcessBulkRequestResponse,
-  ProcessBulkRequestParams,
-} from '@iexec/dataprotector';
+import { IExecDataProtectorCore } from '@iexec/dataprotector';
 import { GraphQLClient } from 'graphql-request';
 import { fetchUserContacts } from './fetchUserContacts.js';
 import { fetchMyContacts } from './fetchMyContacts.js';
@@ -17,7 +13,7 @@ import {
   Web3TelegramConfigOptions,
   Web3SignerProvider,
   FetchMyContactsParams,
-  SendTelegramSingleResponse,
+  SendTelegramResponse,
 } from './types.js';
 import { getChainDefaultConfig } from '../config/config.js';
 import { isValidProvider } from '../utils/validators.js';
@@ -114,12 +110,9 @@ export class IExecWeb3telegram {
     });
   }
 
-  async sendTelegram(
-    args: SendTelegramParams
-  ): Promise<
-    | ProcessBulkRequestResponse<ProcessBulkRequestParams>
-    | SendTelegramSingleResponse
-  > {
+  async sendTelegram<Params extends SendTelegramParams>(
+    args: Params
+  ): Promise<SendTelegramResponse<Params>> {
     await this.init();
     await isValidProvider(this.iexec);
     return sendTelegram({
@@ -133,11 +126,11 @@ export class IExecWeb3telegram {
       dappAddressOrENS: this.dappAddressOrENS,
       dappWhitelistAddress: this.dappWhitelistAddress,
       graphQLClient: this.graphQLClient,
-    });
+    } as any) as Promise<SendTelegramResponse<Params>>;
   }
 
   private async resolveConfig(): Promise<Web3telegramResolvedConfig> {
-    const chainId = await getChainIdFromProvider(this.ethProvider as any);
+    const chainId = await getChainIdFromProvider(this.ethProvider);
     const chainDefaultConfig = getChainDefaultConfig(chainId, {
       allowExperimentalNetworks: this.options.allowExperimentalNetworks,
     });
@@ -149,7 +142,7 @@ export class IExecWeb3telegram {
 
     try {
       iexec = new IExec(
-        { ethProvider: this.ethProvider as any },
+        { ethProvider: this.ethProvider },
         {
           ipfsGatewayURL: ipfsGateway,
           ...this.options?.iexecOptions,

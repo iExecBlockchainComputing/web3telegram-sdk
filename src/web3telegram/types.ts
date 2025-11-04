@@ -35,17 +35,9 @@ export type Contact = {
   grantedAccess: GrantedAccess;
 };
 
-export type SendTelegramParams = {
+type SendTelegramCommonParams = {
   senderName?: string;
   telegramContent: string;
-  protectedData?: Address;
-  /**
-   * Granted access to process.
-   * use prepareBulkRequest of dataprotector to create a bulk request.
-   * if not provided, the single message will be processed.
-   */
-  grantedAccess?: GrantedAccess[];
-  maxProtectedDataPerTask?: number;
   label?: string;
   workerpoolAddressOrEns?: AddressOrENS;
   dataMaxPrice?: number;
@@ -53,6 +45,23 @@ export type SendTelegramParams = {
   workerpoolMaxPrice?: number;
   useVoucher?: boolean;
 };
+
+export type SendTelegramParams =
+  | ({
+      /**
+       * protected data to process.
+       */
+      protectedData: Address;
+    } & SendTelegramCommonParams)
+  | ({
+      /**
+       * Granted access to process in bulk.
+       * use `fetchMyContacts({ bulkOnly: true })` to get granted accesses.
+       * if not provided, the single message will be processed.
+       */
+      grantedAccess: GrantedAccess[];
+      maxProtectedDataPerTask?: number;
+    } & SendTelegramCommonParams);
 
 export type FetchMyContactsParams = {
   /**
@@ -69,9 +78,26 @@ export type FetchUserContactsParams = {
   userAddress: Address;
 } & FetchMyContactsParams;
 
-export type SendTelegramSingleResponse = {
+type SendTelegramSingleResponse = {
   taskId: string;
 };
+
+type SendTelegramBulkResponse = {
+  tasks: {
+    bulkIndex: number;
+    taskId: string;
+    dealId: string;
+  }[];
+};
+
+export type SendTelegramResponse<Params = { protectedData: Address }> =
+  Params extends {
+    grantedAccess: GrantedAccess[];
+  }
+    ? SendTelegramBulkResponse
+    : never & Params extends { protectedData: Address }
+    ? SendTelegramSingleResponse
+    : never;
 
 /**
  * Configuration options for web3telegram.

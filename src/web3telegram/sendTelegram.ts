@@ -1,9 +1,5 @@
 import { Buffer } from 'buffer';
 import {
-  ProcessBulkRequestResponse,
-  ProcessBulkRequestParams,
-} from '@iexec/dataprotector';
-import {
   MAX_DESIRED_APP_ORDER_PRICE,
   MAX_DESIRED_DATA_ORDER_PRICE,
   MAX_DESIRED_WORKERPOOL_ORDER_PRICE,
@@ -20,7 +16,12 @@ import {
   senderNameSchema,
   booleanSchema,
 } from '../utils/validators.js';
-import { SendTelegramParams, SendTelegramSingleResponse } from './types.js';
+import {
+  Address,
+  GrantedAccess,
+  SendTelegramParams,
+  SendTelegramResponse,
+} from './types.js';
 import {
   DappAddressConsumer,
   DappWhitelistAddressConsumer,
@@ -33,7 +34,7 @@ import {
 
 export type SendTelegram = typeof sendTelegram;
 
-export const sendTelegram = async ({
+export const sendTelegram = async <Params extends SendTelegramParams>({
   graphQLClient = throwIfMissing(),
   iexec = throwIfMissing(),
   dataProtector = throwIfMissing(),
@@ -57,11 +58,12 @@ export const sendTelegram = async ({
   DappWhitelistAddressConsumer &
   IpfsNodeConfigConsumer &
   IpfsGatewayConfigConsumer &
-  SendTelegramParams &
-  DataProtectorConsumer): Promise<
-  | ProcessBulkRequestResponse<ProcessBulkRequestParams>
-  | SendTelegramSingleResponse
-> => {
+  DataProtectorConsumer &
+  Params & {
+    protectedData?: Address;
+    grantedAccess?: GrantedAccess[];
+    maxProtectedDataPerTask?: number;
+  }): Promise<SendTelegramResponse<Params>> => {
   try {
     const vUseVoucher = booleanSchema()
       .label('useVoucher')
@@ -154,13 +156,20 @@ export const sendTelegram = async ({
         bulkAccesses: grantedAccess,
         maxProtectedDataPerTask: vMaxProtectedDataPerTask,
       });
-      const processBulkRequestResponse: ProcessBulkRequestResponse<ProcessBulkRequestParams> =
-        await dataProtector.processBulkRequest({
+      const processBulkRequestResponse = await dataProtector.processBulkRequest(
+        {
           bulkRequest: bulkRequest.bulkRequest,
           useVoucher: vUseVoucher,
           workerpool: vWorkerpoolAddressOrEns,
-        });
-      return processBulkRequestResponse;
+        }
+      );
+      return {
+        tasks: processBulkRequestResponse.tasks.map((task) => ({
+          taskId: task.taskId,
+          dealId: task.dealId,
+          bulkIndex: task.bulkIndex,
+        })),
+      } as SendTelegramResponse<Params>;
     }
 
     // Single processing mode - protectedData is required
@@ -198,7 +207,7 @@ export const sendTelegram = async ({
 
     return {
       taskId: result.taskId,
-    };
+    } as SendTelegramResponse<Params>;
   } catch (error) {
     //  Protocol error detected, re-throwing as-is
     if ((error as any)?.isProtocolError === true) {
