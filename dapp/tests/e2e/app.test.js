@@ -217,11 +217,10 @@ describe('sendTelegram', () => {
       const result = JSON.parse(resultTxt);
       expect(result).toStrictEqual({
         message: 'Bulk processing completed: 2 successful, 0 failed',
-        status: 200,
-        'total-processed': 2,
+        'total-count': 2,
         'success-count': 2,
         'error-count': 0,
-        'dataset-results': [
+        results: [
           {
             index: 1,
             dataset: 'data-chatId.zip',
@@ -270,11 +269,10 @@ describe('sendTelegram', () => {
       const result = JSON.parse(resultTxt);
       expect(result).toStrictEqual({
         message: 'Bulk processing completed: 1 successful, 1 failed',
-        status: 200,
-        'total-processed': 2,
+        'total-count': 2,
         'success-count': 1,
         'error-count': 1,
-        'dataset-results': [
+        results: [
           {
             index: 1,
             dataset: 'data-chatId.zip',

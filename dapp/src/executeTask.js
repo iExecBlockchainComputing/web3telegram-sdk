@@ -135,11 +135,10 @@ async function start() {
 
     const bulkResult = {
       message: `Bulk processing completed: ${successCount} successful, ${errorCount} failed`,
-      status: 200,
-      'total-processed': results.length,
+      'total-count': results.length,
       'success-count': successCount,
       'error-count': errorCount,
-      'dataset-results': results.map((r) => ({
+      results: results.map((r) => ({
         index: r.index,
         dataset:
           process.env[`IEXEC_DATASET_${r.index}_FILENAME`] ||
