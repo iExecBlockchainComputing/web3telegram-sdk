@@ -19,16 +19,14 @@ async function writeTaskOutput(path, message) {
   }
 }
 
-async function processProtectedData(
+async function processProtectedData({
   index,
-  {
-    IEXEC_IN,
-    IEXEC_OUT,
-    appDeveloperSecret,
-    requesterSecret,
-    datasetFilename = null,
-  }
-) {
+  IEXEC_IN,
+  IEXEC_OUT,
+  appDeveloperSecret,
+  requesterSecret,
+  datasetFilename = null,
+}) {
   // Parse the protected data
   let protectedData;
   try {
@@ -114,10 +112,11 @@ async function start() {
   if (bulkSize > 0) {
     // Process multiple protected data
     const promises = [];
-    for (let i = 1; i <= bulkSize; i += 1) {
-      const datasetFilename = process.env[`IEXEC_DATASET_${i}_FILENAME`];
+    for (let index = 1; index <= bulkSize; index += 1) {
+      const datasetFilename = process.env[`IEXEC_DATASET_${index}_FILENAME`];
 
-      const promise = processProtectedData(i, {
+      const promise = processProtectedData({
+        index,
         IEXEC_IN,
         IEXEC_OUT: workerEnv.IEXEC_OUT,
         appDeveloperSecret,
@@ -126,13 +125,13 @@ async function start() {
       })
         .then((result) => result)
         .catch((error) => ({
-          index: i,
+          index,
           resultFileName: datasetFilename
             ? `${datasetFilename}.txt`
-            : `dataset-${i}.txt`,
+            : `dataset-${index}.txt`,
           response: {
             status: 500,
-            message: `Failed to process dataset ${i}: ${error.message}`,
+            message: `Failed to process dataset ${index}: ${error.message}`,
           },
         }));
 
@@ -143,7 +142,8 @@ async function start() {
     results.push(...bulkResults);
   } else {
     // Process single protected data
-    const result = await processProtectedData(0, {
+    const result = await processProtectedData({
+      index: 0,
       IEXEC_IN,
       IEXEC_OUT: workerEnv.IEXEC_OUT,
       appDeveloperSecret,
