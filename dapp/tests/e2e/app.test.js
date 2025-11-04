@@ -153,7 +153,7 @@ describe('sendTelegram', () => {
 
     const { IEXEC_OUT } = process.env;
     const resultTxt = await fsPromises.readFile(
-      path.join(IEXEC_OUT, 'result.txt'),
+      path.join(IEXEC_OUT, 'result.json'),
       'utf-8'
     );
     const computedJson = await fsPromises.readFile(
@@ -165,7 +165,7 @@ describe('sendTelegram', () => {
     expect(result.message).toBe('Failed to send Telegram message.');
     expect(result.status).toBe(404);
     expect(JSON.parse(computedJson)).toStrictEqual({
-      'deterministic-output-path': `${IEXEC_OUT}/result.txt`,
+      'deterministic-output-path': `${IEXEC_OUT}/result.json`,
     });
   });
 
@@ -174,7 +174,7 @@ describe('sendTelegram', () => {
 
     const { IEXEC_OUT } = process.env;
     const resultTxt = await fsPromises.readFile(
-      path.join(IEXEC_OUT, 'result.txt'),
+      path.join(IEXEC_OUT, 'result.json'),
       'utf-8'
     );
     const computedJson = await fsPromises.readFile(
@@ -188,7 +188,7 @@ describe('sendTelegram', () => {
     );
     expect(result.status).toBe(200);
     expect(JSON.parse(computedJson)).toStrictEqual({
-      'deterministic-output-path': `${IEXEC_OUT}/result.txt`,
+      'deterministic-output-path': `${IEXEC_OUT}/result.json`,
     });
   });
 
@@ -206,11 +206,11 @@ describe('sendTelegram', () => {
       const { IEXEC_OUT } = process.env;
 
       // Check individual result files are NOT created for bulk processing
-      // Only result.txt and computed.json should exist
+      // Only result.json and computed.json should exist
 
-      // Check result.txt (main output file)
+      // Check result.json (main output file)
       const resultTxt = await fsPromises.readFile(
-        path.join(IEXEC_OUT, 'result.txt'),
+        path.join(IEXEC_OUT, 'result.json'),
         'utf-8'
       );
 
@@ -223,7 +223,7 @@ describe('sendTelegram', () => {
         results: [
           {
             index: 1,
-            dataset: 'data-chatId.zip',
+            'protected-data': 'data-chatId.zip',
             response: {
               message: 'Your telegram message has been sent successfully.',
               status: 200,
@@ -231,7 +231,7 @@ describe('sendTelegram', () => {
           },
           {
             index: 2,
-            dataset: 'data-chatId.zip',
+            'protected-data': 'data-chatId.zip',
             response: {
               message: 'Your telegram message has been sent successfully.',
               status: 200,
@@ -248,7 +248,7 @@ describe('sendTelegram', () => {
 
       const computed = JSON.parse(computedJson);
       expect(computed).toStrictEqual({
-        'deterministic-output-path': `${IEXEC_OUT}/result.txt`,
+        'deterministic-output-path': `${IEXEC_OUT}/result.json`,
       });
     });
 
@@ -260,9 +260,9 @@ describe('sendTelegram', () => {
 
       const { IEXEC_OUT } = process.env;
 
-      // Check result.txt (main output file)
+      // Check result.json (main output file)
       const resultTxt = await fsPromises.readFile(
-        path.join(IEXEC_OUT, 'result.txt'),
+        path.join(IEXEC_OUT, 'result.json'),
         'utf-8'
       );
 
@@ -275,7 +275,7 @@ describe('sendTelegram', () => {
         results: [
           {
             index: 1,
-            dataset: 'data-chatId.zip',
+            'protected-data': 'data-chatId.zip',
             response: {
               message: 'Your telegram message has been sent successfully.',
               status: 200,
@@ -283,10 +283,12 @@ describe('sendTelegram', () => {
           },
           {
             index: 2,
-            dataset: 'invalid-data.zip',
+            'protected-data': 'invalid-data.zip',
             response: {
               status: 500,
-              message: expect.stringContaining('Failed to process dataset 2'),
+              message: expect.stringContaining(
+                'Failed to process protected-data 2. Cause:'
+              ),
             },
           },
         ],
@@ -300,7 +302,7 @@ describe('sendTelegram', () => {
 
       const computed = JSON.parse(computedJson);
       expect(computed).toStrictEqual({
-        'deterministic-output-path': `${IEXEC_OUT}/result.txt`,
+        'deterministic-output-path': `${IEXEC_OUT}/result.json`,
       });
     });
   });

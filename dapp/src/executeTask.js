@@ -116,7 +116,7 @@ async function start() {
               : `dataset-${index}.txt`,
             response: {
               status: 500,
-              message: `Failed to process dataset ${index}: ${error.message}`,
+              message: `Failed to process protected-data ${index}. Cause: ${error.message}`,
             },
           };
         });
@@ -127,7 +127,7 @@ async function start() {
     const bulkResults = await Promise.all(promises);
     results.push(...bulkResults);
 
-    // Write result.txt for bulk processing
+    // Write result.json for bulk processing
     const successCount = results.filter(
       (r) => r.response.status === 200
     ).length;
@@ -140,7 +140,7 @@ async function start() {
       'error-count': errorCount,
       results: results.map((r) => ({
         index: r.index,
-        dataset:
+        'protected-data':
           process.env[`IEXEC_DATASET_${r.index}_FILENAME`] ||
           `dataset-${r.index}`,
         response: r.response,
@@ -148,7 +148,7 @@ async function start() {
     };
 
     await writeTaskOutput(
-      `${workerEnv.IEXEC_OUT}/result.txt`,
+      `${workerEnv.IEXEC_OUT}/result.json`,
       JSON.stringify(bulkResult, null, 2)
     );
   } else {
@@ -163,7 +163,7 @@ async function start() {
     results.push(result);
 
     await writeTaskOutput(
-      `${workerEnv.IEXEC_OUT}/result.txt`,
+      `${workerEnv.IEXEC_OUT}/result.json`,
       JSON.stringify(result.response, null, 2)
     );
   }
@@ -173,7 +173,7 @@ async function start() {
     `${workerEnv.IEXEC_OUT}/computed.json`,
     JSON.stringify(
       {
-        'deterministic-output-path': `${workerEnv.IEXEC_OUT}/result.txt`,
+        'deterministic-output-path': `${workerEnv.IEXEC_OUT}/result.json`,
       },
       null,
       2

@@ -93,7 +93,7 @@ describe('start function', () => {
     });
 
     expect(fs.writeFile).toHaveBeenCalledWith(
-      '/mock/output/result.txt',
+      '/mock/output/result.json',
       JSON.stringify(
         {
           message: 'Your telegram message has been sent successfully.',
@@ -106,7 +106,7 @@ describe('start function', () => {
     expect(fs.writeFile).toHaveBeenCalledWith(
       '/mock/output/computed.json',
       JSON.stringify(
-        { 'deterministic-output-path': '/mock/output/result.txt' },
+        { 'deterministic-output-path': '/mock/output/result.json' },
         null,
         2
       )

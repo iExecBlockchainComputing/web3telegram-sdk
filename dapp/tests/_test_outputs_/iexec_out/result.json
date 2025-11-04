@@ -1,0 +1,24 @@
+{
+  "message": "Bulk processing completed: 1 successful, 1 failed",
+  "total-count": 2,
+  "success-count": 1,
+  "error-count": 1,
+  "results": [
+    {
+      "index": 1,
+      "protected-data": "data-chatId.zip",
+      "response": {
+        "message": "Your telegram message has been sent successfully.",
+        "status": 200
+      }
+    },
+    {
+      "index": 2,
+      "protected-data": "invalid-data.zip",
+      "response": {
+        "status": 500,
+        "message": "Failed to process protected-data 2. Cause: Failed to parse ProtectedData 2: Failed to load protected data"
+      }
+    }
+  ]
+}
