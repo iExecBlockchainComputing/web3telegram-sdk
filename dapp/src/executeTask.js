@@ -25,8 +25,10 @@ async function processProtectedData({
   IEXEC_OUT,
   appDeveloperSecret,
   requesterSecret,
-  datasetFilename = null,
 }) {
+  const datasetFilename =
+    index > 0 ? process.env[`IEXEC_DATASET_${index}_FILENAME`] : null;
+
   // Parse the protected data
   let protectedData;
   try {
@@ -113,27 +115,28 @@ async function start() {
     // Process multiple protected data
     const promises = [];
     for (let index = 1; index <= bulkSize; index += 1) {
-      const datasetFilename = process.env[`IEXEC_DATASET_${index}_FILENAME`];
-
       const promise = processProtectedData({
         index,
         IEXEC_IN,
         IEXEC_OUT: workerEnv.IEXEC_OUT,
         appDeveloperSecret,
         requesterSecret,
-        datasetFilename,
       })
         .then((result) => result)
-        .catch((error) => ({
-          index,
-          resultFileName: datasetFilename
-            ? `${datasetFilename}.txt`
-            : `dataset-${index}.txt`,
-          response: {
-            status: 500,
-            message: `Failed to process dataset ${index}: ${error.message}`,
-          },
-        }));
+        .catch((error) => {
+          const datasetFilename =
+            process.env[`IEXEC_DATASET_${index}_FILENAME`];
+          return {
+            index,
+            resultFileName: datasetFilename
+              ? `${datasetFilename}.txt`
+              : `dataset-${index}.txt`,
+            response: {
+              status: 500,
+              message: `Failed to process dataset ${index}: ${error.message}`,
+            },
+          };
+        });
 
       promises.push(promise);
     }
