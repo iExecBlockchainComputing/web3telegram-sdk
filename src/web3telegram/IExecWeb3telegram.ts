@@ -19,6 +19,11 @@ import { getChainDefaultConfig } from '../config/config.js';
 import { isValidProvider } from '../utils/validators.js';
 import { getChainIdFromProvider } from '../utils/getChainId.js';
 import { resolveDappAddressFromCompass } from '../utils/resolveDappAddressFromCompass.js';
+import {
+  prepareTelegramCampaign,
+  PrepareTelegramCampaignParams,
+  PrepareTelegramCampaignResponse,
+} from './prepareTelegramCampain.js';
 
 type EthersCompatibleProvider =
   | AbstractProvider
@@ -127,6 +132,21 @@ export class IExecWeb3telegram {
       dappWhitelistAddress: this.dappWhitelistAddress,
       graphQLClient: this.graphQLClient,
     } as any) as Promise<SendTelegramResponse<Params>>;
+  }
+
+  async prepareTelegramCampaign(
+    args: PrepareTelegramCampaignParams
+  ): Promise<PrepareTelegramCampaignResponse> {
+    await this.init();
+
+    return prepareTelegramCampaign({
+      ...args,
+      iexec: this.iexec,
+      dataProtector: this.dataProtector,
+      ipfsNode: this.ipfsNode,
+      ipfsGateway: this.ipfsGateway,
+      dappAddressOrENS: this.dappAddressOrENS,
+    });
   }
 
   private async resolveConfig(): Promise<Web3telegramResolvedConfig> {
