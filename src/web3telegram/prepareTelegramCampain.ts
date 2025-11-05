@@ -49,7 +49,7 @@ export type PrepareTelegramCampaignResponse = {
 export const prepareTelegramCampaign = async ({
   iexec = throwIfMissing(),
   dataProtector = throwIfMissing(),
-  workerpoolAddressOrEns = throwIfMissing(),
+  workerpoolAddressOrEns,
   dappAddressOrENS,
   ipfsNode,
   ipfsGateway,
@@ -68,7 +68,6 @@ export const prepareTelegramCampaign = async ({
   PrepareTelegramCampaignParams): Promise<PrepareTelegramCampaignResponse> => {
   try {
     const vWorkerpoolAddressOrEns = addressOrEnsSchema()
-      .required()
       .label('WorkerpoolAddressOrEns')
       .validateSync(workerpoolAddressOrEns);
     const vSenderName = senderNameSchema()
