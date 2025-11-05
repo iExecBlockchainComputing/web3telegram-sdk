@@ -93,7 +93,6 @@ async function start() {
   requesterSecret = validateRequesterSecret(requesterSecret);
 
   const bulkSize = parseInt(IEXEC_BULK_SLICE_SIZE, 10) || 0;
-  const results = [];
 
   // Process multiple protected data
   if (bulkSize > 0) {
@@ -104,28 +103,24 @@ async function start() {
         IEXEC_IN,
         appDeveloperSecret,
         requesterSecret,
-      })
-        .then((result) => result)
-        .catch((error) => {
-          const datasetFilename =
-            process.env[`IEXEC_DATASET_${index}_FILENAME`];
-          return {
-            index,
-            resultFileName: datasetFilename
-              ? `${datasetFilename}.txt`
-              : `dataset-${index}.txt`,
-            response: {
-              status: 500,
-              message: `Failed to process protected-data ${index}. Cause: ${error.message}`,
-            },
-          };
-        });
+      }).catch((error) => {
+        const datasetFilename = process.env[`IEXEC_DATASET_${index}_FILENAME`];
+        return {
+          index,
+          resultFileName: datasetFilename
+            ? `${datasetFilename}.txt`
+            : `dataset-${index}.txt`,
+          response: {
+            status: 500,
+            message: `Failed to process protected-data ${index}. Cause: ${error.message}`,
+          },
+        };
+      });
 
       promises.push(promise);
     }
 
-    const bulkResults = await Promise.all(promises);
-    results.push(...bulkResults);
+    const results = await Promise.all(promises);
 
     // Write result.json for bulk processing
     const successCount = results.filter(
@@ -159,8 +154,6 @@ async function start() {
       appDeveloperSecret,
       requesterSecret,
     });
-
-    results.push(result);
 
     await writeTaskOutput(
       `${workerEnv.IEXEC_OUT}/result.json`,
