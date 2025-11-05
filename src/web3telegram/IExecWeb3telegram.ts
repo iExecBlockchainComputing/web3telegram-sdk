@@ -6,6 +6,11 @@ import { fetchUserContacts } from './fetchUserContacts.js';
 import { fetchMyContacts } from './fetchMyContacts.js';
 import { sendTelegram } from './sendTelegram.js';
 import {
+  sendTelegramCampaign,
+  SendTelegramCampaignParams,
+  SendTelegramCampaignResponse,
+} from './sendTelegramCampaign.js';
+import {
   Contact,
   FetchUserContactsParams,
   SendTelegramParams,
@@ -115,9 +120,9 @@ export class IExecWeb3telegram {
     });
   }
 
-  async sendTelegram<Params extends SendTelegramParams>(
-    args: Params
-  ): Promise<SendTelegramResponse<Params>> {
+  async sendTelegram(
+    args: SendTelegramParams & { protectedData: string }
+  ): Promise<SendTelegramResponse> {
     await this.init();
     await isValidProvider(this.iexec);
     return sendTelegram({
@@ -125,13 +130,25 @@ export class IExecWeb3telegram {
       workerpoolAddressOrEns:
         args.workerpoolAddressOrEns || this.defaultWorkerpool,
       iexec: this.iexec,
-      dataProtector: this.dataProtector,
       ipfsNode: this.ipfsNode,
       ipfsGateway: this.ipfsGateway,
       dappAddressOrENS: this.dappAddressOrENS,
       dappWhitelistAddress: this.dappWhitelistAddress,
       graphQLClient: this.graphQLClient,
-    } as any) as Promise<SendTelegramResponse<Params>>;
+    });
+  }
+
+  async sendTelegramCampaign(
+    args: SendTelegramCampaignParams
+  ): Promise<SendTelegramCampaignResponse> {
+    await this.init();
+    await isValidProvider(this.iexec);
+    return sendTelegramCampaign({
+      ...args,
+      workerpoolAddressOrEns:
+        args.workerpoolAddressOrEns || this.defaultWorkerpool,
+      dataProtector: this.dataProtector,
+    });
   }
 
   async prepareTelegramCampaign(

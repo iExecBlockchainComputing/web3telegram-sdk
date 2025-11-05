@@ -1,6 +1,6 @@
 import { isAddress } from 'ethers';
 import { IExec } from 'iexec';
-import { ValidationError, boolean, number, string } from 'yup';
+import { ValidationError, boolean, number, object, string } from 'yup';
 
 export const isValidProvider = async (iexec: IExec) => {
   const client = await iexec.config.resolveContractsClient();
@@ -53,3 +53,6 @@ export const positiveNumberSchema = () =>
 
 export const booleanSchema = () =>
   boolean().strict().typeError('${path} should be a boolean');
+
+export const campaignRequestSchema = () =>
+  object().required().typeError('${path} should be a BulkRequest object');

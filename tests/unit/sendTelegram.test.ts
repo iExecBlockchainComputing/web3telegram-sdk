@@ -18,18 +18,10 @@ jest.unstable_mockModule('../../src/utils/ipfs-service.js', () => ({
   get: jest.fn(() => Promise.resolve(new ArrayBuffer(8))),
 }));
 
-jest.unstable_mockModule('@iexec/dataprotector', () => ({
-  IExecDataProtectorCore: jest.fn(),
-}));
-
 describe('sendTelegram', () => {
   let testedModule: any;
   let sendTelegram: SendTelegram;
   const defaultConfig = getChainDefaultConfig(DEFAULT_CHAIN_ID);
-
-  const mockDataProtector = {
-    processProtectedData: jest.fn().mockResolvedValue({ taskId: 'task123' } as never),
-  };
 
   beforeAll(async () => {
     // import tested module after all mocked modules
@@ -51,7 +43,6 @@ describe('sendTelegram', () => {
           sendTelegram({
             graphQLClient: { request: jest.fn() } as any,
             iexec: mockAllForSendTelegram() as any,
-            dataProtector: mockDataProtector as any,
             workerpoolAddressOrEns: defaultConfig.prodWorkerpoolAddress,
             dappAddressOrENS: defaultConfig.dappAddress,
             dappWhitelistAddress: defaultConfig.whitelistSmartContract,
@@ -85,7 +76,6 @@ describe('sendTelegram', () => {
           sendTelegram({
             graphQLClient: { request: jest.fn() } as any,
             iexec: mockAllForSendTelegram() as any,
-            dataProtector: mockDataProtector as any,
             workerpoolAddressOrEns: defaultConfig.prodWorkerpoolAddress,
             dappAddressOrENS: defaultConfig.dappAddress,
             dappWhitelistAddress: defaultConfig.whitelistSmartContract,
@@ -119,7 +109,6 @@ describe('sendTelegram', () => {
           sendTelegram({
             graphQLClient: { request: jest.fn() } as any,
             iexec: mockAllForSendTelegram() as any,
-            dataProtector: mockDataProtector as any,
             workerpoolAddressOrEns: defaultConfig.prodWorkerpoolAddress,
             dappAddressOrENS: defaultConfig.dappAddress,
             dappWhitelistAddress: defaultConfig.whitelistSmartContract,
@@ -152,7 +141,6 @@ describe('sendTelegram', () => {
           sendTelegram({
             graphQLClient: { request: jest.fn() } as any,
             iexec: mockAllForSendTelegram() as any,
-            dataProtector: mockDataProtector as any,
             workerpoolAddressOrEns: defaultConfig.prodWorkerpoolAddress,
             dappAddressOrENS: defaultConfig.dappAddress,
             dappWhitelistAddress: defaultConfig.whitelistSmartContract,
@@ -187,7 +175,6 @@ describe('sendTelegram', () => {
           sendTelegram({
             graphQLClient: { request: jest.fn() } as any,
             iexec: mockAllForSendTelegram() as any,
-            dataProtector: mockDataProtector as any,
             workerpoolAddressOrEns: defaultConfig.prodWorkerpoolAddress,
             dappAddressOrENS: defaultConfig.dappAddress,
             dappWhitelistAddress: defaultConfig.whitelistSmartContract,
@@ -209,7 +196,7 @@ describe('sendTelegram', () => {
   });
 
   describe('Orders fetching', () => {
-    it('should call processProtectedData from dataProtector', async () => {
+    it('should call fetchWorkerpoolOrderbook for App & Whitelist', async () => {
       //  --- GIVEN
       const { checkProtectedDataValidity } = (await import(
         '../../src/utils/subgraphQuery.js'
@@ -221,11 +208,12 @@ describe('sendTelegram', () => {
       const protectedData = getRandomAddress().toLowerCase();
       const iexec = mockAllForSendTelegram() as any;
 
+      const userAddress = await iexec.wallet.getAddress();
+
       // --- WHEN
       await sendTelegram({
         graphQLClient: { request: jest.fn() } as any,
         iexec,
-        dataProtector: mockDataProtector as any,
         workerpoolAddressOrEns: defaultConfig.prodWorkerpoolAddress,
         dappAddressOrENS: defaultConfig.dappAddress,
         dappWhitelistAddress: defaultConfig.whitelistSmartContract,
@@ -236,400 +224,46 @@ describe('sendTelegram', () => {
       });
 
       // --- THEN
-      expect(mockDataProtector.processProtectedData).toHaveBeenCalledTimes(1);
-      expect(mockDataProtector.processProtectedData).toHaveBeenCalledWith(
-        expect.objectContaining({
-          protectedData: protectedData,
-          app: defaultConfig.dappAddress,
+      expect(iexec.orderbook.fetchWorkerpoolOrderbook).toHaveBeenCalledTimes(2);
+      expect(iexec.orderbook.fetchWorkerpoolOrderbook).toHaveBeenNthCalledWith(
+        1,
+        {
           workerpool: defaultConfig.prodWorkerpoolAddress,
-        })
+          app: defaultConfig.dappAddress.toLowerCase(),
+          dataset: protectedData,
+          requester: userAddress,
+          isRequesterStrict: false,
+          minTag: ['tee', 'scone'],
+          maxTag: ['tee', 'scone'],
+          category: 0,
+        }
       );
-    });
-
-    describe('Bulk processing', () => {
-      it('should call prepareBulkRequest and processBulkRequest when grantedAccess is provided', async () => {
-        // --- GIVEN
-        const mockBulkRequest = {
-          bulkRequest: {
-            bulkRequestAddress: '0x1234567890123456789012345678901234567890',
-          },
-        };
-
-        const mockResponse = {
-          tasks: [
-            { taskId: 'mock-task-id-1', dealId: 'mock-deal-id-1', bulkIndex: 0 },
-            { taskId: 'mock-task-id-2', dealId: 'mock-deal-id-2', bulkIndex: 1 },
-          ],
-        };
-
-        const mockDataprotector = {
-          prepareBulkRequest: jest.fn<() => Promise<any>>().mockResolvedValue(mockBulkRequest),
-          processBulkRequest: jest.fn<() => Promise<any>>().mockResolvedValue(mockResponse),
-          processProtectedData: jest.fn(),
-        } as any;
-
-        const grantedAccess = [
-          {
-            dataset: getRandomAddress(),
-            datasetprice: '0',
-            volume: '1',
-            tag: '0x0000000000000000000000000000000000000000000000000000000000000000',
-            apprestrict: defaultConfig.dappAddress,
-            workerpoolrestrict: '0x0000000000000000000000000000000000000000',
-            requesterrestrict: '0x0000000000000000000000000000000000000000',
-            salt: '0x0000000000000000000000000000000000000000000000000000000000000000',
-            sign: '0x0000000000000000000000000000000000000000000000000000000000000000',
-            remainingAccess: 1,
-          },
-          {
-            dataset: getRandomAddress(),
-            datasetprice: '0',
-            volume: '1',
-            tag: '0x0000000000000000000000000000000000000000000000000000000000000000',
-            apprestrict: defaultConfig.dappAddress,
-            workerpoolrestrict: '0x0000000000000000000000000000000000000000',
-            requesterrestrict: '0x0000000000000000000000000000000000000000',
-            salt: '0x0000000000000000000000000000000000000000000000000000000000000000',
-            sign: '0x0000000000000000000000000000000000000000000000000000000000000000',
-            remainingAccess: 1,
-          },
-        ];
-
-        // --- WHEN
-        const result = await sendTelegram({
-          graphQLClient: { request: jest.fn() } as any,
-          iexec: mockAllForSendTelegram() as any,
-          dataProtector: mockDataprotector as any,
-          workerpoolAddressOrEns: defaultConfig.prodWorkerpoolAddress,
-          dappAddressOrENS: defaultConfig.dappAddress,
-          dappWhitelistAddress: defaultConfig.whitelistSmartContract,
-          ipfsNode: defaultConfig.ipfsUploadUrl,
-          ipfsGateway: defaultConfig.ipfsGateway,
-          telegramContent: 'bulk test',
-          grantedAccess,
-          maxProtectedDataPerTask: 2,
-        });
-
-        // --- THEN
-        expect(mockDataprotector.processProtectedData).not.toHaveBeenCalled();
-        expect(mockDataprotector.prepareBulkRequest).toHaveBeenCalledTimes(1);
-        expect(mockDataprotector.prepareBulkRequest).toHaveBeenCalledWith(
-          expect.objectContaining({
-            app: defaultConfig.dappAddress,
-            workerpool: defaultConfig.prodWorkerpoolAddress,
-            bulkAccesses: grantedAccess,
-            maxProtectedDataPerTask: 2,
-          })
-        );
-        expect(mockDataprotector.processBulkRequest).toHaveBeenCalledTimes(1);
-        expect(mockDataprotector.processBulkRequest).toHaveBeenCalledWith({
-          bulkRequest: mockBulkRequest.bulkRequest,
-          useVoucher: false,
+      expect(iexec.orderbook.fetchWorkerpoolOrderbook).toHaveBeenNthCalledWith(
+        2,
+        {
           workerpool: defaultConfig.prodWorkerpoolAddress,
-        });
-        expect(result).toEqual(mockResponse);
-        expect('tasks' in result).toBe(true);
-      });
-
-      it('should validate maxProtectedDataPerTask when grantedAccess is provided', async () => {
-        // --- GIVEN
-        const mockDataprotector = {
-          prepareBulkRequest: jest.fn(),
-          processBulkRequest: jest.fn(),
-          processProtectedData: jest.fn(),
-        } as any;
-
-        const grantedAccess = [
-          {
-            dataset: getRandomAddress(),
-            datasetprice: '0',
-            volume: '1',
-            tag: '0x0000000000000000000000000000000000000000000000000000000000000000',
-            apprestrict: defaultConfig.dappAddress,
-            workerpoolrestrict: '0x0000000000000000000000000000000000000000',
-            requesterrestrict: '0x0000000000000000000000000000000000000000',
-            salt: '0x0000000000000000000000000000000000000000000000000000000000000000',
-            sign: '0x0000000000000000000000000000000000000000000000000000000000000000',
-            remainingAccess: 1,
-          },
-        ];
-
-        // --- WHEN & THEN
-        await expect(
-          sendTelegram({
-            graphQLClient: { request: jest.fn() } as any,
-            iexec: mockAllForSendTelegram() as any,
-            dataProtector: mockDataprotector as any,
-            workerpoolAddressOrEns: defaultConfig.prodWorkerpoolAddress,
-            dappAddressOrENS: defaultConfig.dappAddress,
-            dappWhitelistAddress: defaultConfig.whitelistSmartContract,
-            ipfsNode: defaultConfig.ipfsUploadUrl,
-            ipfsGateway: defaultConfig.ipfsGateway,
-            telegramContent: 'bulk test',
-            grantedAccess,
-            maxProtectedDataPerTask: -1, // Invalid negative value
-          })
-        ).rejects.toMatchObject({
-          message: 'Failed to sendTelegram',
-          cause: expect.objectContaining({
-            name: 'ValidationError',
-          }),
-        });
-      });
-
-      it('should validate maxProtectedDataPerTask is required when grantedAccess is provided', async () => {
-        // --- GIVEN
-        const mockDataprotector = {
-          prepareBulkRequest: jest.fn(),
-          processBulkRequest: jest.fn(),
-          processProtectedData: jest.fn(),
-        } as any;
-
-        const grantedAccess = [
-          {
-            dataset: getRandomAddress(),
-            datasetprice: '0',
-            volume: '1',
-            tag: '0x0000000000000000000000000000000000000000000000000000000000000000',
-            apprestrict: defaultConfig.dappAddress,
-            workerpoolrestrict: '0x0000000000000000000000000000000000000000',
-            requesterrestrict: '0x0000000000000000000000000000000000000000',
-            salt: '0x0000000000000000000000000000000000000000000000000000000000000000',
-            sign: '0x0000000000000000000000000000000000000000000000000000000000000000',
-            remainingAccess: 1,
-          },
-        ];
-
-        // --- WHEN & THEN
-        await expect(
-          sendTelegram({
-            graphQLClient: { request: jest.fn() } as any,
-            iexec: mockAllForSendTelegram() as any,
-            dataProtector: mockDataprotector as any,
-            workerpoolAddressOrEns: defaultConfig.prodWorkerpoolAddress,
-            dappAddressOrENS: defaultConfig.dappAddress,
-            dappWhitelistAddress: defaultConfig.whitelistSmartContract,
-            ipfsNode: defaultConfig.ipfsUploadUrl,
-            ipfsGateway: defaultConfig.ipfsGateway,
-            telegramContent: 'bulk test',
-            grantedAccess,
-            // maxProtectedDataPerTask is not provided
-          })
-        ).rejects.toMatchObject({
-          message: 'Failed to sendTelegram',
-          cause: expect.anything(),
-        });
-      });
-
-      it('should return ProcessBulkRequestResponse when grantedAccess is processed', async () => {
-        // --- GIVEN
-        const mockBulkRequest = {
-          bulkRequest: {
-            bulkRequestAddress: '0x1234567890123456789012345678901234567890',
-          },
-        };
-
-        const mockResponse = {
-          tasks: [
-            { taskId: 'task-1', dealId: 'deal-1', bulkIndex: 0 },
-            { taskId: 'task-2', dealId: 'deal-2', bulkIndex: 1 },
-            { taskId: 'task-3', dealId: 'deal-3', bulkIndex: 2 },
-          ],
-        };
-
-        const mockDataprotector = {
-          prepareBulkRequest: jest.fn<() => Promise<any>>().mockResolvedValue(mockBulkRequest),
-          processBulkRequest: jest.fn<() => Promise<any>>().mockResolvedValue(mockResponse),
-          processProtectedData: jest.fn(),
-        } as any;
-
-        const grantedAccess = [
-          {
-            dataset: getRandomAddress(),
-            datasetprice: '0',
-            volume: '1',
-            tag: '0x0000000000000000000000000000000000000000000000000000000000000000',
-            apprestrict: defaultConfig.dappAddress,
-            workerpoolrestrict: '0x0000000000000000000000000000000000000000',
-            requesterrestrict: '0x0000000000000000000000000000000000000000',
-            salt: '0x0000000000000000000000000000000000000000000000000000000000000000',
-            sign: '0x0000000000000000000000000000000000000000000000000000000000000000',
-            remainingAccess: 1,
-          },
-        ];
-
-        // --- WHEN
-        const result = await sendTelegram({
-          graphQLClient: { request: jest.fn() } as any,
-          iexec: mockAllForSendTelegram() as any,
-          dataProtector: mockDataprotector as any,
-          workerpoolAddressOrEns: defaultConfig.prodWorkerpoolAddress,
-          dappAddressOrENS: defaultConfig.dappAddress,
-          dappWhitelistAddress: defaultConfig.whitelistSmartContract,
-          ipfsNode: defaultConfig.ipfsUploadUrl,
-          ipfsGateway: defaultConfig.ipfsGateway,
-          telegramContent: 'bulk test',
-          grantedAccess,
-          maxProtectedDataPerTask: 1,
-        });
-
-        // --- THEN
-        expect(result).toEqual(mockResponse);
-        expect('tasks' in result).toBe(true);
-        const tasks = 'tasks' in result ? result.tasks : [];
-        expect(tasks.length).toBe(3);
-      });
-
-      it('should use single processing when grantedAccess is not provided', async () => {
-        // --- GIVEN
-        const { checkProtectedDataValidity } = (await import(
-          '../../src/utils/subgraphQuery.js'
-        )) as unknown as {
-          checkProtectedDataValidity: jest.Mock<() => Promise<boolean>>;
-        };
-        checkProtectedDataValidity.mockResolvedValue(true);
-
-        const protectedData = getRandomAddress();
-        const mockDataprotector = {
-          prepareBulkRequest: jest.fn(),
-          processBulkRequest: jest.fn(),
-          processProtectedData: jest.fn().mockResolvedValue({ taskId: 'task123' } as never),
-        } as any;
-
-        // --- WHEN
-        const result = await sendTelegram({
-          graphQLClient: { request: jest.fn() } as any,
-          iexec: mockAllForSendTelegram() as any,
-          dataProtector: mockDataprotector as any,
-          workerpoolAddressOrEns: defaultConfig.prodWorkerpoolAddress,
-          dappAddressOrENS: defaultConfig.dappAddress,
-          dappWhitelistAddress: defaultConfig.whitelistSmartContract,
-          ipfsNode: defaultConfig.ipfsUploadUrl,
-          ipfsGateway: defaultConfig.ipfsGateway,
-          telegramContent: 'single test',
-          protectedData,
-        });
-
-        // --- THEN
-        expect(mockDataprotector.prepareBulkRequest).not.toHaveBeenCalled();
-        expect(mockDataprotector.processBulkRequest).not.toHaveBeenCalled();
-        expect(mockDataprotector.processProtectedData).toHaveBeenCalledTimes(1);
-        expect(result).toEqual({ taskId: 'task123' });
-        expect('taskId' in result).toBe(true);
-      });
-
-      it('should work without protectedData when grantedAccess is provided', async () => {
-        // --- GIVEN
-        const mockBulkRequest = {
-          bulkRequest: {
-            bulkRequestAddress: '0x1234567890123456789012345678901234567890',
-          },
-        };
-
-        const mockResponse = {
-          tasks: [{ taskId: 'task-1', dealId: 'deal-1', bulkIndex: 0 }],
-        };
-
-        const mockDataprotector = {
-          prepareBulkRequest: jest.fn<() => Promise<any>>().mockResolvedValue(mockBulkRequest),
-          processBulkRequest: jest.fn<() => Promise<any>>().mockResolvedValue(mockResponse),
-          processProtectedData: jest.fn(),
-        } as any;
-
-        const grantedAccess = [
-          {
-            dataset: getRandomAddress(),
-            datasetprice: '0',
-            volume: '1',
-            tag: '0x0000000000000000000000000000000000000000000000000000000000000000',
-            apprestrict: defaultConfig.dappAddress,
-            workerpoolrestrict: '0x0000000000000000000000000000000000000000',
-            requesterrestrict: '0x0000000000000000000000000000000000000000',
-            salt: '0x0000000000000000000000000000000000000000000000000000000000000000',
-            sign: '0x0000000000000000000000000000000000000000000000000000000000000000',
-            remainingAccess: 1,
-          },
-        ];
-
-        // --- WHEN
-        const result = await sendTelegram({
-          graphQLClient: { request: jest.fn() } as any,
-          iexec: mockAllForSendTelegram() as any,
-          dataProtector: mockDataprotector as any,
-          workerpoolAddressOrEns: defaultConfig.prodWorkerpoolAddress,
-          dappAddressOrENS: defaultConfig.dappAddress,
-          dappWhitelistAddress: defaultConfig.whitelistSmartContract,
-          ipfsNode: defaultConfig.ipfsUploadUrl,
-          ipfsGateway: defaultConfig.ipfsGateway,
-          telegramContent: 'bulk test',
-          // protectedData is not provided
-          grantedAccess,
-          maxProtectedDataPerTask: 1,
-        });
-
-        // --- THEN
-        expect(mockDataprotector.prepareBulkRequest).toHaveBeenCalledTimes(1);
-        expect(mockDataprotector.processBulkRequest).toHaveBeenCalledTimes(1);
-        expect(result).toEqual(mockResponse);
-        expect('tasks' in result).toBe(true);
-      });
-
-      it('should pass useVoucher correctly to processBulkRequest', async () => {
-        // --- GIVEN
-        const mockBulkRequest = {
-          bulkRequest: {
-            bulkRequestAddress: '0x1234567890123456789012345678901234567890',
-          },
-        };
-
-        const mockResponse = {
-          tasks: [{ taskId: 'task-1', dealId: 'deal-1', bulkIndex: 0 }],
-        };
-
-        const mockDataprotector = {
-          prepareBulkRequest: jest.fn<() => Promise<any>>().mockResolvedValue(mockBulkRequest),
-          processBulkRequest: jest.fn<() => Promise<any>>().mockResolvedValue(mockResponse),
-          processProtectedData: jest.fn(),
-        } as any;
-
-        const grantedAccess = [
-          {
-            dataset: getRandomAddress(),
-            datasetprice: '0',
-            volume: '1',
-            tag: '0x0000000000000000000000000000000000000000000000000000000000000000',
-            apprestrict: defaultConfig.dappAddress,
-            workerpoolrestrict: '0x0000000000000000000000000000000000000000',
-            requesterrestrict: '0x0000000000000000000000000000000000000000',
-            salt: '0x0000000000000000000000000000000000000000000000000000000000000000',
-            sign: '0x0000000000000000000000000000000000000000000000000000000000000000',
-            remainingAccess: 1,
-          },
-        ];
-
-        // --- WHEN
-        await sendTelegram({
-          graphQLClient: { request: jest.fn() } as any,
-          iexec: mockAllForSendTelegram() as any,
-          dataProtector: mockDataprotector as any,
-          workerpoolAddressOrEns: defaultConfig.prodWorkerpoolAddress,
-          dappAddressOrENS: defaultConfig.dappAddress,
-          dappWhitelistAddress: defaultConfig.whitelistSmartContract,
-          ipfsNode: defaultConfig.ipfsUploadUrl,
-          ipfsGateway: defaultConfig.ipfsGateway,
-          telegramContent: 'bulk test',
-          grantedAccess,
-          maxProtectedDataPerTask: 1,
-          useVoucher: true,
-        });
-
-        // --- THEN
-        expect(mockDataprotector.processBulkRequest).toHaveBeenCalledWith({
-          bulkRequest: mockBulkRequest.bulkRequest,
-          useVoucher: true,
+          app: defaultConfig.whitelistSmartContract.toLowerCase(),
+          dataset: protectedData,
+          requester: userAddress,
+          isRequesterStrict: false,
+          minTag: ['tee', 'scone'],
+          maxTag: ['tee', 'scone'],
+          category: 0,
+        }
+      );
+      expect(iexec.orderbook.fetchWorkerpoolOrderbook).toHaveBeenNthCalledWith(
+        2,
+        {
           workerpool: defaultConfig.prodWorkerpoolAddress,
-        });
-      });
+          app: defaultConfig.whitelistSmartContract.toLowerCase(),
+          dataset: protectedData,
+          requester: userAddress,
+          isRequesterStrict: false,
+          minTag: ['tee', 'scone'],
+          maxTag: ['tee', 'scone'],
+          category: 0,
+        }
+      );
     });
   });
 });
