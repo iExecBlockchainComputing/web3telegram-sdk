@@ -35,6 +35,8 @@ jobs:
       - name: Set publish version
         id: set-publish-version
         run: |
+          BRANCH=$(echo "${{ github.ref_name }}" | sed 's|/|-|g')
+          COMMIT_SHA="${{ github.sha }}"
           CURRENT_VERSION=$(npm pkg get version | tr -d '"')
           TAG="${{ github.event.inputs.tag || 'nightly' }}"
           # For nightly tag, append commit SHA to version
