@@ -1,3 +1,4 @@
+import { BulkRequest } from '@iexec/dataprotector';
 import { EnhancedWallet } from 'iexec';
 import { IExecConfigOptions } from 'iexec/IExecConfig';
 
@@ -98,6 +99,27 @@ export type SendTelegramResponse<Params = { protectedData: Address }> =
     : never & Params extends { protectedData: Address }
     ? SendTelegramSingleResponse
     : never;
+
+export type PrepareTelegramCampaignParams = {
+  /**
+   * Granted access to process in bulk.
+   * use `fetchMyContacts({ bulkOnly: true })` to get granted accesses.
+   * if not provided, the single message will be processed.
+   */
+  grantedAccess: GrantedAccess[];
+  maxProtectedDataPerTask?: number;
+  senderName?: string;
+  telegramContent: string;
+  label?: string;
+  workerpoolAddressOrEns?: AddressOrENS;
+  dataMaxPrice?: number;
+  appMaxPrice?: number;
+  workerpoolMaxPrice?: number;
+};
+
+export type PrepareTelegramCampaignResponse = {
+  campaignRequest: BulkRequest;
+};
 
 /**
  * Configuration options for web3telegram.

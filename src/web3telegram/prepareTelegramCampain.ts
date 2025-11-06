@@ -13,7 +13,10 @@ import {
   throwIfMissing,
   senderNameSchema,
 } from '../utils/validators.js';
-import { GrantedAccess } from './types.js';
+import {
+  PrepareTelegramCampaignParams,
+  PrepareTelegramCampaignResponse,
+} from './types.js';
 import {
   DappAddressConsumer,
   DataProtectorConsumer,
@@ -21,30 +24,8 @@ import {
   IpfsGatewayConfigConsumer,
   IpfsNodeConfigConsumer,
 } from './internalTypes.js';
-import { AddressOrENS, BulkRequest } from '@iexec/dataprotector';
 
 export type PrepareTelegramCampaign = typeof prepareTelegramCampaign;
-
-export type PrepareTelegramCampaignParams = {
-  /**
-   * Granted access to process in bulk.
-   * use `fetchMyContacts({ bulkOnly: true })` to get granted accesses.
-   * if not provided, the single message will be processed.
-   */
-  grantedAccess: GrantedAccess[];
-  maxProtectedDataPerTask?: number;
-  senderName?: string;
-  telegramContent: string;
-  label?: string;
-  workerpoolAddressOrEns?: AddressOrENS;
-  dataMaxPrice?: number;
-  appMaxPrice?: number;
-  workerpoolMaxPrice?: number;
-};
-
-export type PrepareTelegramCampaignResponse = {
-  campaignRequest: BulkRequest;
-};
 
 export const prepareTelegramCampaign = async ({
   iexec = throwIfMissing(),

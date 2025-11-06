@@ -19,16 +19,14 @@ import {
   Web3SignerProvider,
   FetchMyContactsParams,
   SendTelegramResponse,
+  PrepareTelegramCampaignResponse,
+  PrepareTelegramCampaignParams,
 } from './types.js';
 import { getChainDefaultConfig } from '../config/config.js';
 import { isValidProvider } from '../utils/validators.js';
 import { getChainIdFromProvider } from '../utils/getChainId.js';
 import { resolveDappAddressFromCompass } from '../utils/resolveDappAddressFromCompass.js';
-import {
-  prepareTelegramCampaign,
-  PrepareTelegramCampaignParams,
-  PrepareTelegramCampaignResponse,
-} from './prepareTelegramCampain.js';
+import { prepareTelegramCampaign } from './prepareTelegramCampain.js';
 
 type EthersCompatibleProvider =
   | AbstractProvider
