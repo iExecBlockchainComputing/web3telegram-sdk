@@ -13,15 +13,10 @@ import {
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
   MAX_EXPECTED_SUBGRAPH_INDEXING_TIME,
-  TEST_CHAIN,
-  createAndPublishAppOrders,
   getRandomWallet,
   getTestConfig,
-  getTestIExecOption,
-  getTestWeb3SignerProvider,
   waitSubgraphIndexing,
 } from '../test-utils.js';
-import { IExec } from 'iexec';
 
 describe('web3telegram.prepareTelegramCampaign()', () => {
   let consumerWallet: HDNodeWallet;
@@ -31,21 +26,12 @@ describe('web3telegram.prepareTelegramCampaign()', () => {
   let validProtectedData1: ProtectedDataWithSecretProps;
   let validProtectedData2: ProtectedDataWithSecretProps;
   let validProtectedData3: ProtectedDataWithSecretProps;
-  const iexecOptions = getTestIExecOption();
   const prodWorkerpoolPublicPrice = 1000;
   const defaultConfig = getChainDefaultConfig(DEFAULT_CHAIN_ID);
 
   beforeAll(async () => {
     // Create app orders
     providerWallet = getRandomWallet();
-    const ethProvider = getTestWeb3SignerProvider(
-      TEST_CHAIN.appOwnerWallet.privateKey
-    );
-    const resourceProvider = new IExec({ ethProvider }, iexecOptions);
-    await createAndPublishAppOrders(
-      resourceProvider,
-      defaultConfig!.dappAddress
-    );
 
     dataProtector = new IExecDataProtectorCore(
       ...getTestConfig(providerWallet.privateKey)

@@ -51,15 +51,14 @@ describe('web3telegram.sendTelegramCampaign() - Bulk Processing', () => {
 
         // Create app orders
         providerWallet = getRandomWallet();
-        const ethProvider = getTestWeb3SignerProvider(
+
+        const resourceProvider = new IExec({ ethProvider: getTestWeb3SignerProvider(
             TEST_CHAIN.appOwnerWallet.privateKey
-        );
-        const resourceProvider = new IExec({ ethProvider }, iexecOptions);
+        ) }, iexecOptions);
         await createAndPublishAppOrders(
             resourceProvider,
             defaultConfig!.dappAddress
         );
-
 
         dataProtector = new IExecDataProtectorCore(
             ...getTestConfig(providerWallet.privateKey)
