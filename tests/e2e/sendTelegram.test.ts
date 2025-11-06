@@ -256,7 +256,7 @@ describe('web3telegram.sendTelegram()', () => {
 
       // Pass the modified options to IExecWeb3telegram
       const invalidWeb3telegram = new IExecWeb3telegram(ethProvider, options);
-      let error: WorkflowError | undefined;
+      let error: Web3TelegramWorkflowError | undefined;
 
       try {
         await invalidWeb3telegram.sendTelegram({
@@ -265,10 +265,10 @@ describe('web3telegram.sendTelegram()', () => {
           telegramContent: 'e2e telegram content for test',
         });
       } catch (err) {
-        error = err as WorkflowError;
+        error = err as Web3TelegramWorkflowError;
       }
 
-      expect(error).toBeInstanceOf(WorkflowError);
+      expect(error).toBeInstanceOf(Web3TelegramWorkflowError);
       expect(error?.message).toBe(
         "A service in the iExec protocol appears to be unavailable. You can retry later or contact iExec's technical support for help."
       );

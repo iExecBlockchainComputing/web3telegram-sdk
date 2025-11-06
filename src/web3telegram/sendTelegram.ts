@@ -305,7 +305,14 @@ export const sendTelegram = async ({
       taskId,
     };
   } catch (error) {
+    // Protocol error detected, re-throwing as-is
+    if ((error as any)?.isProtocolError === true) {
+      throw error;
+    }
+    // Handle protocol errors - this will throw if it's an ApiCallError
+    // handleIfProtocolError transforms ApiCallError into a WorkflowError with isProtocolError=true
     handleIfProtocolError(error);
+    // For all other errors
     throw new WorkflowError({
       message: 'Failed to sendTelegram',
       errorCause: error,
