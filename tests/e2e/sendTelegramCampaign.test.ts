@@ -82,7 +82,7 @@ describe('web3telegram.sendTelegramCampaign() - Bulk Processing', () => {
         });
 
         await waitSubgraphIndexing();
-    }, 5 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME + 5_000);
+    }, 5 * (MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME) + MAX_EXPECTED_SUBGRAPH_INDEXING_TIME + 5_000);
 
     beforeEach(async () => {
         consumerWallet = getRandomWallet();
@@ -116,9 +116,8 @@ describe('web3telegram.sendTelegramCampaign() - Bulk Processing', () => {
             allowBulk: true,
         });
 
-        await waitSubgraphIndexing();
         web3telegram = new IExecWeb3telegram(...getTestConfig(consumerWallet.privateKey));
-    }, MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_SUBGRAPH_INDEXING_TIME);
+    }, 3 * MAX_EXPECTED_WEB2_SERVICES_TIME + 5_000);
 
     describe('Bulk telegram sending', () => {
         it(
