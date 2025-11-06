@@ -9,7 +9,10 @@ import {
   DEFAULT_CHAIN_ID,
   getChainDefaultConfig,
 } from '../../src/config/config.js';
-import { IExecWeb3telegram, WorkflowError as Web3TelegramWorkflowError } from '../../src/index.js';
+import {
+  IExecWeb3telegram,
+  WorkflowError as Web3TelegramWorkflowError,
+} from '../../src/index.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_SUBGRAPH_INDEXING_TIME,
@@ -173,7 +176,9 @@ describe('web3telegram.sendTelegram()', () => {
           });
           expect('taskId' in sendTelegramResponse).toBe(true);
           expect(
-            'taskId' in sendTelegramResponse ? sendTelegramResponse.taskId : undefined
+            'taskId' in sendTelegramResponse
+              ? sendTelegramResponse.taskId
+              : undefined
           ).toBeDefined();
         },
         2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
@@ -286,7 +291,11 @@ describe('web3telegram.sendTelegram()', () => {
         workerpoolAddressOrEns: learnProdWorkerpoolAddress,
       });
       expect('taskId' in sendTelegramResponse).toBe(true);
-      expect('taskId' in sendTelegramResponse ? sendTelegramResponse.taskId : undefined).toBeDefined();
+      expect(
+        'taskId' in sendTelegramResponse
+          ? sendTelegramResponse.taskId
+          : undefined
+      ).toBeDefined();
     },
     2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
   );
@@ -313,8 +322,12 @@ describe('web3telegram.sendTelegram()', () => {
         protectedData: protectedDataForWhitelist.address,
         workerpoolAddressOrEns: learnProdWorkerpoolAddress,
       });
-      expect("taskId" in sendTelegramResponse).toBe(true);
-      expect("taskId" in sendTelegramResponse ? sendTelegramResponse.taskId : undefined).toBeDefined();
+      expect('taskId' in sendTelegramResponse).toBe(true);
+      expect(
+        'taskId' in sendTelegramResponse
+          ? sendTelegramResponse.taskId
+          : undefined
+      ).toBeDefined();
     },
     2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
   );
@@ -330,8 +343,12 @@ describe('web3telegram.sendTelegram()', () => {
         // contentType: 'text/html',
         workerpoolAddressOrEns: learnProdWorkerpoolAddress,
       });
-      expect("taskId" in sendTelegramResponse).toBe(true);
-      expect("taskId" in sendTelegramResponse ? sendTelegramResponse.taskId : undefined).toBeDefined();
+      expect('taskId' in sendTelegramResponse).toBe(true);
+      expect(
+        'taskId' in sendTelegramResponse
+          ? sendTelegramResponse.taskId
+          : undefined
+      ).toBeDefined();
     },
     2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
   );
@@ -348,7 +365,11 @@ describe('web3telegram.sendTelegram()', () => {
       });
       expect(sendTelegramResponse).toBeDefined();
       expect('taskId' in sendTelegramResponse).toBe(true);
-      expect('taskId' in sendTelegramResponse ? sendTelegramResponse.taskId : undefined).toBeDefined();
+      expect(
+        'taskId' in sendTelegramResponse
+          ? sendTelegramResponse.taskId
+          : undefined
+      ).toBeDefined();
     },
     2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
   );
@@ -366,8 +387,12 @@ describe('web3telegram.sendTelegram()', () => {
         senderName: 'Product Team',
         workerpoolAddressOrEns: learnProdWorkerpoolAddress,
       });
-      expect("taskId" in sendTelegramResponse).toBe(true);
-      expect("taskId" in sendTelegramResponse ? sendTelegramResponse.taskId : undefined).toBeDefined();
+      expect('taskId' in sendTelegramResponse).toBe(true);
+      expect(
+        'taskId' in sendTelegramResponse
+          ? sendTelegramResponse.taskId
+          : undefined
+      ).toBeDefined();
     },
     2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
   );
@@ -381,8 +406,12 @@ describe('web3telegram.sendTelegram()', () => {
         workerpoolAddressOrEns: learnProdWorkerpoolAddress,
         label: 'ID1234678',
       });
-      expect("taskId" in sendTelegramResponse).toBe(true);
-      expect("taskId" in sendTelegramResponse ? sendTelegramResponse.taskId : undefined).toBeDefined();
+      expect('taskId' in sendTelegramResponse).toBe(true);
+      expect(
+        'taskId' in sendTelegramResponse
+          ? sendTelegramResponse.taskId
+          : undefined
+      ).toBeDefined();
       // TODO check label in created deal
     },
     2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
@@ -471,12 +500,16 @@ describe('web3telegram.sendTelegram()', () => {
             // workerpoolAddressOrEns: prodWorkerpoolAddress, // default
             useVoucher: true,
           });
-          expect("taskId" in sendTelegramResponse).toBe(true);
-          expect("taskId" in sendTelegramResponse ? sendTelegramResponse.taskId : undefined).toBeDefined();
+          expect('taskId' in sendTelegramResponse).toBe(true);
+          expect(
+            'taskId' in sendTelegramResponse
+              ? sendTelegramResponse.taskId
+              : undefined
+          ).toBeDefined();
         },
         2 * MAX_EXPECTED_BLOCKTIME +
-        MAX_EXPECTED_WEB2_SERVICES_TIME +
-        MAX_EXPECTED_SUBGRAPH_INDEXING_TIME
+          MAX_EXPECTED_WEB2_SERVICES_TIME +
+          MAX_EXPECTED_SUBGRAPH_INDEXING_TIME
       );
     });
 
@@ -528,13 +561,16 @@ describe('web3telegram.sendTelegram()', () => {
               workerpoolMaxPrice: nonSponsoredAmount,
               useVoucher: true,
             });
-            expect("taskId" in sendTelegramResponse).toBe(true);
-            expect("taskId" in sendTelegramResponse ? sendTelegramResponse.taskId : undefined).toBeDefined();
-
+            expect('taskId' in sendTelegramResponse).toBe(true);
+            expect(
+              'taskId' in sendTelegramResponse
+                ? sendTelegramResponse.taskId
+                : undefined
+            ).toBeDefined();
           },
           2 * MAX_EXPECTED_BLOCKTIME +
-          MAX_EXPECTED_WEB2_SERVICES_TIME +
-          MAX_EXPECTED_SUBGRAPH_INDEXING_TIME
+            MAX_EXPECTED_WEB2_SERVICES_TIME +
+            MAX_EXPECTED_SUBGRAPH_INDEXING_TIME
         );
       });
       describe('and workerpoolMaxPrice does NOT covers the non sponsored amount', () => {
@@ -586,8 +622,8 @@ describe('web3telegram.sendTelegram()', () => {
             );
           },
           2 * MAX_EXPECTED_BLOCKTIME +
-          MAX_EXPECTED_WEB2_SERVICES_TIME +
-          MAX_EXPECTED_SUBGRAPH_INDEXING_TIME
+            MAX_EXPECTED_WEB2_SERVICES_TIME +
+            MAX_EXPECTED_SUBGRAPH_INDEXING_TIME
         );
       });
     });

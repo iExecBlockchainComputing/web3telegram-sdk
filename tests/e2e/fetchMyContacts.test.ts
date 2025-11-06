@@ -50,11 +50,11 @@ describe('web3telegram.fetchMyContacts()', () => {
       });
       expect(
         foundContactForASpecificRequester &&
-        foundContactForASpecificRequester.address
+          foundContactForASpecificRequester.address
       ).toBeDefined();
       expect(
         foundContactForASpecificRequester &&
-        foundContactForASpecificRequester.address
+          foundContactForASpecificRequester.address
       ).toBe(protectedData.address.toLocaleLowerCase());
     },
     MAX_EXPECTED_WEB2_SERVICES_TIME
@@ -187,16 +187,20 @@ describe('web3telegram.fetchMyContacts()', () => {
 
         // Should only include the contact with bulk access
         const bulkContact = contactsWithBulkOnly.find(
-          (contact) => contact.address === protectedDataWithBulk.address.toLowerCase()
+          (contact) =>
+            contact.address === protectedDataWithBulk.address.toLowerCase()
         );
         const noBulkContact = contactsWithBulkOnly.find(
-          (contact) => contact.address === protectedDataWithoutBulk.address.toLowerCase()
+          (contact) =>
+            contact.address === protectedDataWithoutBulk.address.toLowerCase()
         );
 
         expect(bulkContact).toBeDefined();
         expect(noBulkContact).toBeUndefined();
       },
-      MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_SUBGRAPH_INDEXING_TIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+      MAX_EXPECTED_BLOCKTIME +
+        MAX_EXPECTED_SUBGRAPH_INDEXING_TIME +
+        MAX_EXPECTED_WEB2_SERVICES_TIME
     );
 
     it(
@@ -209,10 +213,12 @@ describe('web3telegram.fetchMyContacts()', () => {
 
         // Should include both contacts
         const bulkContact = contactsWithoutBulkOnly.find(
-          (contact) => contact.address === protectedDataWithBulk.address.toLowerCase()
+          (contact) =>
+            contact.address === protectedDataWithBulk.address.toLowerCase()
         );
         const noBulkContact = contactsWithoutBulkOnly.find(
-          (contact) => contact.address === protectedDataWithoutBulk.address.toLowerCase()
+          (contact) =>
+            contact.address === protectedDataWithoutBulk.address.toLowerCase()
         );
 
         expect(bulkContact).toBeDefined();
@@ -229,10 +235,12 @@ describe('web3telegram.fetchMyContacts()', () => {
 
         // Should include both contacts
         const bulkContact = contactsDefault.find(
-          (contact) => contact.address === protectedDataWithBulk.address.toLowerCase()
+          (contact) =>
+            contact.address === protectedDataWithBulk.address.toLowerCase()
         );
         const noBulkContact = contactsDefault.find(
-          (contact) => contact.address === protectedDataWithoutBulk.address.toLowerCase()
+          (contact) =>
+            contact.address === protectedDataWithoutBulk.address.toLowerCase()
         );
 
         expect(bulkContact).toBeDefined();
