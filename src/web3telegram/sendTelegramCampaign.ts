@@ -17,8 +17,6 @@ import {
   SendTelegramCampaignResponse,
 } from './types.js';
 
-export type BulkRequestConsumer = { campaignRequest: BulkRequest };
-
 export type SendTelegramCampaign = typeof sendTelegramCampaign;
 
 export const sendTelegramCampaign = async ({
@@ -26,7 +24,6 @@ export const sendTelegramCampaign = async ({
   workerpoolAddressOrEns = throwIfMissing(),
   campaignRequest,
 }: DataProtectorConsumer &
-  BulkRequestConsumer &
   SendTelegramCampaignParams): Promise<SendTelegramCampaignResponse> => {
   try {
     const vCampaignRequest = campaignRequestSchema()
