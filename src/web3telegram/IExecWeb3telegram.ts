@@ -5,11 +5,7 @@ import { GraphQLClient } from 'graphql-request';
 import { fetchUserContacts } from './fetchUserContacts.js';
 import { fetchMyContacts } from './fetchMyContacts.js';
 import { sendTelegram } from './sendTelegram.js';
-import {
-  sendTelegramCampaign,
-  SendTelegramCampaignParams,
-  SendTelegramCampaignResponse,
-} from './sendTelegramCampaign.js';
+import { sendTelegramCampaign } from './sendTelegramCampaign.js';
 import {
   Contact,
   FetchUserContactsParams,
@@ -21,6 +17,8 @@ import {
   SendTelegramResponse,
   PrepareTelegramCampaignResponse,
   PrepareTelegramCampaignParams,
+  SendTelegramCampaignParams,
+  SendTelegramCampaignResponse,
 } from './types.js';
 import { getChainDefaultConfig } from '../config/config.js';
 import { isValidProvider } from '../utils/validators.js';

@@ -121,6 +121,19 @@ export type PrepareTelegramCampaignResponse = {
   campaignRequest: BulkRequest;
 };
 
+export type SendTelegramCampaignResponse = {
+  tasks: {
+    bulkIndex: number;
+    taskId: string;
+    dealId: string;
+  }[];
+};
+
+export type SendTelegramCampaignParams = {
+  campaignRequest: BulkRequest;
+  workerpoolAddressOrEns?: string;
+};
+
 /**
  * Configuration options for web3telegram.
  */

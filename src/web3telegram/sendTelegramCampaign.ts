@@ -12,21 +12,12 @@ import {
   ProcessBulkRequestResponse,
 } from '@iexec/dataprotector';
 import { ValidationError } from 'yup';
+import {
+  SendTelegramCampaignParams,
+  SendTelegramCampaignResponse,
+} from './types.js';
 
 export type BulkRequestConsumer = { campaignRequest: BulkRequest };
-
-export type SendTelegramCampaignResponse = {
-  tasks: {
-    bulkIndex: number;
-    taskId: string;
-    dealId: string;
-  }[];
-};
-
-export type SendTelegramCampaignParams = {
-  campaignRequest: BulkRequest;
-  workerpoolAddressOrEns?: string;
-};
 
 export type SendTelegramCampaign = typeof sendTelegramCampaign;
 
