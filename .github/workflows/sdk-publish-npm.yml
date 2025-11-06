@@ -2,17 +2,8 @@
 name: Publish NPM Package
 
 on:
-  # For staging/nightly releases
+  # For staging releases
   workflow_dispatch:
-    inputs:
-      tag:
-        description: 'NPM tag to publish (latest or nightly)'
-        required: true
-        type: choice
-        options:
-          - latest
-          - nightly
-        default: nightly
   # For latest releases
   release:
     types: [published]
@@ -23,8 +14,9 @@ permissions:
   contents: read
 
 jobs:
-  set-publish-version:
-    # Run for manual dispatch on any branch (allows nightly releases from any branch)
+  set-staging-version:
+    # Only run for manual dispatch
+    # when running from main branch, sets dist-tag to "nightly"
     if: ${{ github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     steps:
@@ -33,30 +25,30 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
       - name: Set publish version
-        id: set-publish-version
+        id: set-staging-version
         run: |
           BRANCH=$(echo "${{ github.ref_name }}" | sed 's|/|-|g')
           COMMIT_SHA="${{ github.sha }}"
           CURRENT_VERSION=$(npm pkg get version | tr -d '"')
-          TAG="${{ github.event.inputs.tag || 'nightly' }}"
-          # For nightly tag, append commit SHA to version
-          if [ "$TAG" == "nightly" ]; then
-            NIGHTLY_VERSION="${CURRENT_VERSION}-nightly-${GITHUB_SHA::7}"
-            echo "VERSION=${NIGHTLY_VERSION}" >> $GITHUB_OUTPUT
+          STAGING_VERSION="${CURRENT_VERSION}-${BRANCH}-${COMMIT_SHA::7}"
+          echo "VERSION=${STAGING_VERSION}" | tee -a $GITHUB_OUTPUT
+          if [ "${BRANCH}" = "main" ]; then
+            echo "DIST_TAG=nightly" | tee -a $GITHUB_OUTPUT
           else
-            echo "VERSION=${CURRENT_VERSION}" >> $GITHUB_OUTPUT
+            echo "DIST_TAG=${BRANCH}" | tee -a $GITHUB_OUTPUT
           fi
     outputs:
-      VERSION: ${{ steps.set-publish-version.outputs.VERSION }}
+      VERSION: ${{ steps.set-staging-version.outputs.VERSION }}
+      DIST_TAG: ${{ steps.set-staging-version.outputs.DIST_TAG }}
 
   publish-npm-staging:
-    # Run for manual dispatch on any branch (allows nightly releases from any branch)
+    # Only run for manual dispatch
     if: ${{ github.event_name == 'workflow_dispatch' }}
     uses: ./.github/workflows/reusable-sdk-npm.yml
-    needs: set-publish-version
+    needs: set-staging-version
     with:
-      tag: ${{ github.event.inputs.tag }}
-      version: ${{ needs.set-publish-version.outputs.VERSION }}
+      tag: ${{ needs.set-staging-version.outputs.DIST_TAG }}
+      version: ${{ needs.set-staging-version.outputs.VERSION }}
 
   publish-npm-latest:
     # # Only run for release published with tag "web3telegram-v*"
