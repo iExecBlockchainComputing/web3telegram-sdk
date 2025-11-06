@@ -116,9 +116,7 @@ export class IExecWeb3telegram {
     });
   }
 
-  async sendTelegram(
-    args: SendTelegramParams & { protectedData: string }
-  ): Promise<SendTelegramResponse> {
+  async sendTelegram(args: SendTelegramParams): Promise<SendTelegramResponse> {
     await this.init();
     await isValidProvider(this.iexec);
     return sendTelegram({

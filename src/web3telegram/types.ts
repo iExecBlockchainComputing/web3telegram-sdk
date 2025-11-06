@@ -36,34 +36,6 @@ export type Contact = {
   grantedAccess: GrantedAccess;
 };
 
-type SendTelegramCommonParams = {
-  senderName?: string;
-  telegramContent: string;
-  label?: string;
-  workerpoolAddressOrEns?: AddressOrENS;
-  dataMaxPrice?: number;
-  appMaxPrice?: number;
-  workerpoolMaxPrice?: number;
-  useVoucher?: boolean;
-};
-
-export type SendTelegramParams =
-  | ({
-      /**
-       * protected data to process.
-       */
-      protectedData: Address;
-    } & SendTelegramCommonParams)
-  | ({
-      /**
-       * Granted access to process in bulk.
-       * use `fetchMyContacts({ bulkOnly: true })` to get granted accesses.
-       * if not provided, the single message will be processed.
-       */
-      grantedAccess: GrantedAccess[];
-      maxProtectedDataPerTask?: number;
-    } & SendTelegramCommonParams);
-
 export type FetchMyContactsParams = {
   /**
    * Get contacts for this specific user only
@@ -79,26 +51,21 @@ export type FetchUserContactsParams = {
   userAddress: Address;
 } & FetchMyContactsParams;
 
-type SendTelegramSingleResponse = {
+export type SendTelegramParams = {
+  senderName?: string;
+  telegramContent: string;
+  protectedData: Address;
+  label?: string;
+  workerpoolAddressOrEns?: AddressOrENS;
+  dataMaxPrice?: number;
+  appMaxPrice?: number;
+  workerpoolMaxPrice?: number;
+  useVoucher?: boolean;
+};
+
+export type SendTelegramResponse = {
   taskId: string;
 };
-
-type SendTelegramBulkResponse = {
-  tasks: {
-    bulkIndex: number;
-    taskId: string;
-    dealId: string;
-  }[];
-};
-
-export type SendTelegramResponse<Params = { protectedData: Address }> =
-  Params extends {
-    grantedAccess: GrantedAccess[];
-  }
-    ? SendTelegramBulkResponse
-    : never & Params extends { protectedData: Address }
-    ? SendTelegramSingleResponse
-    : never;
 
 export type PrepareTelegramCampaignParams = {
   /**
@@ -121,17 +88,17 @@ export type PrepareTelegramCampaignResponse = {
   campaignRequest: BulkRequest;
 };
 
+export type SendTelegramCampaignParams = {
+  campaignRequest: BulkRequest;
+  workerpoolAddressOrEns?: string;
+};
+
 export type SendTelegramCampaignResponse = {
   tasks: {
     bulkIndex: number;
     taskId: string;
     dealId: string;
   }[];
-};
-
-export type SendTelegramCampaignParams = {
-  campaignRequest: BulkRequest;
-  workerpoolAddressOrEns?: string;
 };
 
 /**

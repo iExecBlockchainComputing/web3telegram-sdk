@@ -18,7 +18,7 @@ import {
   senderNameSchema,
   booleanSchema,
 } from '../utils/validators.js';
-import { SendTelegramResponse } from './types.js';
+import { SendTelegramParams, SendTelegramResponse } from './types.js';
 import {
   checkUserVoucher,
   filterWorkerpoolOrders,
@@ -33,18 +33,6 @@ import {
 } from './internalTypes.js';
 
 export type SendTelegram = typeof sendTelegram;
-
-type SendTelegramSingleParams = {
-  senderName?: string;
-  telegramContent: string;
-  label?: string;
-  workerpoolAddressOrEns?: string;
-  dataMaxPrice?: number;
-  appMaxPrice?: number;
-  workerpoolMaxPrice?: number;
-  protectedData: string;
-  useVoucher?: boolean;
-};
 
 export const sendTelegram = async ({
   graphQLClient = throwIfMissing(),
@@ -68,7 +56,7 @@ export const sendTelegram = async ({
   DappWhitelistAddressConsumer &
   IpfsNodeConfigConsumer &
   IpfsGatewayConfigConsumer &
-  SendTelegramSingleParams): Promise<SendTelegramResponse> => {
+  SendTelegramParams): Promise<SendTelegramResponse> => {
   try {
     const vDatasetAddress = addressOrEnsSchema()
       .required()
