@@ -141,7 +141,8 @@ export const sendTelegram = async ({
     ] = await Promise.all([
       // Fetch dataset order for web3telegram app
       iexec.orderbook
-        .fetchDatasetOrderbook(vDatasetAddress, {
+        .fetchDatasetOrderbook({
+          dataset: vDatasetAddress,
           app: dappAddressOrENS,
           requester: requesterAddress,
         })
@@ -154,7 +155,8 @@ export const sendTelegram = async ({
 
       // Fetch dataset order for web3telegram whitelist
       iexec.orderbook
-        .fetchDatasetOrderbook(vDatasetAddress, {
+        .fetchDatasetOrderbook({
+          dataset: vDatasetAddress,
           app: vDappWhitelistAddress,
           requester: requesterAddress,
         })
@@ -167,7 +169,8 @@ export const sendTelegram = async ({
 
       // Fetch app order
       iexec.orderbook
-        .fetchAppOrderbook(dappAddressOrENS, {
+        .fetchAppOrderbook({
+          app: dappAddressOrENS,
           minTag: ['tee', 'scone'],
           maxTag: ['tee', 'scone'],
           workerpool: workerpoolAddressOrEns,
