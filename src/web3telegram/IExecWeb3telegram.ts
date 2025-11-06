@@ -24,7 +24,7 @@ import { getChainDefaultConfig } from '../config/config.js';
 import { isValidProvider } from '../utils/validators.js';
 import { getChainIdFromProvider } from '../utils/getChainId.js';
 import { resolveDappAddressFromCompass } from '../utils/resolveDappAddressFromCompass.js';
-import { prepareTelegramCampaign } from './prepareTelegramCampain.js';
+import { prepareTelegramCampaign } from './prepareTelegramCampaign.js';
 
 type EthersCompatibleProvider =
   | AbstractProvider
