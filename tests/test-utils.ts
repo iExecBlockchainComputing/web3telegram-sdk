@@ -133,8 +133,17 @@ export const getRandomTxHash = () => {
 
 export const createAndPublishAppOrders = async (
   resourceProvider,
-  appAddress
+  appAddressOrEns
 ) => {
+  // Resolve ENS name to address if needed
+  let appAddress = appAddressOrEns;
+  if (appAddressOrEns && appAddressOrEns.includes('.eth')) {
+    appAddress = await resourceProvider.ens.resolveName(appAddressOrEns);
+    if (!appAddress) {
+      throw new Error(`Failed to resolve ENS name: ${appAddressOrEns}`);
+    }
+  }
+
   await resourceProvider.order
     .createApporder({
       app: appAddress,
