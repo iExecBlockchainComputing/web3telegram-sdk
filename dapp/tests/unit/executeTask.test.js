@@ -46,12 +46,6 @@ jest.unstable_mockModule('fs', () => ({
     writeFile: jest.fn().mockResolvedValue(undefined),
   },
 }));
-const { validateRequesterSecret, validateProtectedData } = await import(
-  '../../src/validation'
-);
-const { IExecDataProtectorDeserializer } = await import(
-  '@iexec/dataprotector-deserializer'
-);
 const { downloadEncryptedContent, decryptContent } = await import(
   '../../src/decryptContent'
 );
@@ -92,18 +86,19 @@ describe('start function', () => {
       senderName: 'TestUser',
     });
 
-    expect(fs.writeFile).toHaveBeenCalledWith(
+    expect(fs.writeFile).toHaveBeenNthCalledWith(
+      1,
       '/mock/output/result.json',
       JSON.stringify(
         {
-          message: 'Your telegram message has been sent successfully.',
-          status: 200,
+          success: true,
         },
         null,
         2
       )
     );
-    expect(fs.writeFile).toHaveBeenCalledWith(
+    expect(fs.writeFile).toHaveBeenNthCalledWith(
+      2,
       '/mock/output/computed.json',
       JSON.stringify(
         { 'deterministic-output-path': '/mock/output/result.json' },
@@ -113,59 +108,156 @@ describe('start function', () => {
     );
   });
 
-  test('should throw an error when developer secret is invalid', async () => {
+  test('should output an error when developer secret is invalid', async () => {
     process.env.IEXEC_APP_DEVELOPER_SECRET = 'invalid-json';
 
-    await expect(start()).rejects.toThrow(
-      'Failed to parse the developer secret'
+    await start();
+    expect(fs.writeFile).toHaveBeenNthCalledWith(
+      1,
+      '/mock/output/result.json',
+      JSON.stringify(
+        {
+          success: false,
+          error: 'Failed to parse the developer secret',
+        },
+        null,
+        2
+      )
+    );
+    expect(fs.writeFile).toHaveBeenNthCalledWith(
+      2,
+      '/mock/output/computed.json',
+      JSON.stringify(
+        {
+          'deterministic-output-path': '/mock/output/result.json',
+        },
+        null,
+        2
+      )
     );
   });
 
-  test('should throw an error when requester secret is invalid', async () => {
+  test('should output an error when requester secret is invalid', async () => {
     process.env.IEXEC_REQUESTER_SECRET_1 = 'invalid-json';
 
-    await expect(start()).rejects.toThrow('Failed to parse requester secret');
+    await start();
+    expect(fs.writeFile).toHaveBeenNthCalledWith(
+      1,
+      '/mock/output/result.json',
+      JSON.stringify(
+        {
+          success: false,
+          error: 'Failed to parse requester secret',
+        },
+        null,
+        2
+      )
+    );
+    expect(fs.writeFile).toHaveBeenNthCalledWith(
+      2,
+      '/mock/output/computed.json',
+      JSON.stringify(
+        {
+          'deterministic-output-path': '/mock/output/result.json',
+        },
+        null,
+        2
+      )
+    );
   });
 
-  test('should fail when downloadEncryptedContent fails', async () => {
+  test('should output an error when downloadEncryptedContent fails', async () => {
     downloadEncryptedContent.mockRejectedValue(new Error('Download error'));
-
-    await expect(start()).rejects.toThrow('Download error');
+    await start();
+    expect(fs.writeFile).toHaveBeenNthCalledWith(
+      1,
+      '/mock/output/result.json',
+      JSON.stringify(
+        {
+          success: false,
+          error: 'Download error',
+        },
+        null,
+        2
+      )
+    );
+    expect(fs.writeFile).toHaveBeenNthCalledWith(
+      2,
+      '/mock/output/computed.json',
+      JSON.stringify(
+        {
+          'deterministic-output-path': '/mock/output/result.json',
+        },
+        null,
+        2
+      )
+    );
   });
 
-  test('should fail when decryptContent fails', async () => {
+  test('should output an error when decryptContent fails', async () => {
     decryptContent.mockImplementation(() => {
       throw new Error('Decryption failed');
     });
 
-    await expect(start()).rejects.toThrow('Decryption failed');
-  });
-
-  test('should exit when writeTaskOutput fails', async () => {
-    fs.writeFile.mockRejectedValueOnce(new Error('Write error')); // ✅ Fix 2: Ensure mockRejectedValueOnce is available
-
-    const mockExit = jest.spyOn(process, 'exit').mockImplementation(() => {});
-
     await start();
-
-    expect(mockExit).toHaveBeenCalledWith(1);
-
-    mockExit.mockRestore();
+    expect(fs.writeFile).toHaveBeenNthCalledWith(
+      1,
+      '/mock/output/result.json',
+      JSON.stringify(
+        {
+          success: false,
+          error: 'Decryption failed',
+        },
+        null,
+        2
+      )
+    );
+    expect(fs.writeFile).toHaveBeenNthCalledWith(
+      2,
+      '/mock/output/computed.json',
+      JSON.stringify(
+        {
+          'deterministic-output-path': '/mock/output/result.json',
+        },
+        null,
+        2
+      )
+    );
   });
 
-  test('should fail when sendTelegram fails', async () => {
-    sendTelegram.mockRejectedValue(new Error('Telegram API Error')); // ✅ Fix 3: Ensure sendTelegram mock is correct
-
-    await expect(start()).rejects.toThrow('Telegram API Error');
-  });
-
-  test('should fail validation if requester secret is invalid', async () => {
-    validateRequesterSecret.mockImplementation(() => {
-      throw new Error('Requester secret error: invalid data');
+  test('should output an error when sendTelegram fails', async () => {
+    sendTelegram.mockImplementation(() => {
+      throw new Error('Send failed');
     });
 
-    await expect(start()).rejects.toThrow(
-      'Requester secret error: invalid data'
+    await start();
+    expect(fs.writeFile).toHaveBeenNthCalledWith(
+      1,
+      '/mock/output/result.json',
+      JSON.stringify(
+        {
+          success: false,
+          error: 'Send failed',
+        },
+        null,
+        2
+      )
     );
+    expect(fs.writeFile).toHaveBeenNthCalledWith(
+      2,
+      '/mock/output/computed.json',
+      JSON.stringify(
+        {
+          'deterministic-output-path': '/mock/output/result.json',
+        },
+        null,
+        2
+      )
+    );
+  });
+
+  test('should throw when writeTaskOutput fails', async () => {
+    fs.writeFile.mockRejectedValueOnce(new Error('Write error')); // ✅ Fix 2: Ensure mockRejectedValueOnce is available
+    await expect(start()).rejects.toThrow(Error('Write error'));
   });
 });

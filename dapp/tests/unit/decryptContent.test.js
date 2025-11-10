@@ -25,6 +25,12 @@ describe('decryptContent', () => {
     expect(decryptedMessage.length).toEqual(message.length);
     expect(decryptedMessage).toEqual(message);
   });
+
+  it('should throw an error if decryption fails', async () => {
+    expect(() => decryptContent(null, null)).toThrow(
+      Error('Failed to decrypt content')
+    );
+  });
 });
 
 describe('downloadEncryptedContent', () => {
@@ -40,6 +46,8 @@ describe('downloadEncryptedContent', () => {
   it('should throw an error if the content cannot be loaded', async () => {
     const multiaddr =
       '/ipfs/QmYhXeg4p4D729m432t8b9877b35e756a82749723456789invalid';
-    await expect(downloadEncryptedContent(multiaddr)).rejects.toThrow();
+    await expect(downloadEncryptedContent(multiaddr)).rejects.toThrow(
+      Error('Failed to download encrypted content')
+    );
   });
 });

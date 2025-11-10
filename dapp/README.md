@@ -12,7 +12,11 @@ fill in the environment variables:
 
 - **IEXEC_IN**: The path to the input directory on your local machine where the unencrypted data .zip file will be stored. This file contains the telegram chat ID address to which the message will be sent.
 - **IEXEC_OUT**: The path on your local machine where the result of the Dapp execution will be written.
-- **IEXEC_DATASET_FILENAME**: The name of the data file that you place in the **IEXEC_IN** directory.
+- data to process
+  - either **IEXEC_DATASET_FILENAME**: The name of the data file that you place in the **IEXEC_IN** directory.
+  - or multiple datasets using:
+    - **IEXEC_BULK_SLICE_SIZE**
+    - **IEXEC_DATASET\_\<index\>\_FILENAME**: The name of the data file for dataset at index <index> (starting from 1) that you place in the **IEXEC_IN** directory.
 - **IEXEC_APP_DEVELOPER_SECRET**: A JSON string with the following keys:
   - **TELEGRAM_BOT_TOKEN**: The API key of the telegram bot used to send the message.
 - **IEXEC_REQUESTER_SECRET_1**: A JSON string with the following keys:
