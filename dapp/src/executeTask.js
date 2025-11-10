@@ -59,6 +59,7 @@ async function processProtectedData({
     result.success = false;
     result.error = e.message;
   }
+  console.log(`Protected data ${index} processed:`, result);
   return result;
 }
 
@@ -96,6 +97,7 @@ async function start() {
 
     // Process multiple protected data
     if (bulkSize > 0) {
+      console.log(`Processing ${bulkSize} protected data...`);
       const processPromises = new Array(bulkSize).fill(null).map((_, index) =>
         processProtectedData({
           index: index + 1,
@@ -121,6 +123,7 @@ async function start() {
         })),
       };
     } else {
+      console.log('Processing single protected data...');
       const { protectedData, success, error } = await processProtectedData({
         index: 0,
         IEXEC_IN,
@@ -130,9 +133,11 @@ async function start() {
       result = { protectedData, success, error };
     }
   } catch (e) {
+    console.error('Something went wrong:', e.message);
     result = { success: false, error: e.message };
   }
 
+  console.log('Writing results:', JSON.stringify(result));
   await fs.writeFile(
     `${workerEnv.IEXEC_OUT}/result.json`,
     JSON.stringify(result, null, 2)
