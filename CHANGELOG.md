@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.0-alpha.6](https://github.com/iExecBlockchainComputing/web3telegram-sdk/compare/web3telegram-v0.1.0-alpha.5...web3telegram-v0.1.0-alpha.6) (2025-11-10)
+
+
+### Added
+
+* add bulk Telegram campaigns ([#83](https://github.com/iExecBlockchainComputing/web3telegram-sdk/issues/83)) ([1eabf93](https://github.com/iExecBlockchainComputing/web3telegram-sdk/commit/1eabf93d18dbfb175cf660b377bd39f22881609f))
+
 ## [0.1.0-alpha.5](https://github.com/iExecBlockchainComputing/web3telegram-sdk/compare/web3telegram-v0.1.0-alpha.4...web3telegram-v0.1.0-alpha.5) (2025-10-14)
 
 
