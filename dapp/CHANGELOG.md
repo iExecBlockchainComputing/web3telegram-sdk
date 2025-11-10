@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-alpha.3](https://github.com/iExecBlockchainComputing/web3telegram-sdk/compare/dapp-v0.1.0-alpha.3...dapp-v1.0.0-alpha.3) (2025-11-10)
+
+
+### ⚠ BREAKING CHANGES
+
+* **iapp:** result file renamed to `result.json`; single protectedData result file now contains `{"success": <boolean>, "protectedData"?: <address>, "error"?: <string> }`; upon error, the iapp will now exit 0 and output `"success": false` and `"error": <string>` rather than falling the task.
+
+### Added
+
+* **iapp:** support bulk processing ([#82](https://github.com/iExecBlockchainComputing/web3telegram-sdk/issues/82)) ([15d0936](https://github.com/iExecBlockchainComputing/web3telegram-sdk/commit/15d093636b3f065d76270c5f537661ba9d684527))
+
 ## [0.1.0-alpha.3](https://github.com/iExecBlockchainComputing/web3telegram-sdk/compare/dapp-v0.1.0-alpha.2...dapp-v0.1.0-alpha.3) (2025-09-05)
 
 
