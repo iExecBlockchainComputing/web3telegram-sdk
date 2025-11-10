@@ -1,23 +1,30 @@
 import { AbstractProvider, AbstractSigner, Eip1193Provider } from 'ethers';
 import { IExec } from 'iexec';
+import { IExecDataProtectorCore } from '@iexec/dataprotector';
 import { GraphQLClient } from 'graphql-request';
 import { fetchUserContacts } from './fetchUserContacts.js';
 import { fetchMyContacts } from './fetchMyContacts.js';
 import { sendTelegram } from './sendTelegram.js';
+import { sendTelegramCampaign } from './sendTelegramCampaign.js';
 import {
   Contact,
   FetchUserContactsParams,
   SendTelegramParams,
   AddressOrENS,
   Web3TelegramConfigOptions,
-  SendTelegramResponse,
   Web3SignerProvider,
   FetchMyContactsParams,
+  SendTelegramResponse,
+  PrepareTelegramCampaignResponse,
+  PrepareTelegramCampaignParams,
+  SendTelegramCampaignParams,
+  SendTelegramCampaignResponse,
 } from './types.js';
 import { getChainDefaultConfig } from '../config/config.js';
 import { isValidProvider } from '../utils/validators.js';
 import { getChainIdFromProvider } from '../utils/getChainId.js';
 import { resolveDappAddressFromCompass } from '../utils/resolveDappAddressFromCompass.js';
+import { prepareTelegramCampaign } from './prepareTelegramCampaign.js';
 
 type EthersCompatibleProvider =
   | AbstractProvider
@@ -34,6 +41,7 @@ interface Web3telegramResolvedConfig {
   ipfsGateway: string;
   defaultWorkerpool: string;
   iexec: IExec;
+  dataProtector: IExecDataProtectorCore;
 }
 
 export class IExecWeb3telegram {
@@ -50,6 +58,8 @@ export class IExecWeb3telegram {
   private defaultWorkerpool!: string;
 
   private iexec!: IExec;
+
+  private dataProtector!: IExecDataProtectorCore;
 
   private initPromise: Promise<void> | null = null;
 
@@ -75,6 +85,7 @@ export class IExecWeb3telegram {
         this.ipfsGateway = config.ipfsGateway;
         this.defaultWorkerpool = config.defaultWorkerpool;
         this.iexec = config.iexec;
+        this.dataProtector = config.dataProtector;
       });
     }
     return this.initPromise;
@@ -118,6 +129,34 @@ export class IExecWeb3telegram {
       dappAddressOrENS: this.dappAddressOrENS,
       dappWhitelistAddress: this.dappWhitelistAddress,
       graphQLClient: this.graphQLClient,
+    });
+  }
+
+  async sendTelegramCampaign(
+    args: SendTelegramCampaignParams
+  ): Promise<SendTelegramCampaignResponse> {
+    await this.init();
+    await isValidProvider(this.iexec);
+    return sendTelegramCampaign({
+      ...args,
+      workerpoolAddressOrEns:
+        args.workerpoolAddressOrEns || this.defaultWorkerpool,
+      dataProtector: this.dataProtector,
+    });
+  }
+
+  async prepareTelegramCampaign(
+    args: PrepareTelegramCampaignParams
+  ): Promise<PrepareTelegramCampaignResponse> {
+    await this.init();
+
+    return prepareTelegramCampaign({
+      ...args,
+      iexec: this.iexec,
+      dataProtector: this.dataProtector,
+      ipfsNode: this.ipfsNode,
+      ipfsGateway: this.ipfsGateway,
+      dappAddressOrENS: this.dappAddressOrENS,
     });
   }
 
@@ -185,6 +224,17 @@ export class IExecWeb3telegram {
       throw new Error(`Failed to create GraphQLClient: ${error.message}`);
     }
 
+    const dataProtector = new IExecDataProtectorCore(this.ethProvider, {
+      iexecOptions: {
+        ipfsGatewayURL: ipfsGateway,
+        ...this.options?.iexecOptions,
+        allowExperimentalNetworks: this.options.allowExperimentalNetworks,
+      },
+      ipfsGateway,
+      ipfsNode,
+      subgraphUrl,
+    });
+
     return {
       dappAddressOrENS,
       dappWhitelistAddress: dappWhitelistAddress.toLowerCase(),
@@ -193,6 +243,7 @@ export class IExecWeb3telegram {
       ipfsNode,
       ipfsGateway,
       iexec,
+      dataProtector,
     };
   }
 }

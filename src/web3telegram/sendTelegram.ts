@@ -129,7 +129,8 @@ export const sendTelegram = async ({
     ] = await Promise.all([
       // Fetch dataset order for web3telegram app
       iexec.orderbook
-        .fetchDatasetOrderbook(vDatasetAddress, {
+        .fetchDatasetOrderbook({
+          dataset: vDatasetAddress,
           app: dappAddressOrENS,
           requester: requesterAddress,
         })
@@ -142,7 +143,8 @@ export const sendTelegram = async ({
 
       // Fetch dataset order for web3telegram whitelist
       iexec.orderbook
-        .fetchDatasetOrderbook(vDatasetAddress, {
+        .fetchDatasetOrderbook({
+          dataset: vDatasetAddress,
           app: vDappWhitelistAddress,
           requester: requesterAddress,
         })
@@ -155,7 +157,8 @@ export const sendTelegram = async ({
 
       // Fetch app order
       iexec.orderbook
-        .fetchAppOrderbook(dappAddressOrENS, {
+        .fetchAppOrderbook({
+          app: dappAddressOrENS,
           minTag: ['tee', 'scone'],
           maxTag: ['tee', 'scone'],
           workerpool: workerpoolAddressOrEns,
@@ -290,7 +293,14 @@ export const sendTelegram = async ({
       taskId,
     };
   } catch (error) {
+    // Protocol error detected, re-throwing as-is
+    if ((error as any)?.isProtocolError === true) {
+      throw error;
+    }
+    // Handle protocol errors - this will throw if it's an ApiCallError
+    // handleIfProtocolError transforms ApiCallError into a WorkflowError with isProtocolError=true
     handleIfProtocolError(error);
+    // For all other errors
     throw new WorkflowError({
       message: 'Failed to sendTelegram',
       errorCause: error,

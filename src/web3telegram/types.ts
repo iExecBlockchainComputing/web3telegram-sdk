@@ -1,3 +1,4 @@
+import { BulkRequest } from '@iexec/dataprotector';
 import { EnhancedWallet } from 'iexec';
 import { IExecConfigOptions } from 'iexec/IExecConfig';
 
@@ -11,15 +12,44 @@ export type Address = string;
 
 export type TimeStamp = string;
 
+export type GrantedAccess = {
+  dataset: string;
+  datasetprice: string;
+  volume: string;
+  tag: string;
+  apprestrict: string;
+  workerpoolrestrict: string;
+  requesterrestrict: string;
+  salt: string;
+  sign: string;
+  remainingAccess: number;
+};
+
 export type Contact = {
   address: Address;
   owner: Address;
   accessGrantTimestamp: TimeStamp;
   isUserStrict: boolean;
-  name: string;
+  name?: string;
   remainingAccess: number;
   accessPrice: number;
+  grantedAccess: GrantedAccess;
 };
+
+export type FetchMyContactsParams = {
+  /**
+   * Get contacts for this specific user only
+   */
+  isUserStrict?: boolean;
+  bulkOnly?: boolean;
+};
+
+export type FetchUserContactsParams = {
+  /**
+   * Address of the user
+   */
+  userAddress: Address;
+} & FetchMyContactsParams;
 
 export type SendTelegramParams = {
   senderName?: string;
@@ -33,22 +63,42 @@ export type SendTelegramParams = {
   useVoucher?: boolean;
 };
 
-export type FetchMyContactsParams = {
-  /**
-   * Get contacts for this specific user only
-   */
-  isUserStrict?: boolean;
-};
-
-export type FetchUserContactsParams = {
-  /**
-   * Address of the user
-   */
-  userAddress: Address;
-} & FetchMyContactsParams;
-
 export type SendTelegramResponse = {
   taskId: string;
+};
+
+export type PrepareTelegramCampaignParams = {
+  /**
+   * Granted access to process in bulk.
+   * use `fetchMyContacts({ bulkOnly: true })` to get granted accesses.
+   * if not provided, the single message will be processed.
+   */
+  grantedAccess: GrantedAccess[];
+  maxProtectedDataPerTask?: number;
+  senderName?: string;
+  telegramContent: string;
+  label?: string;
+  workerpoolAddressOrEns?: AddressOrENS;
+  dataMaxPrice?: number;
+  appMaxPrice?: number;
+  workerpoolMaxPrice?: number;
+};
+
+export type PrepareTelegramCampaignResponse = {
+  campaignRequest: BulkRequest;
+};
+
+export type SendTelegramCampaignParams = {
+  campaignRequest: BulkRequest;
+  workerpoolAddressOrEns?: string;
+};
+
+export type SendTelegramCampaignResponse = {
+  tasks: {
+    bulkIndex: number;
+    taskId: string;
+    dealId: string;
+  }[];
 };
 
 /**

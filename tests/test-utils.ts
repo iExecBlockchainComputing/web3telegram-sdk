@@ -8,6 +8,8 @@ import { randomInt } from 'crypto';
 import { getSignerFromPrivateKey } from 'iexec/utils';
 
 export const TEST_CHAIN = {
+  ipfsGateway: 'http://127.0.0.1:8080',
+  ipfsNode: 'http://127.0.0.1:5001',
   rpcURL: 'http://localhost:8545',
   chainId: '134',
   smsURL: 'http://127.0.0.1:13300',
@@ -77,6 +79,8 @@ export const getTestIExecOption = () => ({
   iexecGatewayURL: TEST_CHAIN.iexecGatewayURL,
   voucherHubAddress: TEST_CHAIN.voucherHubAddress,
   voucherSubgraphURL: TEST_CHAIN.voucherSubgraphURL,
+  ipfsGatewayURL: TEST_CHAIN.ipfsGateway,
+  ipfsNodeURL: TEST_CHAIN.ipfsNode,
 });
 
 export const getTestConfig = (
@@ -129,8 +133,17 @@ export const getRandomTxHash = () => {
 
 export const createAndPublishAppOrders = async (
   resourceProvider,
-  appAddress
+  appAddressOrEns
 ) => {
+  // Resolve ENS name to address if needed
+  let appAddress = appAddressOrEns;
+  if (appAddressOrEns && appAddressOrEns.includes('.eth')) {
+    appAddress = await resourceProvider.ens.resolveName(appAddressOrEns);
+    if (!appAddress) {
+      throw new Error(`Failed to resolve ENS name: ${appAddressOrEns}`);
+    }
+  }
+
   await resourceProvider.order
     .createApporder({
       app: appAddress,
