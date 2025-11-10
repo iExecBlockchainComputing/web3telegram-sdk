@@ -1,4 +1,0 @@
-{
-  "message": "Your telegram message has been sent successfully.",
-  "status": 200
-}

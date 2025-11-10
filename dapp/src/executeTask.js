@@ -1,5 +1,5 @@
-import { IExecDataProtectorDeserializer } from '@iexec/dataprotector-deserializer';
 import { promises as fs } from 'fs';
+import { IExecDataProtectorDeserializer } from '@iexec/dataprotector-deserializer';
 import { decryptContent, downloadEncryptedContent } from './decryptContent.js';
 import sendTelegram from './telegramService.js';
 import {
@@ -9,79 +9,148 @@ import {
   validateWorkerEnv,
 } from './validation.js';
 
-async function writeTaskOutput(path, message) {
+async function processProtectedData({
+  index,
+  IEXEC_IN,
+  appDeveloperSecret,
+  requesterSecret,
+}) {
+  const datasetFilename =
+    index > 0
+      ? process.env[`IEXEC_DATASET_${index}_FILENAME`]
+      : process.env.IEXEC_DATASET_FILENAME;
+  const result = { index, protectedData: datasetFilename };
   try {
-    await fs.writeFile(path, message);
-    console.log(`File successfully written at path: ${path}`);
-  } catch {
-    console.error('Failed to write Task Output');
-    process.exit(1);
+    let protectedData;
+    try {
+      const deserializerConfig = datasetFilename
+        ? { protectedDataPath: `${IEXEC_IN}/${datasetFilename}` }
+        : {};
+
+      const deserializer = new IExecDataProtectorDeserializer(
+        deserializerConfig
+      );
+      protectedData = {
+        chatId: await deserializer.getValue('telegram_chatId', 'string'),
+      };
+    } catch (e) {
+      throw Error(`Failed to parse ProtectedData ${index}: ${e.message}`);
+    }
+
+    validateProtectedData(protectedData);
+
+    const encryptedTelegramContent = await downloadEncryptedContent(
+      requesterSecret.telegramContentMultiAddr
+    );
+
+    const telegramContent = decryptContent(
+      encryptedTelegramContent,
+      requesterSecret.telegramContentEncryptionKey
+    );
+
+    await sendTelegram({
+      chatId: protectedData.chatId,
+      message: telegramContent,
+      botToken: appDeveloperSecret.TELEGRAM_BOT_TOKEN,
+      senderName: requesterSecret.senderName,
+    });
+    result.success = true;
+  } catch (e) {
+    result.success = false;
+    result.error = e.message;
   }
+  console.log(`Protected data ${index} processed:`, result);
+  return result;
 }
 
 async function start() {
-  const { IEXEC_OUT, IEXEC_APP_DEVELOPER_SECRET, IEXEC_REQUESTER_SECRET_1 } =
-    process.env;
+  const {
+    IEXEC_OUT,
+    IEXEC_APP_DEVELOPER_SECRET,
+    IEXEC_REQUESTER_SECRET_1,
+    IEXEC_IN,
+    IEXEC_BULK_SLICE_SIZE,
+  } = process.env;
 
-  // Check worker env
   const workerEnv = validateWorkerEnv({ IEXEC_OUT });
-  // Parse the app developer secret environment variable
-  let appDeveloperSecret;
-  try {
-    appDeveloperSecret = JSON.parse(IEXEC_APP_DEVELOPER_SECRET);
-  } catch {
-    throw Error('Failed to parse the developer secret');
-  }
-  appDeveloperSecret = validateAppSecret(appDeveloperSecret);
 
-  // Parse the requester secret environment variable
-  let requesterSecret;
+  let result; // { success: boolean, error?: string ,  protectedData?: string,  results?: { index: number, protectedData: string, success: boolean, error?: string }[] }
   try {
-    requesterSecret = IEXEC_REQUESTER_SECRET_1
-      ? JSON.parse(IEXEC_REQUESTER_SECRET_1)
-      : {};
-  } catch {
-    throw Error('Failed to parse requester secret');
-  }
-  requesterSecret = validateRequesterSecret(requesterSecret);
+    let appDeveloperSecret;
+    try {
+      appDeveloperSecret = JSON.parse(IEXEC_APP_DEVELOPER_SECRET);
+    } catch {
+      throw Error('Failed to parse the developer secret');
+    }
+    appDeveloperSecret = validateAppSecret(appDeveloperSecret);
 
-  // Parse the protected data and get the requester secret (chatId)
-  let protectedData;
-  try {
-    const deserializer = new IExecDataProtectorDeserializer();
-    protectedData = {
-      chatId: await deserializer.getValue('telegram_chatId', 'string'),
-    };
+    let requesterSecret;
+    try {
+      requesterSecret = JSON.parse(IEXEC_REQUESTER_SECRET_1);
+    } catch {
+      throw Error('Failed to parse requester secret');
+    }
+
+    requesterSecret = validateRequesterSecret(requesterSecret);
+
+    const bulkSize = parseInt(IEXEC_BULK_SLICE_SIZE, 10) || 0;
+
+    // Process multiple protected data
+    if (bulkSize > 0) {
+      console.log(`Processing ${bulkSize} protected data...`);
+      const processPromises = new Array(bulkSize).fill(null).map((_, index) =>
+        processProtectedData({
+          index: index + 1,
+          IEXEC_IN,
+          appDeveloperSecret,
+          requesterSecret,
+        })
+      );
+      const results = await Promise.all(processPromises);
+      const successCount = results.filter((r) => r.success === true).length;
+      const errorCount = results.filter((r) => r.success !== true).length;
+      result = {
+        success: errorCount === 0,
+        error: errorCount > 0 ? 'Partial failure' : undefined,
+        totalCount: results.length,
+        successCount,
+        errorCount,
+        results: results.map((r) => ({
+          index: r.index,
+          protectedData: r.protectedData,
+          success: r.success,
+          error: r.error,
+        })),
+      };
+    } else {
+      console.log('Processing single protected data...');
+      const { protectedData, success, error } = await processProtectedData({
+        index: 0,
+        IEXEC_IN,
+        appDeveloperSecret,
+        requesterSecret,
+      });
+      result = { protectedData, success, error };
+    }
   } catch (e) {
-    throw Error(`Failed to parse ProtectedData: ${e.message}`);
+    console.error('Something went wrong:', e.message);
+    result = { success: false, error: e.message };
   }
-  // Validate the protected data (chatId)
-  validateProtectedData(protectedData);
 
-  const encryptedTelegramContent = await downloadEncryptedContent(
-    requesterSecret.telegramContentMultiAddr
+  console.log('Writing results:', JSON.stringify(result));
+  await fs.writeFile(
+    `${workerEnv.IEXEC_OUT}/result.json`,
+    JSON.stringify(result, null, 2)
   );
-
-  const telegramContent = decryptContent(
-    encryptedTelegramContent,
-    requesterSecret.telegramContentEncryptionKey
-  );
-
-  const response = await sendTelegram({
-    chatId: protectedData.chatId,
-    message: telegramContent,
-    botToken: appDeveloperSecret.TELEGRAM_BOT_TOKEN,
-    senderName: requesterSecret.senderName,
-  });
-  await writeTaskOutput(
-    `${workerEnv.IEXEC_OUT}/result.txt`,
-    JSON.stringify(response, null, 2)
-  );
-  await writeTaskOutput(
+  await fs.writeFile(
     `${workerEnv.IEXEC_OUT}/computed.json`,
-    JSON.stringify({
-      'deterministic-output-path': `${workerEnv.IEXEC_OUT}/result.txt`,
-    })
+    JSON.stringify(
+      {
+        'deterministic-output-path': `${workerEnv.IEXEC_OUT}/result.json`,
+      },
+      null,
+      2
+    )
   );
 }
 

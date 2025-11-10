@@ -1,6 +1,28 @@
-import { promises as fsPromises } from 'fs';
+import fsPromises from 'fs/promises';
 import path from 'path';
 import start from '../../src/executeTask';
+
+export async function readOutputs(outputDir) {
+  const [result, computed] = await Promise.all([
+    fsPromises
+      .readFile(path.join(outputDir, 'result.json'), 'utf-8')
+      .then(JSON.parse)
+      .catch(() => null),
+    fsPromises
+      .readFile(path.join(outputDir, 'computed.json'), 'utf-8')
+      .then(JSON.parse)
+      .catch(() => null),
+  ]);
+  return {
+    result,
+    computed,
+  };
+}
+
+export async function cleanOutputs(outputDir) {
+  await fsPromises.rm(outputDir, { recursive: true }).catch(() => {});
+  await fsPromises.mkdir(outputDir, { recursive: true });
+}
 
 describe('sendTelegram', () => {
   beforeEach(async () => {
@@ -8,10 +30,7 @@ describe('sendTelegram', () => {
     process.env.IEXEC_IN = './tests/_test_inputs_';
     process.env.IEXEC_OUT = './tests/_test_outputs_/iexec_out';
     // clean IEXEC_OUT
-    await fsPromises
-      .rm(process.env.IEXEC_OUT, { recursive: true })
-      .catch(() => {});
-    await fsPromises.mkdir(process.env.IEXEC_OUT, { recursive: true });
+    await cleanOutputs(process.env.IEXEC_OUT);
   });
 
   beforeEach(() => {
@@ -31,83 +50,99 @@ describe('sendTelegram', () => {
     });
   });
 
-  it('should fail if developer secret is missing', async () => {
+  it('should output an error if developer secret is missing', async () => {
     process.env.IEXEC_APP_DEVELOPER_SECRET = '';
-    await expect(start()).rejects.toThrow(
-      new Error('Failed to parse the developer secret')
-    );
+    await start();
+    const { result } = await readOutputs(process.env.IEXEC_OUT);
+    expect(result).toStrictEqual({
+      success: false,
+      error: 'Failed to parse the developer secret',
+    });
   });
 
-  it('should fail if TELEGRAM_BOT_TOKEN in developer secret is missing', async () => {
+  it('should output an error if TELEGRAM_BOT_TOKEN in developer secret is missing', async () => {
     process.env.IEXEC_APP_DEVELOPER_SECRET = JSON.stringify({});
-    await expect(start()).rejects.toThrow(
-      new Error('App secret error: "TELEGRAM_BOT_TOKEN" is required')
-    );
+    await start();
+    const { result } = await readOutputs(process.env.IEXEC_OUT);
+    expect(result).toStrictEqual({
+      success: false,
+      error: 'App secret error: "TELEGRAM_BOT_TOKEN" is required',
+    });
   });
 
-  it('should fail if telegramContentEncryptionKey is empty', async () => {
+  it('should output an error if telegramContentEncryptionKey is empty', async () => {
     process.env.IEXEC_REQUESTER_SECRET_1 = JSON.stringify({
       telegramContentEncryptionKey: '',
       telegramContentMultiAddr:
         '/ipfs/QmVodr1Bxa2bTiz1pLmWjDrCeTEdGPfe58qRMRwErJDcRu',
       senderName: 'sender test name',
     });
-    await expect(start()).rejects.toThrow(
-      new Error(
-        'Requester secret error: "telegramContentEncryptionKey" is not allowed to be empty'
-      )
-    );
+    await start();
+    const { result } = await readOutputs(process.env.IEXEC_OUT);
+    expect(result).toStrictEqual({
+      success: false,
+      error:
+        'Requester secret error: "telegramContentEncryptionKey" is not allowed to be empty',
+    });
   });
 
-  it('should fail if telegramContentEncryptionKey is not base64', async () => {
+  it('should output an error if telegramContentEncryptionKey is not base64', async () => {
     process.env.IEXEC_REQUESTER_SECRET_1 = JSON.stringify({
       telegramContentMultiAddr:
         '/ipfs/QmVodr1Bxa2bTiz1pLmWjDrCeTEdGPfe58qRMRwErJDcRu',
       telegramContentEncryptionKey: 'notabase64',
       senderName: 'sender test name',
     });
-    await expect(start()).rejects.toThrow(
-      new Error(
-        'Requester secret error: "telegramContentEncryptionKey" must be a valid base64 string'
-      )
-    );
+    await start();
+    const { result } = await readOutputs(process.env.IEXEC_OUT);
+    expect(result).toStrictEqual({
+      success: false,
+      error:
+        'Requester secret error: "telegramContentEncryptionKey" must be a valid base64 string',
+    });
   });
 
-  it('should fail if telegramContentMultiAddr is missing', async () => {
+  it('should output an error if telegramContentMultiAddr is missing', async () => {
     process.env.IEXEC_REQUESTER_SECRET_1 = JSON.stringify({
       telegramContentEncryptionKey:
         'rjUmm5KQTwZ5oraBKMnmpgh6QM/qRR33kVF+Ct0/K6c=',
       senderName: 'sender test name',
     });
-    await expect(start()).rejects.toThrow(
-      new Error(
-        'Requester secret error: "telegramContentMultiAddr" is required'
-      )
-    );
+    await start();
+    const { result } = await readOutputs(process.env.IEXEC_OUT);
+    expect(result).toStrictEqual({
+      success: false,
+      error: 'Requester secret error: "telegramContentMultiAddr" is required',
+    });
   });
 
-  it('should fail if telegramContentMultiAddr is not a valid multiAddr', async () => {
+  it('should output an error if telegramContentMultiAddr is not a valid multiAddr', async () => {
     process.env.IEXEC_REQUESTER_SECRET_1 = JSON.stringify({
       telegramContentMultiAddr: 'notamultiaddr',
       telegramContentEncryptionKey:
         'rjUmm5KQTwZ5oraBKMnmpgh6QM/qRR33kVF+Ct0/K6c=',
       senderName: 'sender test name',
     });
-    await expect(start()).rejects.toThrow(
-      new Error(
-        'Requester secret error: "telegramContentMultiAddr" must be a multiAddr'
-      )
-    );
+    await start();
+    const { result } = await readOutputs(process.env.IEXEC_OUT);
+    expect(result).toStrictEqual({
+      success: false,
+      error:
+        'Requester secret error: "telegramContentMultiAddr" must be a multiAddr',
+    });
   });
 
-  it('should fail if IEXEC_REQUESTER_SECRET_1 is not a JSON', async () => {
+  it('should output an error if IEXEC_REQUESTER_SECRET_1 is not a JSON', async () => {
     process.env.IEXEC_REQUESTER_SECRET_1 = '_';
-    await expect(start()).rejects.toThrow(
-      new Error('Failed to parse requester secret')
-    );
+    await start();
+    const { result } = await readOutputs(process.env.IEXEC_OUT);
+    expect(result).toStrictEqual({
+      success: false,
+      error: 'Failed to parse requester secret',
+    });
   });
 
-  it('should fail if senderName is too long', async () => {
+  it('should output an error if senderName is too long', async () => {
     process.env.IEXEC_REQUESTER_SECRET_1 = JSON.stringify({
       senderName: 'A very long sender tag may be flagged as spam',
       telegramContentMultiAddr:
@@ -115,14 +150,16 @@ describe('sendTelegram', () => {
       telegramContentEncryptionKey:
         'rjUmm5KQTwZ5oraBKMnmpgh6QM/qRR33kVF+Ct0/K6c=',
     });
-    await expect(start()).rejects.toThrow(
-      new Error(
-        'Requester secret error: "senderName" length must be less than or equal to 20 characters long'
-      )
-    );
+    await start();
+    const { result } = await readOutputs(process.env.IEXEC_OUT);
+    expect(result).toStrictEqual({
+      success: false,
+      error:
+        'Requester secret error: "senderName" length must be less than or equal to 20 characters long',
+    });
   });
 
-  it('should fail if not empty senderName', async () => {
+  it('should output an error if senderName is empty', async () => {
     process.env.IEXEC_REQUESTER_SECRET_1 = JSON.stringify({
       senderName: '',
       telegramContentMultiAddr:
@@ -130,9 +167,12 @@ describe('sendTelegram', () => {
       telegramContentEncryptionKey:
         'rjUmm5KQTwZ5oraBKMnmpgh6QM/qRR33kVF+Ct0/K6c=',
     });
-    await expect(() => start()).rejects.toThrow(
-      Error('Requester secret error: "senderName" is not allowed to be empty')
-    );
+    await start();
+    const { result } = await readOutputs(process.env.IEXEC_OUT);
+    expect(result).toStrictEqual({
+      success: false,
+      error: 'Requester secret error: "senderName" is not allowed to be empty',
+    });
   });
 
   it('should send the telegram if senderName is undefined and set the default senderName to "iExec web3telegram"', async () => {
@@ -142,30 +182,29 @@ describe('sendTelegram', () => {
       telegramContentEncryptionKey:
         'rjUmm5KQTwZ5oraBKMnmpgh6QM/qRR33kVF+Ct0/K6c=',
     });
-    await expect(start()).resolves.not.toThrow();
+    await start();
+    const { result } = await readOutputs(process.env.IEXEC_OUT);
+    expect(result).toStrictEqual({
+      protectedData: 'data-chatId.zip',
+      success: true,
+    });
   });
 
-  it('should handle telegram service failure gracefully and write error in output', async () => {
+  it('should output an error if telegram service fails', async () => {
     process.env.IEXEC_APP_DEVELOPER_SECRET = JSON.stringify({
       TELEGRAM_BOT_TOKEN: 'wrongtoken',
     });
-    await expect(start()).resolves.toBeUndefined();
-
     const { IEXEC_OUT } = process.env;
-    const resultTxt = await fsPromises.readFile(
-      path.join(IEXEC_OUT, 'result.txt'),
-      'utf-8'
-    );
-    const computedJson = await fsPromises.readFile(
-      path.join(IEXEC_OUT, 'computed.json'),
-      'utf-8'
-    );
-
-    const result = JSON.parse(resultTxt);
-    expect(result.message).toBe('Failed to send Telegram message.');
-    expect(result.status).toBe(404);
-    expect(JSON.parse(computedJson)).toStrictEqual({
-      'deterministic-output-path': `${IEXEC_OUT}/result.txt`,
+    await start();
+    const { result, computed } = await readOutputs(IEXEC_OUT);
+    expect(result).toStrictEqual({
+      protectedData: 'data-chatId.zip',
+      success: false,
+      error:
+        'Failed to send Telegram message, bot API answered with status: 404',
+    });
+    expect(computed).toStrictEqual({
+      'deterministic-output-path': `${IEXEC_OUT}/result.json`,
     });
   });
 
@@ -173,22 +212,86 @@ describe('sendTelegram', () => {
     await expect(start()).resolves.toBeUndefined();
 
     const { IEXEC_OUT } = process.env;
-    const resultTxt = await fsPromises.readFile(
-      path.join(IEXEC_OUT, 'result.txt'),
-      'utf-8'
-    );
-    const computedJson = await fsPromises.readFile(
-      path.join(IEXEC_OUT, 'computed.json'),
-      'utf-8'
-    );
+    const { result, computed } = await readOutputs(IEXEC_OUT);
+    expect(result.success).toBe(true);
+    expect(result.error).toBeUndefined();
+    expect(computed).toStrictEqual({
+      'deterministic-output-path': `${IEXEC_OUT}/result.json`,
+    });
+  });
 
-    const result = JSON.parse(resultTxt);
-    expect(result.message).toBe(
-      'Your telegram message has been sent successfully.'
-    );
-    expect(result.status).toBe(200);
-    expect(JSON.parse(computedJson)).toStrictEqual({
-      'deterministic-output-path': `${IEXEC_OUT}/result.txt`,
+  describe('Bulk Processing', () => {
+    beforeEach(() => {
+      // Setup bulk processing environment
+      process.env.IEXEC_BULK_SLICE_SIZE = '2';
+      process.env.IEXEC_DATASET_1_FILENAME = 'data-chatId.zip';
+      process.env.IEXEC_DATASET_2_FILENAME = 'data-chatId.zip';
+    });
+
+    it('should process multiple datasets successfully', async () => {
+      await expect(start()).resolves.toBeUndefined();
+      const { IEXEC_OUT } = process.env;
+      const { computed, result } = await readOutputs(IEXEC_OUT);
+      // Check result.json (main output file)
+      expect(result).toStrictEqual({
+        success: true,
+        totalCount: 2,
+        successCount: 2,
+        errorCount: 0,
+        results: [
+          {
+            index: 1,
+            protectedData: 'data-chatId.zip',
+            success: true,
+          },
+          {
+            index: 2,
+            protectedData: 'data-chatId.zip',
+            success: true,
+          },
+        ],
+      });
+      // Check computed.json
+      expect(computed).toStrictEqual({
+        'deterministic-output-path': `${IEXEC_OUT}/result.json`,
+      });
+    });
+
+    it('should handle bulk processing with mixed results and output an error', async () => {
+      process.env.IEXEC_DATASET_1_FILENAME = 'data-chatId.zip'; // Valid dataset
+      process.env.IEXEC_DATASET_2_FILENAME = 'invalid-data.zip'; // Invalid dataset
+
+      await expect(start()).resolves.toBeUndefined();
+      const { IEXEC_OUT } = process.env;
+      const { computed, result } = await readOutputs(IEXEC_OUT);
+
+      // Check result.json (main output file)
+      expect(result).toStrictEqual({
+        error: 'Partial failure',
+        success: false,
+        totalCount: 2,
+        successCount: 1,
+        errorCount: 1,
+        results: [
+          {
+            index: 1,
+            protectedData: 'data-chatId.zip',
+            success: true,
+          },
+          {
+            index: 2,
+            protectedData: 'invalid-data.zip',
+            success: false,
+            error:
+              'Failed to parse ProtectedData 2: Failed to load protected data',
+          },
+        ],
+      });
+
+      // Check computed.json
+      expect(computed).toStrictEqual({
+        'deterministic-output-path': `${IEXEC_OUT}/result.json`,
+      });
     });
   });
 });

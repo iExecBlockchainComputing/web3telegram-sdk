@@ -1,0 +1,20 @@
+{
+  "success": false,
+  "error": "Partial failure",
+  "totalCount": 2,
+  "successCount": 1,
+  "errorCount": 1,
+  "results": [
+    {
+      "index": 1,
+      "protectedData": "data-chatId.zip",
+      "success": true
+    },
+    {
+      "index": 2,
+      "protectedData": "invalid-data.zip",
+      "success": false,
+      "error": "Failed to parse ProtectedData 2: Failed to load protected data"
+    }
+  ]
+}

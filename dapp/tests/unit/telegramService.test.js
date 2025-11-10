@@ -22,14 +22,12 @@ describe('sendTelegram', () => {
       json: jest.fn().mockResolvedValue({ ok: true, result: {} }),
     };
     global.fetch.mockResolvedValue(mockResponse);
-
     const response = await sendTelegram({
       chatId,
       message,
       botToken,
       senderName,
     });
-
     expect(global.fetch).toHaveBeenCalledWith(
       `https://api.telegram.org/bot${botToken}/sendMessage`,
       {
@@ -44,11 +42,7 @@ describe('sendTelegram', () => {
         }),
       }
     );
-
-    expect(response).toEqual({
-      message: 'Your telegram message has been sent successfully.',
-      status: 200,
-    });
+    expect(response).toBeUndefined();
   });
 
   it('handles errors when sending a Telegram message', async () => {
@@ -62,51 +56,30 @@ describe('sendTelegram', () => {
     };
     global.fetch.mockResolvedValue(mockResponse);
 
-    const response = await sendTelegram({
-      chatId,
-      message,
-      botToken,
-      senderName,
-    });
-
-    expect(response).toEqual({
-      message: 'Failed to send Telegram message.',
-      status: 400,
-    });
+    await expect(
+      sendTelegram({
+        chatId,
+        message,
+        botToken,
+        senderName,
+      })
+    ).rejects.toThrow(
+      Error(
+        'Failed to send Telegram message, bot API answered with status: 400'
+      )
+    );
   });
 
   it('handles network errors', async () => {
     global.fetch.mockRejectedValue(new Error('Network error'));
-
-    const response = await sendTelegram({
-      chatId,
-      message,
-      botToken,
-      senderName,
-    });
-
-    expect(response).toEqual({
-      message: 'Failed to send Telegram message.',
-      status: 500,
-    });
-  });
-
-  it('throws an error when chatId is missing', async () => {
     await expect(
-      sendTelegram({ chatId: undefined, message, botToken, senderName })
-    ).rejects.toThrowError('Chat ID is required');
-  });
-
-  it('throws an error when message is missing', async () => {
-    await expect(
-      sendTelegram({ chatId, message: undefined, botToken, senderName })
-    ).rejects.toThrowError('Message content is required');
-  });
-
-  it('throws an error when botToken is missing', async () => {
-    await expect(
-      sendTelegram({ chatId, message, botToken: undefined, senderName })
-    ).rejects.toThrowError('Bot token is required');
+      sendTelegram({
+        chatId,
+        message,
+        botToken,
+        senderName,
+      })
+    ).rejects.toThrow('Failed to reach Telegram bot API');
   });
 
   it('should not throw an error when sender name is undefined', async () => {
