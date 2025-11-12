@@ -174,12 +174,10 @@ describe('web3telegram.sendTelegram()', () => {
             protectedData: validProtectedData.address,
             workerpoolMaxPrice: prodWorkerpoolPublicPrice,
           });
-          expect('taskId' in sendTelegramResponse).toBe(true);
-          expect(
-            'taskId' in sendTelegramResponse
-              ? sendTelegramResponse.taskId
-              : undefined
-          ).toBeDefined();
+          expect(sendTelegramResponse).toStrictEqual({
+            dealId: expect.any(String),
+            taskId: expect.any(String),
+          });
         },
         2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
       );
@@ -290,12 +288,10 @@ describe('web3telegram.sendTelegram()', () => {
         protectedData: validProtectedData.address,
         workerpoolAddressOrEns: learnProdWorkerpoolAddress,
       });
-      expect('taskId' in sendTelegramResponse).toBe(true);
-      expect(
-        'taskId' in sendTelegramResponse
-          ? sendTelegramResponse.taskId
-          : undefined
-      ).toBeDefined();
+      expect(sendTelegramResponse).toStrictEqual({
+        dealId: expect.any(String),
+        taskId: expect.any(String),
+      });
     },
     2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
   );
@@ -323,11 +319,10 @@ describe('web3telegram.sendTelegram()', () => {
         workerpoolAddressOrEns: learnProdWorkerpoolAddress,
       });
       expect('taskId' in sendTelegramResponse).toBe(true);
-      expect(
-        'taskId' in sendTelegramResponse
-          ? sendTelegramResponse.taskId
-          : undefined
-      ).toBeDefined();
+      expect(sendTelegramResponse).toStrictEqual({
+        dealId: expect.any(String),
+        taskId: expect.any(String),
+      });
     },
     2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
   );
@@ -344,11 +339,10 @@ describe('web3telegram.sendTelegram()', () => {
         workerpoolAddressOrEns: learnProdWorkerpoolAddress,
       });
       expect('taskId' in sendTelegramResponse).toBe(true);
-      expect(
-        'taskId' in sendTelegramResponse
-          ? sendTelegramResponse.taskId
-          : undefined
-      ).toBeDefined();
+      expect(sendTelegramResponse).toStrictEqual({
+        dealId: expect.any(String),
+        taskId: expect.any(String),
+      });
     },
     2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
   );
@@ -365,11 +359,10 @@ describe('web3telegram.sendTelegram()', () => {
       });
       expect(sendTelegramResponse).toBeDefined();
       expect('taskId' in sendTelegramResponse).toBe(true);
-      expect(
-        'taskId' in sendTelegramResponse
-          ? sendTelegramResponse.taskId
-          : undefined
-      ).toBeDefined();
+      expect(sendTelegramResponse).toStrictEqual({
+        dealId: expect.any(String),
+        taskId: expect.any(String),
+      });
     },
     2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
   );
@@ -387,12 +380,10 @@ describe('web3telegram.sendTelegram()', () => {
         senderName: 'Product Team',
         workerpoolAddressOrEns: learnProdWorkerpoolAddress,
       });
-      expect('taskId' in sendTelegramResponse).toBe(true);
-      expect(
-        'taskId' in sendTelegramResponse
-          ? sendTelegramResponse.taskId
-          : undefined
-      ).toBeDefined();
+      expect(sendTelegramResponse).toStrictEqual({
+        dealId: expect.any(String),
+        taskId: expect.any(String),
+      });
     },
     2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
   );
@@ -406,12 +397,10 @@ describe('web3telegram.sendTelegram()', () => {
         workerpoolAddressOrEns: learnProdWorkerpoolAddress,
         label: 'ID1234678',
       });
-      expect('taskId' in sendTelegramResponse).toBe(true);
-      expect(
-        'taskId' in sendTelegramResponse
-          ? sendTelegramResponse.taskId
-          : undefined
-      ).toBeDefined();
+      expect(sendTelegramResponse).toStrictEqual({
+        dealId: expect.any(String),
+        taskId: expect.any(String),
+      });
       // TODO check label in created deal
     },
     2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
@@ -500,12 +489,10 @@ describe('web3telegram.sendTelegram()', () => {
             // workerpoolAddressOrEns: prodWorkerpoolAddress, // default
             useVoucher: true,
           });
-          expect('taskId' in sendTelegramResponse).toBe(true);
-          expect(
-            'taskId' in sendTelegramResponse
-              ? sendTelegramResponse.taskId
-              : undefined
-          ).toBeDefined();
+          expect(sendTelegramResponse).toStrictEqual({
+            dealId: expect.any(String),
+            taskId: expect.any(String),
+          });
         },
         2 * MAX_EXPECTED_BLOCKTIME +
           MAX_EXPECTED_WEB2_SERVICES_TIME +
@@ -561,12 +548,10 @@ describe('web3telegram.sendTelegram()', () => {
               workerpoolMaxPrice: nonSponsoredAmount,
               useVoucher: true,
             });
-            expect('taskId' in sendTelegramResponse).toBe(true);
-            expect(
-              'taskId' in sendTelegramResponse
-                ? sendTelegramResponse.taskId
-                : undefined
-            ).toBeDefined();
+            expect(sendTelegramResponse).toStrictEqual({
+              dealId: expect.any(String),
+              taskId: expect.any(String),
+            });
           },
           2 * MAX_EXPECTED_BLOCKTIME +
             MAX_EXPECTED_WEB2_SERVICES_TIME +

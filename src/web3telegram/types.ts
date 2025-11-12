@@ -65,6 +65,7 @@ export type SendTelegramParams = {
 
 export type SendTelegramResponse = {
   taskId: string;
+  dealId: string;
 };
 
 export type PrepareTelegramCampaignParams = {
