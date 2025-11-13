@@ -149,7 +149,7 @@ describe('web3telegram.sendTelegramCampaign() - Bulk Processing', () => {
         try {
           const prepareResult = await web3telegram.prepareTelegramCampaign({
             telegramContent: 'Bulk test message',
-            grantedAccess: bulkOrders,
+            grantedAccesses: bulkOrders,
             maxProtectedDataPerTask: 3,
             appMaxPrice: 1000,
             workerpoolMaxPrice: 1000,
@@ -224,7 +224,7 @@ describe('web3telegram.sendTelegramCampaign() - Bulk Processing', () => {
         try {
           const prepareResult = await web3telegram.prepareTelegramCampaign({
             telegramContent: 'Single contact bulk test message',
-            grantedAccess: bulkOrders,
+            grantedAccesses: bulkOrders,
             maxProtectedDataPerTask: 1,
             appMaxPrice: 1000,
             workerpoolMaxPrice: 1000,
@@ -294,7 +294,7 @@ describe('web3telegram.sendTelegramCampaign() - Bulk Processing', () => {
         try {
           const prepareResult = await web3telegram.prepareTelegramCampaign({
             telegramContent: 'Max protected data per task test',
-            grantedAccess: bulkOrders,
+            grantedAccesses: bulkOrders,
             maxProtectedDataPerTask: 1, // Force one protected data per task
             appMaxPrice: 1000,
             workerpoolMaxPrice: 1000,
@@ -362,7 +362,7 @@ describe('web3telegram.sendTelegramCampaign() - Bulk Processing', () => {
         try {
           const prepareResult = await web3telegram.prepareTelegramCampaign({
             telegramContent: 'Custom parameters test message',
-            grantedAccess: bulkOrders,
+            grantedAccesses: bulkOrders,
             maxProtectedDataPerTask: 3,
             appMaxPrice: 1000,
             workerpoolMaxPrice: 1000,
@@ -423,7 +423,7 @@ describe('web3telegram.sendTelegramCampaign() - Bulk Processing', () => {
         try {
           const prepareResult = await web3telegram.prepareTelegramCampaign({
             telegramContent: 'Workerpool mismatch test',
-            grantedAccess: bulkOrders,
+            grantedAccesses: bulkOrders,
             maxProtectedDataPerTask: 3,
             appMaxPrice: 1000,
             workerpoolMaxPrice: 1000,

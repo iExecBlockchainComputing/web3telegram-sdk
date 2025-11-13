@@ -90,7 +90,7 @@ export type PrepareTelegramCampaignParams = {
    *
    * use `fetchMyContacts({ bulkOnly: true })` to get granted accesses.
    */
-  grantedAccess: GrantedAccess[];
+  grantedAccesses: GrantedAccess[];
   maxProtectedDataPerTask?: number;
   senderName?: string;
   telegramContent: string;

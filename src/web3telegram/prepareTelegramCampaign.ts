@@ -39,7 +39,7 @@ export const prepareTelegramCampaign = async ({
   label,
   appMaxPrice = MAX_DESIRED_APP_ORDER_PRICE,
   workerpoolMaxPrice = MAX_DESIRED_WORKERPOOL_ORDER_PRICE,
-  grantedAccess,
+  grantedAccesses,
   maxProtectedDataPerTask,
 }: IExecConsumer &
   DappAddressConsumer &
@@ -122,7 +122,7 @@ export const prepareTelegramCampaign = async ({
         args: vLabel,
         inputFiles: [],
         secrets,
-        bulkAccesses: grantedAccess,
+        bulkAccesses: grantedAccesses,
         maxProtectedDataPerTask: vMaxProtectedDataPerTask,
       });
     return { campaignRequest };
