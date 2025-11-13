@@ -91,7 +91,9 @@ describe('web3telegram.prepareTelegramCampaign()', () => {
     'should prepare a telegram campaignRequest',
     async () => {
       // Fetch contacts with allowBulk access
-      const contacts: Contact[] = await web3telegram.fetchMyContacts();
+      const contacts: Contact[] = await web3telegram.fetchMyContacts({
+        bulkOnly: true,
+      });
       expect(contacts.length).toBeGreaterThanOrEqual(3);
 
       const bulkOrders = contacts.map((contact) => contact.grantedAccess);

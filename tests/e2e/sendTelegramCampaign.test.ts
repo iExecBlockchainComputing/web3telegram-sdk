@@ -130,7 +130,9 @@ describe('web3telegram.sendTelegramCampaign() - Bulk Processing', () => {
       'should successfully process bulk request',
       async () => {
         // Fetch contacts with allowBulk access
-        const contacts: Contact[] = await web3telegram.fetchMyContacts();
+        const contacts: Contact[] = await web3telegram.fetchMyContacts({
+          bulkOnly: true,
+        });
         expect(contacts.length).toBeGreaterThanOrEqual(3);
 
         // Ensure consumer has sufficient stake
@@ -178,7 +180,9 @@ describe('web3telegram.sendTelegramCampaign() - Bulk Processing', () => {
       'should successfully process bulk request with single contact',
       async () => {
         // Fetch contacts with allowBulk access
-        const contacts: Contact[] = await web3telegram.fetchMyContacts();
+        const contacts: Contact[] = await web3telegram.fetchMyContacts({
+          bulkOnly: true,
+        });
         expect(contacts.length).toBeGreaterThanOrEqual(1);
 
         // Ensure consumer has sufficient stake
@@ -222,7 +226,9 @@ describe('web3telegram.sendTelegramCampaign() - Bulk Processing', () => {
       'should handle maxProtectedDataPerTask parameter correctly',
       async () => {
         // Fetch contacts with allowBulk access
-        const contacts: Contact[] = await web3telegram.fetchMyContacts();
+        const contacts: Contact[] = await web3telegram.fetchMyContacts({
+          bulkOnly: true,
+        });
         expect(contacts.length).toBeGreaterThanOrEqual(3);
 
         // Ensure consumer has sufficient stake
@@ -270,7 +276,9 @@ describe('web3telegram.sendTelegramCampaign() - Bulk Processing', () => {
       'should handle custom senderName and label parameters',
       async () => {
         // Fetch contacts with allowBulk access
-        const contacts: Contact[] = await web3telegram.fetchMyContacts();
+        const contacts: Contact[] = await web3telegram.fetchMyContacts({
+          bulkOnly: true,
+        });
         expect(contacts.length).toBeGreaterThanOrEqual(1);
 
         // Ensure consumer has sufficient stake
@@ -314,7 +322,9 @@ describe('web3telegram.sendTelegramCampaign() - Bulk Processing', () => {
       'should throw error when workerpoolAddressOrEns does not match campaignRequest.workerpool',
       async () => {
         // Fetch contacts with allowBulk access
-        const contacts: Contact[] = await web3telegram.fetchMyContacts();
+        const contacts: Contact[] = await web3telegram.fetchMyContacts({
+          bulkOnly: true,
+        });
         expect(contacts.length).toBeGreaterThanOrEqual(1);
 
         const bulkOrders = contacts.map((contact) => contact.grantedAccess);
