@@ -41,7 +41,9 @@ export const sendTelegramCampaign = async ({
       vCampaignRequest.workerpool.toLowerCase() !==
         vWorkerpoolAddressOrEns.toLowerCase()
     ) {
-      throw new ValidationError('Workerpool mismatch');
+      throw new ValidationError(
+        "workerpoolAddressOrEns doesn't match campaignRequest workerpool"
+      );
     }
 
     // Process bulk request

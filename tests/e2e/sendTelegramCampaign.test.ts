@@ -342,7 +342,8 @@ describe('web3telegram.sendTelegramCampaign() - Bulk Processing', () => {
           message: 'Failed to sendTelegramCampaign',
           cause: expect.objectContaining({
             name: 'ValidationError',
-            message: 'Workerpool mismatch',
+            message:
+              "workerpoolAddressOrEns doesn't match campaignRequest workerpool",
           }),
         });
       },
