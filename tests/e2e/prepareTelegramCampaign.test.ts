@@ -101,7 +101,7 @@ describe('web3telegram.prepareTelegramCampaign()', () => {
         telegramContent: 'Bulk test message',
         senderName: 'Bulk test sender',
         // protectedData is optional when grantedAccess is provided
-        grantedAccess: bulkOrders,
+        grantedAccesses: bulkOrders,
         maxProtectedDataPerTask: 3,
         workerpoolMaxPrice: prodWorkerpoolPublicPrice,
       });

@@ -141,44 +141,16 @@ describe('web3telegram.sendTelegramCampaign() - Bulk Processing', () => {
 
         const bulkOrders = contacts.map((contact) => contact.grantedAccess);
 
-        // Prepare the telegram campaign using prepareTelegramCampaign
-        // Note: This may fail on networks that don't support bulk processing (e.g., bellecour)
-        // We expect this error and handle it gracefully
-        let bulkProcessingAvailable = true;
-        let campaignRequest;
-        try {
-          const prepareResult = await web3telegram.prepareTelegramCampaign({
-            telegramContent: 'Bulk test message',
-            grantedAccess: bulkOrders,
-            maxProtectedDataPerTask: 3,
-            appMaxPrice: 1000,
-            workerpoolMaxPrice: 1000,
-            workerpoolAddressOrEns: TEST_CHAIN.prodWorkerpool,
-            senderName: 'Bulk Test Sender',
-          });
-          campaignRequest = prepareResult.campaignRequest;
-        } catch (error: unknown) {
-          // Expect error if bulk processing is not available on this network
-          // The error message is "Failed to prepareTelegramCampaign" but the cause contains the actual reason
-          const errorMessage = error instanceof Error ? error.message : '';
-          const errorCause =
-            error instanceof Error && error.cause
-              ? error.cause instanceof Error
-                ? error.cause.message
-                : String(error.cause)
-              : '';
-          const fullError = `${errorMessage} ${errorCause}`;
-          if (fullError.includes('Bulk processing is not available')) {
-            bulkProcessingAvailable = false;
-          } else {
-            throw error;
-          }
-        }
-
-        // Skip the rest of the test if bulk processing is not supported
-        if (!bulkProcessingAvailable) {
-          return;
-        }
+        const prepareResult = await web3telegram.prepareTelegramCampaign({
+          telegramContent: 'Bulk test message',
+          grantedAccesses: bulkOrders,
+          maxProtectedDataPerTask: 3,
+          appMaxPrice: 1000,
+          workerpoolMaxPrice: 1000,
+          workerpoolAddressOrEns: TEST_CHAIN.prodWorkerpool,
+          senderName: 'Bulk Test Sender',
+        });
+        const campaignRequest = prepareResult.campaignRequest;
 
         // Process the bulk request using sendTelegramCampaign
         // Use the workerpool from campaignRequest (already resolved to address)
@@ -218,39 +190,16 @@ describe('web3telegram.sendTelegramCampaign() - Bulk Processing', () => {
         // Use only the first contact
         const bulkOrders = [contacts[0].grantedAccess];
 
-        // Prepare the telegram campaign using prepareTelegramCampaign
-        let bulkProcessingAvailable = true;
-        let campaignRequest;
-        try {
-          const prepareResult = await web3telegram.prepareTelegramCampaign({
-            telegramContent: 'Single contact bulk test message',
-            grantedAccess: bulkOrders,
-            maxProtectedDataPerTask: 1,
-            appMaxPrice: 1000,
-            workerpoolMaxPrice: 1000,
-            workerpoolAddressOrEns: TEST_CHAIN.prodWorkerpool,
-            senderName: 'Single Contact Test',
-          });
-          campaignRequest = prepareResult.campaignRequest;
-        } catch (error: unknown) {
-          const errorMessage = error instanceof Error ? error.message : '';
-          const errorCause =
-            error instanceof Error && error.cause
-              ? error.cause instanceof Error
-                ? error.cause.message
-                : String(error.cause)
-              : '';
-          const fullError = `${errorMessage} ${errorCause}`;
-          if (fullError.includes('Bulk processing is not available')) {
-            bulkProcessingAvailable = false;
-          } else {
-            throw error;
-          }
-        }
-
-        if (!bulkProcessingAvailable) {
-          return;
-        }
+        const prepareResult = await web3telegram.prepareTelegramCampaign({
+          telegramContent: 'Single contact bulk test message',
+          grantedAccesses: bulkOrders,
+          maxProtectedDataPerTask: 1,
+          appMaxPrice: 1000,
+          workerpoolMaxPrice: 1000,
+          workerpoolAddressOrEns: TEST_CHAIN.prodWorkerpool,
+          senderName: 'Single Contact Test',
+        });
+        const campaignRequest = prepareResult.campaignRequest;
 
         // Process the bulk request using sendTelegramCampaign
         // Use the workerpool from campaignRequest (already resolved to address)
@@ -287,41 +236,17 @@ describe('web3telegram.sendTelegramCampaign() - Bulk Processing', () => {
 
         const bulkOrders = contacts.map((contact) => contact.grantedAccess);
 
-        // Prepare the telegram campaign with maxProtectedDataPerTask = 1
-        // This should create multiple tasks if we have more than 1 contact
-        let bulkProcessingAvailable = true;
-        let campaignRequest;
-        try {
-          const prepareResult = await web3telegram.prepareTelegramCampaign({
-            telegramContent: 'Max protected data per task test',
-            grantedAccess: bulkOrders,
-            maxProtectedDataPerTask: 1, // Force one protected data per task
-            appMaxPrice: 1000,
-            workerpoolMaxPrice: 1000,
-            workerpoolAddressOrEns: TEST_CHAIN.prodWorkerpool,
-            senderName: 'Max Data Test',
-            label: 'MAXDATA',
-          });
-          campaignRequest = prepareResult.campaignRequest;
-        } catch (error: unknown) {
-          const errorMessage = error instanceof Error ? error.message : '';
-          const errorCause =
-            error instanceof Error && error.cause
-              ? error.cause instanceof Error
-                ? error.cause.message
-                : String(error.cause)
-              : '';
-          const fullError = `${errorMessage} ${errorCause}`;
-          if (fullError.includes('Bulk processing is not available')) {
-            bulkProcessingAvailable = false;
-          } else {
-            throw error;
-          }
-        }
-
-        if (!bulkProcessingAvailable) {
-          return;
-        }
+        const prepareResult = await web3telegram.prepareTelegramCampaign({
+          telegramContent: 'Max protected data per task test',
+          grantedAccesses: bulkOrders,
+          maxProtectedDataPerTask: 1, // Force one protected data per task
+          appMaxPrice: 1000,
+          workerpoolMaxPrice: 1000,
+          workerpoolAddressOrEns: TEST_CHAIN.prodWorkerpool,
+          senderName: 'Max Data Test',
+          label: 'MAXDATA',
+        });
+        const campaignRequest = prepareResult.campaignRequest;
 
         // Process the bulk request using sendTelegramCampaign
         // Use the workerpool from campaignRequest (already resolved to address)
@@ -356,40 +281,17 @@ describe('web3telegram.sendTelegramCampaign() - Bulk Processing', () => {
 
         const bulkOrders = contacts.map((contact) => contact.grantedAccess);
 
-        // Prepare the telegram campaign with custom parameters
-        let bulkProcessingAvailable = true;
-        let campaignRequest;
-        try {
-          const prepareResult = await web3telegram.prepareTelegramCampaign({
-            telegramContent: 'Custom parameters test message',
-            grantedAccess: bulkOrders,
-            maxProtectedDataPerTask: 3,
-            appMaxPrice: 1000,
-            workerpoolMaxPrice: 1000,
-            workerpoolAddressOrEns: TEST_CHAIN.prodWorkerpool,
-            senderName: 'CustomSender',
-            label: 'CUSTOM123',
-          });
-          campaignRequest = prepareResult.campaignRequest;
-        } catch (error: unknown) {
-          const errorMessage = error instanceof Error ? error.message : '';
-          const errorCause =
-            error instanceof Error && error.cause
-              ? error.cause instanceof Error
-                ? error.cause.message
-                : String(error.cause)
-              : '';
-          const fullError = `${errorMessage} ${errorCause}`;
-          if (fullError.includes('Bulk processing is not available')) {
-            bulkProcessingAvailable = false;
-          } else {
-            throw error;
-          }
-        }
-
-        if (!bulkProcessingAvailable) {
-          return;
-        }
+        const prepareResult = await web3telegram.prepareTelegramCampaign({
+          telegramContent: 'Custom parameters test message',
+          grantedAccesses: bulkOrders,
+          maxProtectedDataPerTask: 3,
+          appMaxPrice: 1000,
+          workerpoolMaxPrice: 1000,
+          workerpoolAddressOrEns: TEST_CHAIN.prodWorkerpool,
+          senderName: 'CustomSender',
+          label: 'CUSTOM123',
+        });
+        const campaignRequest = prepareResult.campaignRequest;
 
         // Process the bulk request using sendTelegramCampaign
         // Use the workerpool from campaignRequest (already resolved to address)
@@ -417,39 +319,16 @@ describe('web3telegram.sendTelegramCampaign() - Bulk Processing', () => {
 
         const bulkOrders = contacts.map((contact) => contact.grantedAccess);
 
-        // Prepare the telegram campaign
-        let bulkProcessingAvailable = true;
-        let campaignRequest;
-        try {
-          const prepareResult = await web3telegram.prepareTelegramCampaign({
-            telegramContent: 'Workerpool mismatch test',
-            grantedAccess: bulkOrders,
-            maxProtectedDataPerTask: 3,
-            appMaxPrice: 1000,
-            workerpoolMaxPrice: 1000,
-            workerpoolAddressOrEns: TEST_CHAIN.prodWorkerpool,
-            senderName: 'Mismatch Test',
-          });
-          campaignRequest = prepareResult.campaignRequest;
-        } catch (error: unknown) {
-          const errorMessage = error instanceof Error ? error.message : '';
-          const errorCause =
-            error instanceof Error && error.cause
-              ? error.cause instanceof Error
-                ? error.cause.message
-                : String(error.cause)
-              : '';
-          const fullError = `${errorMessage} ${errorCause}`;
-          if (fullError.includes('Bulk processing is not available')) {
-            bulkProcessingAvailable = false;
-          } else {
-            throw error;
-          }
-        }
-
-        if (!bulkProcessingAvailable) {
-          return;
-        }
+        const prepareResult = await web3telegram.prepareTelegramCampaign({
+          telegramContent: 'Workerpool mismatch test',
+          grantedAccesses: bulkOrders,
+          maxProtectedDataPerTask: 3,
+          appMaxPrice: 1000,
+          workerpoolMaxPrice: 1000,
+          workerpoolAddressOrEns: TEST_CHAIN.prodWorkerpool,
+          senderName: 'Mismatch Test',
+        });
+        const campaignRequest = prepareResult.campaignRequest;
 
         // Try to send with a different workerpool (should fail)
         const differentWorkerpool =
@@ -463,7 +342,8 @@ describe('web3telegram.sendTelegramCampaign() - Bulk Processing', () => {
           message: 'Failed to sendTelegramCampaign',
           cause: expect.objectContaining({
             name: 'ValidationError',
-            message: 'Workerpool mismatch',
+            message:
+              "workerpoolAddressOrEns doesn't match campaignRequest workerpool",
           }),
         });
       },

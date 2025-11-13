@@ -7,12 +7,12 @@ import {
 } from '../utils/validators.js';
 import { DataProtectorConsumer } from './internalTypes.js';
 import {
-  BulkRequest,
   ProcessBulkRequestParams,
   ProcessBulkRequestResponse,
 } from '@iexec/dataprotector';
 import { ValidationError } from 'yup';
 import {
+  CampaignRequest,
   SendTelegramCampaignParams,
   SendTelegramCampaignResponse,
 } from './types.js';
@@ -29,7 +29,7 @@ export const sendTelegramCampaign = async ({
     const vCampaignRequest = campaignRequestSchema()
       .required()
       .label('campaignRequest')
-      .validateSync(campaignRequest) as BulkRequest;
+      .validateSync(campaignRequest) as CampaignRequest;
 
     const vWorkerpoolAddressOrEns = addressOrEnsSchema()
       .required()
@@ -41,13 +41,15 @@ export const sendTelegramCampaign = async ({
       vCampaignRequest.workerpool.toLowerCase() !==
         vWorkerpoolAddressOrEns.toLowerCase()
     ) {
-      throw new ValidationError('Workerpool mismatch');
+      throw new ValidationError(
+        "workerpoolAddressOrEns doesn't match campaignRequest workerpool"
+      );
     }
 
     // Process bulk request
     const processBulkRequestResponse: ProcessBulkRequestResponse<ProcessBulkRequestParams> =
       await dataProtector.processBulkRequest({
-        bulkRequest: vCampaignRequest as BulkRequest,
+        bulkRequest: vCampaignRequest,
         workerpool: vWorkerpoolAddressOrEns,
       });
 
