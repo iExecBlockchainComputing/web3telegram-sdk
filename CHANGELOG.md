@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.0-alpha.7](https://github.com/iExecBlockchainComputing/web3telegram-sdk/compare/web3telegram-v0.1.0-alpha.6...web3telegram-v0.1.0-alpha.7) (2025-11-13)
+
+
+### Changed
+
+* add dealId to sendTelegram response to allow tracking uninitialized tasks by dealId ([#87](https://github.com/iExecBlockchainComputing/web3telegram-sdk/issues/87)) ([46c1a19](https://github.com/iExecBlockchainComputing/web3telegram-sdk/commit/46c1a19e6b22e26705cab625f17e3d82946c08ce))
+* improve campaign methods interfaces ([#89](https://github.com/iExecBlockchainComputing/web3telegram-sdk/issues/89)) ([c62d51d](https://github.com/iExecBlockchainComputing/web3telegram-sdk/commit/c62d51d53aaeacb5edb79d59e97aa1aa54f429ea))
+
 ## [0.1.0-alpha.6](https://github.com/iExecBlockchainComputing/web3telegram-sdk/compare/web3telegram-v0.1.0-alpha.5...web3telegram-v0.1.0-alpha.6) (2025-11-10)
 
 
