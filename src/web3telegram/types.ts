@@ -12,6 +12,22 @@ export type Address = string;
 
 export type TimeStamp = string;
 
+/**
+ * request to send email in bulk
+ *
+ * use `prepareEmailCampaign()` to create a `CampaignRequest`
+ *
+ * then use `sendEmailCampaign()` to send the campaign
+ */
+export type CampaignRequest = BulkRequest;
+
+/**
+ * authorization signed by the data owner granting access to this contact
+ *
+ * `GrantedAccess` are obtained by fetching contacts (e.g. `fetchMyContacts()` or `fetchUserContacts()`)
+ *
+ * `GrantedAccess` can be consumed for email campaigns (e.g. `prepareEmailCampaign()` then `sendEmailCampaign()`)
+ */
 export type GrantedAccess = {
   dataset: string;
   datasetprice: string;
@@ -70,9 +86,9 @@ export type SendTelegramResponse = {
 
 export type PrepareTelegramCampaignParams = {
   /**
-   * Granted access to process in bulk.
+   * List of `GrantedAccess` to contacts to send telegrams to in bulk.
+   *
    * use `fetchMyContacts({ bulkOnly: true })` to get granted accesses.
-   * if not provided, the single message will be processed.
    */
   grantedAccess: GrantedAccess[];
   maxProtectedDataPerTask?: number;
@@ -86,11 +102,22 @@ export type PrepareTelegramCampaignParams = {
 };
 
 export type PrepareTelegramCampaignResponse = {
-  campaignRequest: BulkRequest;
+  /**
+   * The prepared campaign request
+   *
+   * Use this in `sendTelegramCampaign()` to start or continue sending the campaign
+   */
+  campaignRequest: CampaignRequest;
 };
 
 export type SendTelegramCampaignParams = {
-  campaignRequest: BulkRequest;
+  /**
+   * The prepared campaign request from prepareTelegramCampaign
+   */
+  campaignRequest: CampaignRequest;
+  /**
+   * Workerpool address or ENS to use for processing
+   */
   workerpoolAddressOrEns?: string;
 };
 
