@@ -1,0 +1,55 @@
+name: 04-add-resource-whitelist.yml
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        type: choice
+        options:
+          # dev environments
+          - bellecour-dev
+          - arbitrum-sepolia-dev
+          # prod environments
+          - bellecour-prod
+          - arbitrum-sepolia-prod
+          - arbitrum-prod
+      app_address:
+        description: 'App contract address'
+        required: true
+        type: string
+      whitelist_contract_address:
+        description: 'Whitelist contract address (optional, uses environment variable by default)'
+        required: false
+        type: string
+
+jobs:
+  add-to-whitelist:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.19.0'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          cd node_modules/whitelist-smart-contract
+          npm install --save-dev ts-node
+
+      - name: Add resource to whitelist
+        env:
+          CONTRACT_ADDRESS: ${{ inputs.whitelist_contract_address || vars.WEB3TELEGRAM_WHITELIST_CONTRACT_ADDRESS }}
+          PRIVATE_KEY: ${{ secrets.WEB3TELEGRAM_APP_OWNER_PRIVATEKEY }}
+          WHITELIST_NETWORK_NAME: ${{ vars.WHITELIST_NETWORK_NAME }}
+        run: |
+          cd node_modules/whitelist-smart-contract
+          export ADDRESS_TO_ADD=${{ inputs.app_address }}
+          npm run addResourceToWhitelist -- --network $WHITELIST_NETWORK_NAME
