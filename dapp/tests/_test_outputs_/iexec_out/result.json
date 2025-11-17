@@ -1,9 +1,8 @@
 {
-  "success": false,
-  "error": "Partial failure",
-  "totalCount": 2,
-  "successCount": 1,
-  "errorCount": 1,
+  "success": true,
+  "totalCount": 10,
+  "successCount": 10,
+  "errorCount": 0,
   "results": [
     {
       "index": 1,
@@ -12,9 +11,48 @@
     },
     {
       "index": 2,
-      "protectedData": "invalid-data.zip",
-      "success": false,
-      "error": "Failed to parse ProtectedData 2: Failed to load protected data"
+      "protectedData": "data-chatId.zip",
+      "success": true
+    },
+    {
+      "index": 3,
+      "protectedData": "data-chatId.zip",
+      "success": true
+    },
+    {
+      "index": 4,
+      "protectedData": "data-chatId.zip",
+      "success": true
+    },
+    {
+      "index": 5,
+      "protectedData": "data-chatId.zip",
+      "success": true
+    },
+    {
+      "index": 6,
+      "protectedData": "data-chatId.zip",
+      "success": true
+    },
+    {
+      "index": 7,
+      "protectedData": "data-chatId.zip",
+      "success": true
+    },
+    {
+      "index": 8,
+      "protectedData": "data-chatId.zip",
+      "success": true
+    },
+    {
+      "index": 9,
+      "protectedData": "data-chatId.zip",
+      "success": true
+    },
+    {
+      "index": 10,
+      "protectedData": "data-chatId.zip",
+      "success": true
     }
   ]
 }
