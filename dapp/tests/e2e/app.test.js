@@ -206,7 +206,7 @@ describe('sendTelegram', () => {
     expect(computed).toStrictEqual({
       'deterministic-output-path': `${IEXEC_OUT}/result.json`,
     });
-  });
+  }, 10000);
 
   it('should send a telegram message successfully', async () => {
     await expect(start()).resolves.toBeUndefined();
@@ -218,6 +218,36 @@ describe('sendTelegram', () => {
     expect(computed).toStrictEqual({
       'deterministic-output-path': `${IEXEC_OUT}/result.json`,
     });
+  });
+
+  describe('Rate Limiting', () => {
+    it('should handle multiple messages with 1 second delay between calls', async () => {
+      // Setup bulk processing with 5 messages to test rate limiting
+      process.env.IEXEC_BULK_SLICE_SIZE = '5';
+      // eslint-disable-next-line no-plusplus
+      for (let i = 1; i <= 5; i += 1) {
+        process.env[`IEXEC_DATASET_${i}_FILENAME`] = 'data-chatId.zip';
+      }
+
+      await expect(start()).resolves.toBeUndefined();
+
+      const { IEXEC_OUT } = process.env;
+      const { result, computed } = await readOutputs(IEXEC_OUT);
+
+      expect(result.success).toBe(true);
+      expect(result.totalCount).toBe(5);
+      expect(result.successCount).toBe(5);
+      expect(result.errorCount).toBe(0);
+
+      // Verify all messages were sent successfully
+      result.results.forEach((r) => {
+        expect(r.success).toBe(true);
+      });
+
+      expect(computed).toStrictEqual({
+        'deterministic-output-path': `${IEXEC_OUT}/result.json`,
+      });
+    }, 30000); // 30 seconds timeout for 5 messages with delays
   });
 
   describe('Bulk Processing', () => {
@@ -293,5 +323,39 @@ describe('sendTelegram', () => {
         'deterministic-output-path': `${IEXEC_OUT}/result.json`,
       });
     });
+  });
+
+  describe('Retry mechanism with rate limiting', () => {
+    it('should successfully send 10 Telegram messages with 1 second delay and handle retries', async () => {
+      // Setup bulk processing with 10 protected data to test rate limiting and retries
+      process.env.IEXEC_BULK_SLICE_SIZE = '10';
+
+      // eslint-disable-next-line no-plusplus
+      for (let i = 1; i <= 10; i += 1) {
+        process.env[`IEXEC_DATASET_${i}_FILENAME`] = 'data-chatId.zip';
+      }
+
+      await expect(start()).resolves.toBeUndefined();
+
+      const { IEXEC_OUT } = process.env;
+      const { result, computed } = await readOutputs(IEXEC_OUT);
+
+      expect(result.success).toBe(true);
+      expect(result.totalCount).toBe(10);
+      expect(result.successCount).toBe(10);
+      expect(result.errorCount).toBe(0);
+      expect(result.results).toHaveLength(10);
+
+      // Verify all messages were sent successfully
+      result.results.forEach((r, index) => {
+        expect(r.success).toBe(true);
+        expect(r.index).toBe(index + 1);
+        expect(r.protectedData).toBe('data-chatId.zip');
+      });
+
+      expect(computed).toStrictEqual({
+        'deterministic-output-path': `${IEXEC_OUT}/result.json`,
+      });
+    }, 60000); // 60 seconds timeout for 10 messages with delays and potential retries
   });
 });
