@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-alpha.4](https://github.com/iExecBlockchainComputing/web3telegram-sdk/compare/dapp-v1.0.0-alpha.3...dapp-v1.0.0-alpha.4) (2025-11-17)
+
+
+### Changed
+
+* **dapp:** implement rate limiting to prevent 429 errors ([#90](https://github.com/iExecBlockchainComputing/web3telegram-sdk/issues/90)) ([ae57ff1](https://github.com/iExecBlockchainComputing/web3telegram-sdk/commit/ae57ff1a53d978ddc315392c409c50fc07fdc450))
+
 ## [1.0.0-alpha.3](https://github.com/iExecBlockchainComputing/web3telegram-sdk/compare/dapp-v0.1.0-alpha.3...dapp-v1.0.0-alpha.3) (2025-11-10)
 
 
