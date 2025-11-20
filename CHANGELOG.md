@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.0-alpha.8](https://github.com/iExecBlockchainComputing/web3telegram-sdk/compare/web3telegram-v0.1.0-alpha.7...web3telegram-v0.1.0-alpha.8) (2025-11-20)
+
+
+### Changed
+
+* enable campaigns on arbitrum-mainnet ([#92](https://github.com/iExecBlockchainComputing/web3telegram-sdk/issues/92)) ([43c9067](https://github.com/iExecBlockchainComputing/web3telegram-sdk/commit/43c906778805e3795e12be44393d81a787fed03f))
+
 ## [0.1.0-alpha.7](https://github.com/iExecBlockchainComputing/web3telegram-sdk/compare/web3telegram-v0.1.0-alpha.6...web3telegram-v0.1.0-alpha.7) (2025-11-13)
 
 
