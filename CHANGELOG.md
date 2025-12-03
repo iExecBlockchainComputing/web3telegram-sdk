@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.0-alpha.9](https://github.com/iExecBlockchainComputing/web3telegram-sdk/compare/web3telegram-v0.1.0-alpha.8...web3telegram-v0.1.0-alpha.9) (2025-12-03)
+
+
+### Changed
+
+* disable lifecycle scripts for contributors and CI ([49dfe33](https://github.com/iExecBlockchainComputing/web3telegram-sdk/commit/49dfe33b0350d84e066715800fc5265c1caa0ef4))
+* security hardening ([#94](https://github.com/iExecBlockchainComputing/web3telegram-sdk/issues/94)) ([49dfe33](https://github.com/iExecBlockchainComputing/web3telegram-sdk/commit/49dfe33b0350d84e066715800fc5265c1caa0ef4))
+* update dependencies ([49dfe33](https://github.com/iExecBlockchainComputing/web3telegram-sdk/commit/49dfe33b0350d84e066715800fc5265c1caa0ef4))
+* use ethers methods from umbrella ([49dfe33](https://github.com/iExecBlockchainComputing/web3telegram-sdk/commit/49dfe33b0350d84e066715800fc5265c1caa0ef4))
+
 ## [0.1.0-alpha.8](https://github.com/iExecBlockchainComputing/web3telegram-sdk/compare/web3telegram-v0.1.0-alpha.7...web3telegram-v0.1.0-alpha.8) (2025-11-20)
 
 
