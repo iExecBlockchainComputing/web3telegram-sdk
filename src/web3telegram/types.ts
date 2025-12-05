@@ -77,6 +77,7 @@ export type SendTelegramParams = {
   appMaxPrice?: number;
   workerpoolMaxPrice?: number;
   useVoucher?: boolean;
+  allowDeposit?: boolean;
 };
 
 export type SendTelegramResponse = {
@@ -119,6 +120,11 @@ export type SendTelegramCampaignParams = {
    * Workerpool address or ENS to use for processing
    */
   workerpoolAddressOrEns?: string;
+  /**
+   * If true, allows automatic deposit of funds when balance is insufficient
+   * @default false
+   */
+  allowDeposit?: boolean;
 };
 
 export type SendTelegramCampaignResponse = {
