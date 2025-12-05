@@ -67,6 +67,7 @@ describe('sendTelegramCampaign', () => {
       expect(mockDataprotector.processBulkRequest).toHaveBeenCalledWith({
         bulkRequest: mockCampaignRequest,
         workerpool: defaultConfig.prodWorkerpoolAddress,
+        allowDeposit: false,
       });
       expect(result).toEqual(mockResponse);
       expect('tasks' in result).toBe(true);
@@ -171,6 +172,7 @@ describe('sendTelegramCampaign', () => {
       expect(mockDataprotector.processBulkRequest).toHaveBeenCalledWith({
         bulkRequest: mockCampaignRequest,
         workerpool: defaultConfig.prodWorkerpoolAddress,
+        allowDeposit: false,
       });
     });
 
