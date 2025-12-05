@@ -46,14 +46,14 @@ describe('web3telegram.sendTelegram()', () => {
   const iexecOptions = getTestIExecOption();
   const prodWorkerpoolPublicPrice = 1000;
   const defaultConfig = getChainDefaultConfig(DEFAULT_CHAIN_ID);
-
+  const workerpoolprice = 1_000;
   beforeAll(async () => {
     // (default) prod workerpool (not free) always available
     await createAndPublishWorkerpoolOrder(
       TEST_CHAIN.prodWorkerpool,
       TEST_CHAIN.prodWorkerpoolOwnerWallet,
       NULL_ADDRESS,
-      1_000,
+      workerpoolprice,
       prodWorkerpoolPublicPrice
     );
     // learn prod pool (free) assumed always available
@@ -612,5 +612,76 @@ describe('web3telegram.sendTelegram()', () => {
         );
       });
     });
+  });
+
+  describe('allowDeposit', () => {
+    let protectData: ProtectedDataWithSecretProps;
+    consumerWallet = getRandomWallet();
+    const dataPricePerAccess = 1000;
+    let web3telegramConsumerInstance: IExecWeb3telegram;
+    beforeAll(async () => {
+      protectData = await dataProtector.protectData({
+        data: { telegram_chatId: '12345' },
+        name: 'test do not use',
+      });
+      await dataProtector.grantAccess({
+        authorizedApp: getChainDefaultConfig(DEFAULT_CHAIN_ID).dappAddress,
+        protectedData: protectData.address,
+        authorizedUser: consumerWallet.address, // consumer wallet
+        numberOfAccess: 1000,
+        pricePerAccess: dataPricePerAccess,
+      });
+      await waitSubgraphIndexing();
+      web3telegramConsumerInstance = new IExecWeb3telegram(
+        ...getTestConfig(consumerWallet.privateKey)
+      );
+    }, 2 * MAX_EXPECTED_BLOCKTIME);
+    it(
+      'should throw error if insufficient total balance to cover task cost and allowDeposit is false',
+      async () => {
+        let error;
+        try {
+          await web3telegramConsumerInstance.sendTelegram({
+            telegramContent: 'e2e telegram content for test',
+            protectedData: protectData.address,
+            dataMaxPrice: dataPricePerAccess,
+            workerpoolMaxPrice: workerpoolprice,
+            allowDeposit: false,
+          });
+        } catch (err) {
+          error = err;
+        }
+        expect(error).toBeInstanceOf(Web3TelegramWorkflowError);
+        expect(error).toBeInstanceOf(Error);
+        expect(error.message).toBe('Failed to sendTelegram');
+        const causeMsg =
+          error.errorCause?.message ||
+          error.cause?.message ||
+          error.cause ||
+          error.errorCause;
+        expect(causeMsg).toBe(
+          `Cost per task (${
+            dataPricePerAccess + workerpoolprice
+          }) is greater than requester account stake (0). Orders can't be matched. If you are the requester, you should deposit to top up your account`
+        );
+      },
+      3 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+    );
+    it(
+      'should send telegram after depositing sufficient funds to cover task cost when allowDeposit is true',
+      async () => {
+        const result = await web3telegramConsumerInstance.sendTelegram({
+          telegramContent: 'e2e telegram content for test',
+          protectedData: protectData.address,
+          dataMaxPrice: dataPricePerAccess,
+          workerpoolMaxPrice: workerpoolprice,
+          allowDeposit: true,
+        });
+        expect(result).toBeDefined();
+        expect(result).toHaveProperty('taskId');
+        expect(result).toHaveProperty('dealId');
+      },
+      3 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
+    );
   });
 });
