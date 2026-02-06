@@ -25,7 +25,7 @@ export function mockAllForSendTelegram() {
       fetchAppOrderbook: jest
         .fn<() => Promise<{ orders: any[] }>>()
         .mockResolvedValue({
-          orders: [{ order: { appprice: 0 } }],
+          orders: [{ order: { appprice: 0, tag: ['tee'] } }],
         }),
       fetchWorkerpoolOrderbook: jest.fn().mockImplementation(() => {
         return Promise.resolve({
