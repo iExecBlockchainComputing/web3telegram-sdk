@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.0-alpha.10](https://github.com/iExecBlockchainComputing/web3telegram-sdk/compare/web3telegram-v0.1.0-alpha.9...web3telegram-v0.1.0-alpha.10) (2026-02-16)
+
+
+### Changed
+
+* stop enforcing SCONE as unique TEE framework for orders ([#97](https://github.com/iExecBlockchainComputing/web3telegram-sdk/issues/97)) ([6864435](https://github.com/iExecBlockchainComputing/web3telegram-sdk/commit/6864435bb1e0d016e8a1967cb3ae36f3036e7317))
+
 ## [0.1.0-alpha.9](https://github.com/iExecBlockchainComputing/web3telegram-sdk/compare/web3telegram-v0.1.0-alpha.8...web3telegram-v0.1.0-alpha.9) (2025-12-03)
 
 
