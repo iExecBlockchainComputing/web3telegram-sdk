@@ -25,16 +25,21 @@ export function mockAllForSendTelegram() {
       fetchAppOrderbook: jest
         .fn<() => Promise<{ orders: any[] }>>()
         .mockResolvedValue({
-          orders: [{ order: { appprice: 0, tag: ['tee'] } }],
+          orders: [
+            {
+              order: {
+                appprice: 0,
+                tag: '0x0000000000000000000000000000000000000000000000000000000000000001',
+              },
+            },
+          ],
         }),
-      fetchWorkerpoolOrderbook: jest.fn().mockImplementation(() => {
-        return Promise.resolve({
-          ok: true,
-          count: 1,
-          nextPage: 1,
-          orders: [{ order: { workerpoolprice: 0 } }],
-        });
-      }),
+      fetchWorkerpoolOrderbook: jest.fn().mockImplementation(async () => ({
+        ok: true,
+        count: 1,
+        nextPage: 1,
+        orders: [{ order: { workerpoolprice: 0 } }],
+      })),
     },
     secrets: {
       pushRequesterSecret: jest

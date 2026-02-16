@@ -233,7 +233,8 @@ describe('sendTelegram', () => {
           dataset: protectedData,
           requester: userAddress,
           isRequesterStrict: false,
-          minTag: ['tee'],
+          minTag:
+            '0x0000000000000000000000000000000000000000000000000000000000000001',
           category: 0,
         }
       );
@@ -245,7 +246,8 @@ describe('sendTelegram', () => {
           dataset: protectedData,
           requester: userAddress,
           isRequesterStrict: false,
-          minTag: ['tee'],
+          minTag:
+            '0x0000000000000000000000000000000000000000000000000000000000000001',
           category: 0,
         }
       );
@@ -257,7 +259,8 @@ describe('sendTelegram', () => {
           dataset: protectedData,
           requester: userAddress,
           isRequesterStrict: false,
-          minTag: ['tee'],
+          minTag:
+            '0x0000000000000000000000000000000000000000000000000000000000000001',
           category: 0,
         }
       );
