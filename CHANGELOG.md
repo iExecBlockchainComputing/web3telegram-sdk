@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.0-alpha.11](https://github.com/iExecBlockchainComputing/web3telegram-sdk/compare/web3telegram-v0.1.0-alpha.10...web3telegram-v0.1.0-alpha.11) (2026-02-17)
+
+
+### Changed
+
+* prepare migration to TDX ([#99](https://github.com/iExecBlockchainComputing/web3telegram-sdk/issues/99)) ([3ce1ed6](https://github.com/iExecBlockchainComputing/web3telegram-sdk/commit/3ce1ed65e813c754cc1a3e8905e3a8bacf87d802))
+
 ## [0.1.0-alpha.10](https://github.com/iExecBlockchainComputing/web3telegram-sdk/compare/web3telegram-v0.1.0-alpha.9...web3telegram-v0.1.0-alpha.10) (2026-02-16)
 
 
