@@ -4,6 +4,7 @@ import {
   addressOrEnsSchema,
   throwIfMissing,
   campaignRequestSchema,
+  booleanSchema,
 } from '../utils/validators.js';
 import { DataProtectorConsumer } from './internalTypes.js';
 import {
@@ -23,6 +24,7 @@ export const sendTelegramCampaign = async ({
   dataProtector = throwIfMissing(),
   workerpoolAddressOrEns = throwIfMissing(),
   campaignRequest,
+  allowDeposit = false,
 }: DataProtectorConsumer &
   SendTelegramCampaignParams): Promise<SendTelegramCampaignResponse> => {
   try {
@@ -36,6 +38,10 @@ export const sendTelegramCampaign = async ({
       .label('WorkerpoolAddressOrEns')
       .validateSync(workerpoolAddressOrEns);
 
+    const vAllowDeposit = booleanSchema()
+      .label('allowDeposit')
+      .validateSync(allowDeposit);
+
     if (
       vCampaignRequest.workerpool !== NULL_ADDRESS &&
       vCampaignRequest.workerpool.toLowerCase() !==
@@ -47,10 +53,14 @@ export const sendTelegramCampaign = async ({
     }
 
     // Process bulk request
+    // TODO: Remove @ts-ignore once @iexec/dataprotector is updated to a version that includes allowDeposit in ProcessBulkRequestParams types
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - allowDeposit is supported at runtime but not yet in TypeScript types
     const processBulkRequestResponse: ProcessBulkRequestResponse<ProcessBulkRequestParams> =
       await dataProtector.processBulkRequest({
         bulkRequest: vCampaignRequest,
         workerpool: vWorkerpoolAddressOrEns,
+        allowDeposit: vAllowDeposit,
       });
 
     return processBulkRequestResponse;

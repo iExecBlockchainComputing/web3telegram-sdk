@@ -50,6 +50,7 @@ export const sendTelegram = async ({
   workerpoolMaxPrice = MAX_DESIRED_WORKERPOOL_ORDER_PRICE,
   protectedData,
   useVoucher = false,
+  allowDeposit = false,
 }: IExecConsumer &
   SubgraphConsumer &
   DappAddressConsumer &
@@ -94,6 +95,9 @@ export const sendTelegram = async ({
     const vUseVoucher = booleanSchema()
       .label('useVoucher')
       .validateSync(useVoucher);
+    const vAllowDeposit = booleanSchema()
+      .label('allowDeposit')
+      .validateSync(allowDeposit);
 
     // Check protected data validity through subgraph
     const isValidProtectedData = await checkProtectedDataValidity(
@@ -283,7 +287,10 @@ export const sendTelegram = async ({
         workerpoolorder: workerpoolorder,
         requestorder: requestorder,
       },
-      { useVoucher: vUseVoucher }
+      // TODO: Remove @ts-ignore once iexec SDK is updated to a version that includes allowDeposit in matchOrders types
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore - allowDeposit is supported at runtime but not yet in TypeScript types
+      { useVoucher: vUseVoucher, allowDeposit: vAllowDeposit }
     );
     const taskId = await iexec.deal.computeTaskId(dealId, 0);
     return {
