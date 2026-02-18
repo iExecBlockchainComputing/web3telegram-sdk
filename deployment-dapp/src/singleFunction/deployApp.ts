@@ -33,7 +33,7 @@ export const deployApp = async ({
   // TODO: to be deleted after migration to TDX
   if (sconifyVersion) {
     console.log(
-      `Using SCONE framework with SCONIFY version: ${sconifyVersion}`,
+      `Using SCONE framework with SCONIFY version: ${sconifyVersion}`
     );
     mrenclave = {
       framework: 'SCONE', // workaround framework not auto capitalized

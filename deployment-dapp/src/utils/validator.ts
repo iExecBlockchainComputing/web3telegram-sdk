@@ -6,7 +6,7 @@ export const teeFrameworkSchema = () =>
   string()
     .oneOf(
       [...TEE_FRAMEWORKS],
-      `TEE_FRAMEWORK must be one of: ${TEE_FRAMEWORKS.join(', ')}`,
+      `TEE_FRAMEWORK must be one of: ${TEE_FRAMEWORKS.join(', ')}`
     )
     .default('tdx');
 
