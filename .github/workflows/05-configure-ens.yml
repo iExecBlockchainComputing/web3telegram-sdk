@@ -1,0 +1,58 @@
+name: 05-configure-ens.yml
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        type: choice
+        options:
+          # dev environments
+          - bellecour-dev
+          - arbitrum-sepolia-dev
+          # prod environments
+          - bellecour-prod
+          - arbitrum-sepolia-prod
+          - arbitrum-prod
+      app_address:
+        description: 'App contract address'
+        required: true
+        type: string
+      ens_name:
+        description: 'ENS name to configure'
+        required: true
+        type: string
+
+jobs:
+  configure-ens:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.19.0'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          cd deployment-dapp
+          npm ci
+
+      - name: Create app address file
+        run: |
+          echo "${{ inputs.app_address }}" > deployment-dapp/.app-address
+          echo "Using app address: ${{ inputs.app_address }}"
+
+      - name: Configure ENS
+        env:
+          WALLET_PRIVATE_KEY: ${{ secrets.WEB3TELEGRAM_APP_OWNER_PRIVATEKEY }}
+          DAPP_ENS_NAME: ${{ inputs.ens_name }}
+        run: |
+          cd deployment-dapp
+          npm run configure-ens
