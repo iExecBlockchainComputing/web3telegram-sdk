@@ -3,10 +3,12 @@ import { getIExec, loadAppAddress } from './utils/utils.js';
 import {
   positiveNumberSchema,
   positiveStrictIntegerSchema,
+  teeFrameworkSchema,
 } from './utils/validator.js';
 
 const main = async () => {
-  const { RPC_URL, WALLET_PRIVATE_KEY, PRICE, VOLUME } = process.env;
+  const { RPC_URL, WALLET_PRIVATE_KEY, PRICE, VOLUME, TEE_FRAMEWORK } =
+    process.env;
 
   const iexec = getIExec(WALLET_PRIVATE_KEY, RPC_URL);
 
@@ -15,6 +17,10 @@ const main = async () => {
   if (!appAddress) throw Error('Failed to get app address'); // If the app was not deployed, do not continue
 
   // validate params
+  const teeFramework = await teeFrameworkSchema()
+    .label('TEE_FRAMEWORK')
+    .validate(TEE_FRAMEWORK ?? 'tdx');
+
   const price = await positiveNumberSchema()
     .required()
     .label('PRICE')
@@ -28,8 +34,8 @@ const main = async () => {
   console.log(`Volume is ${volume}`);
 
   try {
-    //publish sell order for Tee app (scone)
-    await publishSellOrder(iexec, appAddress, price, volume);
+    // Publish sell order for TEE app
+    await publishSellOrder(iexec, appAddress, price, volume, teeFramework);
   } catch (e) {
     throw Error(`Failed to publish app sell order: ${e}`);
   }
