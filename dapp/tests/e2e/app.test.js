@@ -38,7 +38,7 @@ describe('sendTelegram', () => {
     process.env.IEXEC_DATASET_FILENAME = 'data-chatId.zip';
     // developer secret setup
     process.env.IEXEC_APP_DEVELOPER_SECRET = JSON.stringify({
-      TELEGRAM_BOT_TOKEN: '7045386731:AAGSmPQQ_t2Po5eDob7rUEWEZ25W-s2t9fg',
+      TELEGRAM_BOT_TOKEN: process.env.TELEGRAM_BOT_TOKEN,
     });
     // requester secret setup
     process.env.IEXEC_REQUESTER_SECRET_1 = JSON.stringify({
