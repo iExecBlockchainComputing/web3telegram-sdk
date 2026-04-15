@@ -42,7 +42,7 @@ jobs:
             echo "clean_tag=dev" | tee -a $GITHUB_OUTPUT
           fi
   docker-publish:
-    uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/docker-build.yml@docker-build-v3.1.1
+    uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/docker-build.yml@docker-build-v3.3.0
     needs: [extract-tag]
     with:
       image-name: 'iexechub/web3telegram-dapp'
@@ -54,8 +54,8 @@ jobs:
       push: true
       image-tag: ${{ needs.extract-tag.outputs.clean_tag }}
     secrets:
-      username: ${{ secrets.DOCKERHUB_USERNAME }}
-      password: ${{ secrets.DOCKERHUB_PAT }}
+      dockerhub-username: ${{ secrets.DOCKERHUB_USERNAME }}
+      dockerhub-password: ${{ secrets.DOCKERHUB_PAT }}
 
   sconify:
     if: startsWith(github.event.inputs.environment, 'bellecour-')
@@ -142,6 +142,7 @@ jobs:
         env:
           CONTRACT_ADDRESS: ${{ vars.WEB3TELEGRAM_WHITELIST_CONTRACT_ADDRESS }}
           PRIVATE_KEY: ${{ secrets.WEB3TELEGRAM_APP_OWNER_PRIVATEKEY }}
+          RPC_URL: ${{ secrets.RPC_URL }}
         run: |
           cd node_modules/whitelist-smart-contract
           export ADDRESS_TO_ADD=$(cat ../../deployment-dapp/.app-address)
@@ -206,6 +207,7 @@ jobs:
         env:
           CONTRACT_ADDRESS: ${{ vars.WEB3TELEGRAM_WHITELIST_CONTRACT_ADDRESS }}
           PRIVATE_KEY: ${{ secrets.WEB3TELEGRAM_APP_OWNER_PRIVATEKEY }}
+          RPC_URL: ${{ secrets.RPC_URL }}
         run: |
           cd node_modules/whitelist-smart-contract
           export ADDRESS_TO_ADD=$(cat ../../deployment-dapp/.app-address)
