@@ -1,9 +1,9 @@
+import { TeeFramework } from 'iexec/dist/esm/common/types.js';
 import { publishSellOrder } from './singleFunction/publishSellOrder.js';
 import { getIExec, loadAppAddress } from './utils/utils.js';
 import {
   positiveNumberSchema,
   positiveStrictIntegerSchema,
-  teeFrameworkSchema,
 } from './utils/validator.js';
 
 const main = async () => {
@@ -16,11 +16,9 @@ const main = async () => {
 
   if (!appAddress) throw Error('Failed to get app address'); // If the app was not deployed, do not continue
 
-  // validate params
-  const teeFramework = await teeFrameworkSchema()
-    .label('TEE_FRAMEWORK')
-    .validate(TEE_FRAMEWORK ?? 'tdx');
+  const teeFramework = TEE_FRAMEWORK ?? 'tdx';
 
+  // validate params
   const price = await positiveNumberSchema()
     .required()
     .label('PRICE')
@@ -35,7 +33,13 @@ const main = async () => {
 
   try {
     // Publish sell order for TEE app
-    await publishSellOrder(iexec, appAddress, price, volume, teeFramework);
+    await publishSellOrder(
+      iexec,
+      appAddress,
+      price,
+      volume,
+      teeFramework as TeeFramework
+    );
   } catch (e) {
     throw Error(`Failed to publish app sell order: ${e}`);
   }
