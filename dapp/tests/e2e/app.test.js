@@ -36,6 +36,9 @@ describe('sendTelegram', () => {
   beforeEach(() => {
     // protected data setup
     process.env.IEXEC_DATASET_FILENAME = 'data-chatId.zip';
+    process.env.WEB3TELEGRAM_IPFS_GATEWAY =
+      process.env.WEB3TELEGRAM_IPFS_GATEWAY ||
+      'https://ipfs-gateway.v8-bellecour.iex.ec';
     // developer secret setup
     process.env.IEXEC_APP_DEVELOPER_SECRET = JSON.stringify({
       TELEGRAM_BOT_TOKEN: process.env.TELEGRAM_BOT_TOKEN,
