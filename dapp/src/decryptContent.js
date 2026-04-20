@@ -2,11 +2,19 @@ import { Buffer } from 'buffer';
 import fetch from 'node-fetch';
 import forge from 'node-forge';
 
-const DEFAULT_IPFS_GATEWAY = 'https://ipfs-gateway.v8-bellecour.iex.ec';
+export const resolveIpfsGatewayUrl = () => {
+  const url = process.env.WEB3TELEGRAM_IPFS_GATEWAY;
+  if (url == null || String(url).trim() === '') {
+    throw new Error(
+      'WEB3TELEGRAM_IPFS_GATEWAY environment variable is not set.'
+    );
+  }
+  return String(url).trim();
+};
 
 export const downloadEncryptedContent = async (
   multiaddr,
-  { ipfsGateway = DEFAULT_IPFS_GATEWAY } = {}
+  { ipfsGateway = resolveIpfsGatewayUrl() } = {}
 ) => {
   try {
     const publicUrl = `${ipfsGateway}${multiaddr.replace('/p2p/', '/ipfs/')}`;

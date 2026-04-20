@@ -41,14 +41,26 @@ jobs:
           else
             echo "clean_tag=dev" | tee -a $GITHUB_OUTPUT
           fi
+  read-ipfs-gateway:
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment }}
+    outputs:
+      web3telegram_ipfs_gateway: ${{ vars.WEB3TELEGRAM_IPFS_GATEWAY }}
+    steps:
+      - name: WEB3TELEGRAM_IPFS_GATEWAY
+        run: echo "WEB3TELEGRAM_IPFS_GATEWAY=$WEB3TELEGRAM_IPFS_GATEWAY"
+        env:
+          WEB3TELEGRAM_IPFS_GATEWAY: ${{ vars.WEB3TELEGRAM_IPFS_GATEWAY }}
+
   docker-publish:
     uses: iExecBlockchainComputing/github-actions-workflows/.github/workflows/docker-build.yml@docker-build-v3.3.0
-    needs: [extract-tag]
+    needs: [extract-tag, read-ipfs-gateway]
     with:
       image-name: 'iexechub/web3telegram-dapp'
       registry: 'docker.io'
       dockerfile: 'dapp/Dockerfile'
       context: 'dapp'
+      build-args: WEB3TELEGRAM_IPFS_GATEWAY=${{ needs.read-ipfs-gateway.outputs.web3telegram_ipfs_gateway }}
       security-scan: false
       hadolint: true
       push: true

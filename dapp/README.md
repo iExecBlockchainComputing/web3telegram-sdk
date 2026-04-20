@@ -19,6 +19,7 @@ fill in the environment variables:
     - **IEXEC_DATASET\_\<index\>\_FILENAME**: The name of the data file for dataset at index <index> (starting from 1) that you place in the **IEXEC_IN** directory.
 - **IEXEC_APP_DEVELOPER_SECRET**: A JSON string with the following keys:
   - **TELEGRAM_BOT_TOKEN**: The API key of the telegram bot used to send the message.
+- **WEB3TELEGRAM_IPFS_GATEWAY**: Base URL of the iExec IPFS gateway used to download encrypted message content (must match the chain where content was pinned, e.g. `https://ipfs-gateway.v8-bellecour.iex.ec` or `https://ipfs-gateway.arbitrum-mainnet.iex.ec`). Baked into release images via the deploy workflow; required for local runs.
 - **IEXEC_REQUESTER_SECRET_1**: A JSON string with the following keys:
   - **telegramContentMultiAddr**: Multiaddress pointing to the encrypted message content to send.
   - **telegramContentEncryptionKey**: The encryption key used to encrypt the content.
@@ -43,8 +44,11 @@ The Dapp will send a telegram message using the object and content specified in 
 1.  **Build the Docker image**: Navigate to the `/web3telegram/dapp` directory of the project and run the following command to build the Docker image:
 
     ```sh
-    docker build . --tag web3telegram-dapp
+    docker build . --tag web3telegram-dapp \
+      --build-arg WEB3TELEGRAM_IPFS_GATEWAY=https://ipfs-gateway.v8-bellecour.iex.ec
     ```
+
+    Use the gateway URL for the same chain as your pinned content (see `src/config/config.ts` `ipfsGateway` per chain).
 
 2.  **Create local directories**: In your terminal, execute the following commands to create two local directories on your machine:
 
@@ -69,6 +73,7 @@ The Dapp will send a telegram message using the object and content specified in 
             -e IEXEC_IN=/iexec_in \
             -e IEXEC_OUT=/iexec_out \
             -e IEXEC_DATASET_FILENAME=data.zip \
+            -e WEB3TELEGRAM_IPFS_GATEWAY=https://ipfs-gateway.v8-bellecour.iex.ec \
             IEXEC_REQUESTER_SECRET_1='{"telegramContentEncryptionKey":"telegram_content_encryption_key","telegramContentMultiAddr":"encrypted_telegram_content_multiaddress","senderName":"sender_name","contentType":"text/plain"}' \
             web3telegram-dapp
         ```
