@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.0-alpha.12](https://github.com/iExecBlockchainComputing/web3telegram-sdk/compare/web3telegram-v0.1.0-alpha.11...web3telegram-v0.1.0-alpha.12) (2026-04-20)
+
+
+### Added
+
+* use tdx as default ([#107](https://github.com/iExecBlockchainComputing/web3telegram-sdk/issues/107)) ([344cf9a](https://github.com/iExecBlockchainComputing/web3telegram-sdk/commit/344cf9a1bb19a869468b994872b1a28cdba89530))
+
+
+### Changed
+
+* **deps:** update @iexec/dataprotector ([#104](https://github.com/iExecBlockchainComputing/web3telegram-sdk/issues/104)) ([f26b0cc](https://github.com/iExecBlockchainComputing/web3telegram-sdk/commit/f26b0cc97d2b0fa836e1f17e74793cbbeceb00b2))
+
 ## [0.1.0-alpha.11](https://github.com/iExecBlockchainComputing/web3telegram-sdk/compare/web3telegram-v0.1.0-alpha.10...web3telegram-v0.1.0-alpha.11) (2026-02-17)
 
 
