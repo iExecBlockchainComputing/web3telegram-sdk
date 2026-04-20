@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-alpha.5](https://github.com/iExecBlockchainComputing/web3telegram-sdk/compare/dapp-v1.0.0-alpha.4...dapp-v1.0.0-alpha.5) (2026-04-20)
+
+
+### Changed
+
+* dapp dynamic ipfs gateway ([#103](https://github.com/iExecBlockchainComputing/web3telegram-sdk/issues/103)) ([9848a29](https://github.com/iExecBlockchainComputing/web3telegram-sdk/commit/9848a293c625edf7aa5bc659c684612177d1475a))
+
 ## [1.0.0-alpha.4](https://github.com/iExecBlockchainComputing/web3telegram-sdk/compare/dapp-v1.0.0-alpha.3...dapp-v1.0.0-alpha.4) (2025-11-17)
 
 
