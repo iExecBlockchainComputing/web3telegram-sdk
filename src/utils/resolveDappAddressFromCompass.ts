@@ -10,7 +10,7 @@ export async function resolveDappAddressFromCompass(
   }
 
   return (
-    fetch(`${compassUrl}/${chainId}/iapps/web3telegram`)
+    fetch(`${compassUrl}/${chainId}/iapps/web3telegram-tdx`)
       // Handle network errors
       .catch((error) => {
         throw new CompassCallError(
