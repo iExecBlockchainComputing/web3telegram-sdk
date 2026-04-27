@@ -8,12 +8,13 @@ import {
   resolveIpfsGatewayUrl,
 } from '../../src/decryptContent';
 
-const TEST_IPFS_GATEWAY = 'https://ipfs-gateway.v8-bellecour.iex.ec';
+const TEST_IPFS_GATEWAY =
+  'https://ipfs-gateway.arbitrum-sepolia-testnet.iex.ec';
 
 describe('decryptContent', () => {
   it('should decrypt message correctly', async () => {
     const iexec = new IExec({
-      ethProvider: 'bellecour',
+      ethProvider: 'arbitrum-sepolia-testnet',
     });
 
     const encryptionKey = iexec.dataset.generateEncryptionKey();

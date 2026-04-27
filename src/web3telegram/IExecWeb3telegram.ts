@@ -71,7 +71,7 @@ export class IExecWeb3telegram {
     ethProvider?: EthersCompatibleProvider,
     options?: Web3TelegramConfigOptions
   ) {
-    this.ethProvider = ethProvider || 'bellecour';
+    this.ethProvider = ethProvider || 'arbitrum-sepolia-testnet';
     this.options = options || {};
   }
 

@@ -16,13 +16,9 @@ import {
   throwIfMissing,
   addressSchema,
   senderNameSchema,
-  booleanSchema,
 } from '../utils/validators.js';
 import { SendTelegramParams, SendTelegramResponse } from './types.js';
-import {
-  checkUserVoucher,
-  filterWorkerpoolOrders,
-} from '../utils/sendTelegram.models.js';
+import { filterWorkerpoolOrders } from '../utils/sendTelegram.models.js';
 import {
   DappAddressConsumer,
   DappWhitelistAddressConsumer,
@@ -49,7 +45,6 @@ export const sendTelegram = async ({
   appMaxPrice = MAX_DESIRED_APP_ORDER_PRICE,
   workerpoolMaxPrice = MAX_DESIRED_WORKERPOOL_ORDER_PRICE,
   protectedData,
-  useVoucher = false,
 }: IExecConsumer &
   SubgraphConsumer &
   DappAddressConsumer &
@@ -91,9 +86,6 @@ export const sendTelegram = async ({
     const vWorkerpoolMaxPrice = positiveNumberSchema()
       .label('workerpoolMaxPrice')
       .validateSync(workerpoolMaxPrice);
-    const vUseVoucher = booleanSchema()
-      .label('useVoucher')
-      .validateSync(useVoucher);
 
     // Check protected data validity through subgraph
     const isValidProtectedData = await checkProtectedDataValidity(
@@ -107,20 +99,6 @@ export const sendTelegram = async ({
     }
     const requesterAddress = await iexec.wallet.getAddress();
 
-    let userVoucher;
-    if (vUseVoucher) {
-      try {
-        userVoucher = await iexec.voucher.showUserVoucher(requesterAddress);
-        checkUserVoucher({ userVoucher });
-      } catch (err) {
-        if (err?.message?.startsWith('No Voucher found for address')) {
-          throw new Error(
-            'Oops, it seems your wallet is not associated with any voucher. Check on https://builder.iex.ec/'
-          );
-        }
-        throw err;
-      }
-    }
     // Fetch app order
     const apporder = await iexec.orderbook
       .fetchAppOrderbook({
@@ -173,23 +151,21 @@ export const sendTelegram = async ({
 
         // Fetch workerpool order for App or AppWhitelist
         Promise.all([
-          // for app
           iexec.orderbook.fetchWorkerpoolOrderbook({
             workerpool: workerpoolAddressOrEns,
             app: vDappAddressOrENS,
             dataset: vDatasetAddress,
-            requester: requesterAddress, // public orders + user specific orders
-            isRequesterStrict: useVoucher, // If voucher, we only want user specific orders
+            requester: requesterAddress,
+            isRequesterStrict: false,
             minTag: workerpoolMinTag,
             category: 0,
           }),
-          // for app whitelist
           iexec.orderbook.fetchWorkerpoolOrderbook({
             workerpool: workerpoolAddressOrEns,
             app: vDappWhitelistAddress,
             dataset: vDatasetAddress,
-            requester: requesterAddress, // public orders + user specific orders
-            isRequesterStrict: useVoucher, // If voucher, we only want user specific orders
+            requester: requesterAddress,
+            isRequesterStrict: false,
             minTag: workerpoolMinTag,
             category: 0,
           }),
@@ -201,8 +177,6 @@ export const sendTelegram = async ({
                 ...workerpoolOrderbookForAppWhitelist.orders,
               ],
               workerpoolMaxPrice: vWorkerpoolMaxPrice,
-              useVoucher: vUseVoucher,
-              userVoucher,
             });
             if (!desiredPriceWorkerpoolOrder) {
               throw new Error(
@@ -264,7 +238,7 @@ export const sendTelegram = async ({
       datasetmaxprice: datasetorder.datasetprice,
       appmaxprice: apporder.appprice,
       workerpoolmaxprice: workerpoolorder.workerpoolprice,
-      tag: ['tee'],
+      tag: workerpoolMinTag,
       workerpool: vWorkerpoolAddressOrEns,
       params: {
         iexec_secrets: {
@@ -276,15 +250,12 @@ export const sendTelegram = async ({
     const requestorder = await iexec.order.signRequestorder(requestorderToSign);
 
     // Match orders and compute task ID
-    const { dealid: dealId } = await iexec.order.matchOrders(
-      {
-        apporder: apporder,
-        datasetorder: datasetorder,
-        workerpoolorder: workerpoolorder,
-        requestorder: requestorder,
-      },
-      { useVoucher: vUseVoucher }
-    );
+    const { dealid: dealId } = await iexec.order.matchOrders({
+      apporder: apporder,
+      datasetorder: datasetorder,
+      workerpoolorder: workerpoolorder,
+      requestorder: requestorder,
+    });
     const taskId = await iexec.deal.computeTaskId(dealId, 0);
     return {
       dealId,

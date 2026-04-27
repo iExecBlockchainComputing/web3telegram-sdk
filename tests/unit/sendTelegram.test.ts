@@ -1,6 +1,9 @@
 import { expect, it, jest } from '@jest/globals';
 import { type SendTelegram } from '../../src/web3telegram/sendTelegram.js';
-import { getRandomAddress } from '../test-utils.js';
+import {
+  getRandomAddress,
+  TEST_WEB3TELEGRAM_DAPP_ADDRESS,
+} from '../test-utils.js';
 import {
   DEFAULT_CHAIN_ID,
   getChainDefaultConfig,
@@ -44,7 +47,7 @@ describe('sendTelegram', () => {
             graphQLClient: { request: jest.fn() } as any,
             iexec: mockAllForSendTelegram() as any,
             workerpoolAddressOrEns: defaultConfig.prodWorkerpoolAddress,
-            dappAddressOrENS: defaultConfig.dappAddress,
+            dappAddressOrENS: TEST_WEB3TELEGRAM_DAPP_ADDRESS,
             dappWhitelistAddress: defaultConfig.whitelistSmartContract,
             ipfsNode: defaultConfig.ipfsUploadUrl,
             ipfsGateway: defaultConfig.ipfsGateway,
@@ -77,7 +80,7 @@ describe('sendTelegram', () => {
             graphQLClient: { request: jest.fn() } as any,
             iexec: mockAllForSendTelegram() as any,
             workerpoolAddressOrEns: defaultConfig.prodWorkerpoolAddress,
-            dappAddressOrENS: defaultConfig.dappAddress,
+            dappAddressOrENS: TEST_WEB3TELEGRAM_DAPP_ADDRESS,
             dappWhitelistAddress: defaultConfig.whitelistSmartContract,
             ipfsNode: defaultConfig.ipfsUploadUrl,
             ipfsGateway: defaultConfig.ipfsGateway,
@@ -110,7 +113,7 @@ describe('sendTelegram', () => {
             graphQLClient: { request: jest.fn() } as any,
             iexec: mockAllForSendTelegram() as any,
             workerpoolAddressOrEns: defaultConfig.prodWorkerpoolAddress,
-            dappAddressOrENS: defaultConfig.dappAddress,
+            dappAddressOrENS: TEST_WEB3TELEGRAM_DAPP_ADDRESS,
             dappWhitelistAddress: defaultConfig.whitelistSmartContract,
             ipfsNode: defaultConfig.ipfsUploadUrl,
             ipfsGateway: defaultConfig.ipfsGateway,
@@ -142,7 +145,7 @@ describe('sendTelegram', () => {
             graphQLClient: { request: jest.fn() } as any,
             iexec: mockAllForSendTelegram() as any,
             workerpoolAddressOrEns: defaultConfig.prodWorkerpoolAddress,
-            dappAddressOrENS: defaultConfig.dappAddress,
+            dappAddressOrENS: TEST_WEB3TELEGRAM_DAPP_ADDRESS,
             dappWhitelistAddress: defaultConfig.whitelistSmartContract,
             ipfsNode: defaultConfig.ipfsUploadUrl,
             ipfsGateway: defaultConfig.ipfsGateway,
@@ -176,7 +179,7 @@ describe('sendTelegram', () => {
             graphQLClient: { request: jest.fn() } as any,
             iexec: mockAllForSendTelegram() as any,
             workerpoolAddressOrEns: defaultConfig.prodWorkerpoolAddress,
-            dappAddressOrENS: defaultConfig.dappAddress,
+            dappAddressOrENS: TEST_WEB3TELEGRAM_DAPP_ADDRESS,
             dappWhitelistAddress: defaultConfig.whitelistSmartContract,
             ipfsNode: defaultConfig.ipfsUploadUrl,
             ipfsGateway: defaultConfig.ipfsGateway,
@@ -215,7 +218,7 @@ describe('sendTelegram', () => {
         graphQLClient: { request: jest.fn() } as any,
         iexec,
         workerpoolAddressOrEns: defaultConfig.prodWorkerpoolAddress,
-        dappAddressOrENS: defaultConfig.dappAddress,
+        dappAddressOrENS: TEST_WEB3TELEGRAM_DAPP_ADDRESS,
         dappWhitelistAddress: defaultConfig.whitelistSmartContract,
         ipfsNode: defaultConfig.ipfsUploadUrl,
         ipfsGateway: defaultConfig.ipfsGateway,
@@ -229,7 +232,7 @@ describe('sendTelegram', () => {
         1,
         {
           workerpool: defaultConfig.prodWorkerpoolAddress,
-          app: defaultConfig.dappAddress.toLowerCase(),
+          app: TEST_WEB3TELEGRAM_DAPP_ADDRESS.toLowerCase(),
           dataset: protectedData,
           requester: userAddress,
           isRequesterStrict: false,

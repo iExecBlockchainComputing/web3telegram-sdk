@@ -6,23 +6,16 @@ import {
 import { beforeAll, describe, expect, it } from '@jest/globals';
 import { HDNodeWallet } from 'ethers';
 import {
-  DEFAULT_CHAIN_ID,
-  getChainDefaultConfig,
-} from '../../src/config/config.js';
-import {
   IExecWeb3telegram,
   WorkflowError as Web3TelegramWorkflowError,
 } from '../../src/index.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
-  MAX_EXPECTED_SUBGRAPH_INDEXING_TIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
   TEST_CHAIN,
-  addVoucherEligibleAsset,
+  TEST_WEB3TELEGRAM_DAPP_ADDRESS,
   createAndPublishAppOrders,
   createAndPublishWorkerpoolOrder,
-  createVoucher,
-  createVoucherType,
   ensureSufficientStake,
   getRandomWallet,
   getTestConfig,
@@ -41,14 +34,11 @@ describe('web3telegram.sendTelegram()', () => {
   let validProtectedData: ProtectedDataWithSecretProps;
   let invalidProtectedData: ProtectedDataWithSecretProps;
   let consumerIExecInstance: IExec;
-  let prodWorkerpoolAddress: string;
   let learnProdWorkerpoolAddress: string;
   const iexecOptions = getTestIExecOption();
   const prodWorkerpoolPublicPrice = 1000;
-  const defaultConfig = getChainDefaultConfig(DEFAULT_CHAIN_ID);
 
   beforeAll(async () => {
-    // (default) prod workerpool (not free) always available
     await createAndPublishWorkerpoolOrder(
       TEST_CHAIN.prodWorkerpool,
       TEST_CHAIN.prodWorkerpoolOwnerWallet,
@@ -56,15 +46,13 @@ describe('web3telegram.sendTelegram()', () => {
       1_000,
       prodWorkerpoolPublicPrice
     );
-    // learn prod pool (free) assumed always available
     await createAndPublishWorkerpoolOrder(
-      TEST_CHAIN.learnProdWorkerpool,
-      TEST_CHAIN.learnProdWorkerpoolOwnerWallet,
+      TEST_CHAIN.prodWorkerpool,
+      TEST_CHAIN.prodWorkerpoolOwnerWallet,
       NULL_ADDRESS,
       0,
       10_000
     );
-    // apporder always available
     providerWallet = getRandomWallet();
     const ethProvider = getTestWeb3SignerProvider(
       TEST_CHAIN.appOwnerWallet.privateKey
@@ -72,17 +60,11 @@ describe('web3telegram.sendTelegram()', () => {
     const resourceProvider = new IExec({ ethProvider }, iexecOptions);
     await createAndPublishAppOrders(
       resourceProvider,
-      defaultConfig!.dappAddress
+      TEST_WEB3TELEGRAM_DAPP_ADDRESS
     );
 
-    learnProdWorkerpoolAddress = await resourceProvider.ens.resolveName(
-      TEST_CHAIN.learnProdWorkerpool
-    );
-    prodWorkerpoolAddress = await resourceProvider.ens.resolveName(
-      TEST_CHAIN.prodWorkerpool
-    );
+    learnProdWorkerpoolAddress = TEST_CHAIN.prodWorkerpool;
 
-    //create valid protected data
     dataProtector = new IExecDataProtectorCore(
       ...getTestConfig(providerWallet.privateKey)
     );
@@ -90,7 +72,6 @@ describe('web3telegram.sendTelegram()', () => {
       data: { telegram_chatId: '12345' },
       name: 'test do not use',
     });
-    //create invalid protected data
     invalidProtectedData = await dataProtector.protectData({
       data: { foo: 'bar' },
       name: 'test do not use',
@@ -99,7 +80,6 @@ describe('web3telegram.sendTelegram()', () => {
   }, 4 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME + 5_000);
 
   beforeEach(async () => {
-    // use a fresh wallet for calling sendTelegram
     consumerWallet = getRandomWallet();
     const consumerEthProvider = getTestWeb3SignerProvider(
       consumerWallet.privateKey
@@ -109,9 +89,9 @@ describe('web3telegram.sendTelegram()', () => {
       iexecOptions
     );
     await dataProtector.grantAccess({
-      authorizedApp: defaultConfig.dappAddress,
+      authorizedApp: TEST_WEB3TELEGRAM_DAPP_ADDRESS,
       protectedData: validProtectedData.address,
-      authorizedUser: consumerWallet.address, // consumer wallet
+      authorizedUser: consumerWallet.address,
       numberOfAccess: 1000,
     });
     web3telegram = new IExecWeb3telegram(
@@ -218,7 +198,6 @@ describe('web3telegram.sendTelegram()', () => {
   it(
     'should fail if there is no Dataset order found',
     async () => {
-      //create valid protected data with blank order to not have: datasetorder is fully consumed error from iexec sdk
       const protectedData = await dataProtector.protectData({
         data: { telegram_chatId: '12345' },
         name: 'test do not use',
@@ -244,7 +223,6 @@ describe('web3telegram.sendTelegram()', () => {
   it(
     'should throw a protocol error id a service is not available',
     async () => {
-      // Call getTestConfig to get the default configuration
       const [ethProvider, defaultOptions] = getTestConfig(
         providerWallet.privateKey
       );
@@ -257,7 +235,6 @@ describe('web3telegram.sendTelegram()', () => {
         },
       };
 
-      // Pass the modified options to IExecWeb3telegram
       const invalidWeb3telegram = new IExecWeb3telegram(ethProvider, options);
       let error: Web3TelegramWorkflowError | undefined;
 
@@ -299,17 +276,15 @@ describe('web3telegram.sendTelegram()', () => {
   it(
     'should successfully send telegram with granted access to whitelist address',
     async () => {
-      //create valid protected data
       const protectedDataForWhitelist = await dataProtector.protectData({
         data: { telegram_chatId: '1461320872' },
         name: 'test do not use',
       });
       await waitSubgraphIndexing();
-      //grant access to whitelist
       await dataProtector.grantAccess({
-        authorizedApp: defaultConfig.dappAddress,
+        authorizedApp: TEST_WEB3TELEGRAM_DAPP_ADDRESS,
         protectedData: protectedDataForWhitelist.address,
-        authorizedUser: consumerWallet.address, // consumer wallet
+        authorizedUser: consumerWallet.address,
         numberOfAccess: 1000,
       });
 
@@ -327,7 +302,6 @@ describe('web3telegram.sendTelegram()', () => {
     2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
   );
 
-  // TODO impliment this feature in dapp
   it(
     'should successfully send telegram with content type html',
     async () => {
@@ -335,7 +309,6 @@ describe('web3telegram.sendTelegram()', () => {
         telegramContent:
           '<html><body><h1>Test html</h1> <p>test paragraph </p></body></html>',
         protectedData: validProtectedData.address,
-        // contentType: 'text/html',
         workerpoolAddressOrEns: learnProdWorkerpoolAddress,
       });
       expect('taskId' in sendTelegramResponse).toBe(true);
@@ -370,7 +343,7 @@ describe('web3telegram.sendTelegram()', () => {
   it(
     'should successfully send telegram with message content size < 512 kilo-bytes',
     async () => {
-      const desiredSizeInBytes = 500000; // 500 kilo-bytes
+      const desiredSizeInBytes = 500000;
       const characterToRepeat = 'A';
       const LARGE_CONTENT = characterToRepeat.repeat(desiredSizeInBytes);
 
@@ -401,216 +374,7 @@ describe('web3telegram.sendTelegram()', () => {
         dealId: expect.any(String),
         taskId: expect.any(String),
       });
-      // TODO check label in created deal
     },
     2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
   );
-
-  describe('when useVoucher:true', () => {
-    it(
-      'should throw error if no voucher available for the requester',
-      async () => {
-        let error;
-        try {
-          await web3telegram.sendTelegram({
-            telegramContent: 'e2e telegram content for test',
-            protectedData: validProtectedData.address,
-            workerpoolAddressOrEns: learnProdWorkerpoolAddress,
-            workerpoolMaxPrice: 1000,
-            useVoucher: true,
-          });
-        } catch (err) {
-          error = err;
-        }
-        expect(error).toBeDefined();
-        expect(error.message).toBe('Failed to sendTelegram');
-        expect(error.cause).toStrictEqual(
-          Error(
-            'Oops, it seems your wallet is not associated with any voucher. Check on https://builder.iex.ec/'
-          )
-        );
-      },
-      2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
-    );
-    it(
-      'should throw error if workerpool is not sponsored by the voucher',
-      async () => {
-        const voucherType = await createVoucherType({
-          description: 'test voucher type',
-          duration: 60 * 60,
-        });
-        await createVoucher({
-          owner: consumerWallet.address,
-          voucherType,
-          value: 1000,
-        });
-
-        let error;
-        try {
-          await web3telegram.sendTelegram({
-            telegramContent: 'e2e telegram content for test',
-            protectedData: validProtectedData.address,
-            // workerpoolAddressOrEns: prodWorkerpoolAddress, // default
-            workerpoolMaxPrice: 1000,
-            useVoucher: true,
-          });
-        } catch (err) {
-          error = err;
-        }
-        expect(error).toBeDefined();
-        expect(error.message).toBe('Failed to sendTelegram');
-        expect(error.cause.message).toBe(
-          'Found some workerpool orders but none can be sponsored by your voucher.'
-        );
-      },
-      2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
-    );
-    describe('when voucher balance covers the full workerpool price', () => {
-      it(
-        'should create a deal for send telegram message',
-        async () => {
-          // payable workerpool
-          const voucherType = await createVoucherType({
-            description: 'test voucher type',
-            duration: 60 * 60,
-          });
-          await addVoucherEligibleAsset(prodWorkerpoolAddress, voucherType);
-          const voucherValue = 1000;
-          await createVoucher({
-            owner: consumerWallet.address,
-            voucherType,
-            value: voucherValue,
-          });
-          await waitSubgraphIndexing();
-
-          const sendTelegramResponse = await web3telegram.sendTelegram({
-            telegramContent: 'e2e telegram content for test',
-            protectedData: validProtectedData.address,
-            // workerpoolAddressOrEns: prodWorkerpoolAddress, // default
-            useVoucher: true,
-          });
-          expect(sendTelegramResponse).toStrictEqual({
-            dealId: expect.any(String),
-            taskId: expect.any(String),
-          });
-        },
-        2 * MAX_EXPECTED_BLOCKTIME +
-          MAX_EXPECTED_WEB2_SERVICES_TIME +
-          MAX_EXPECTED_SUBGRAPH_INDEXING_TIME
-      );
-    });
-
-    describe('when voucher balance does not cover the full workerpool price', () => {
-      describe('but workerpoolMaxPrice covers the non sponsored amount', () => {
-        it(
-          'should create task if user approves the non sponsored amount',
-          async () => {
-            const voucherType = await createVoucherType({
-              description: 'test voucher type',
-              duration: 60 * 60,
-            });
-            await addVoucherEligibleAsset(prodWorkerpoolAddress, voucherType);
-
-            const voucherRemainingValue = 500;
-            const workerpoolOrderPrice = 600;
-            const nonSponsoredAmount =
-              workerpoolOrderPrice - voucherRemainingValue;
-
-            // voucher with balance insufficient to cover workerpool price
-            const [voucherAddress] = await Promise.all([
-              createVoucher({
-                owner: consumerWallet.address,
-                voucherType,
-                value: voucherRemainingValue,
-                skipOrders: true,
-              }),
-              createAndPublishWorkerpoolOrder(
-                TEST_CHAIN.prodWorkerpool,
-                TEST_CHAIN.prodWorkerpoolOwnerWallet,
-                consumerWallet.address,
-                workerpoolOrderPrice
-              ),
-            ]);
-            await waitSubgraphIndexing();
-            await ensureSufficientStake(
-              consumerIExecInstance,
-              nonSponsoredAmount
-            );
-            await consumerIExecInstance.account.approve(
-              nonSponsoredAmount,
-              voucherAddress
-            );
-
-            const sendTelegramResponse = await web3telegram.sendTelegram({
-              telegramContent: 'e2e telegram content for test',
-              protectedData: validProtectedData.address,
-              // workerpoolAddressOrEns: prodWorkerpoolAddress, // default
-              workerpoolMaxPrice: nonSponsoredAmount,
-              useVoucher: true,
-            });
-            expect(sendTelegramResponse).toStrictEqual({
-              dealId: expect.any(String),
-              taskId: expect.any(String),
-            });
-          },
-          2 * MAX_EXPECTED_BLOCKTIME +
-            MAX_EXPECTED_WEB2_SERVICES_TIME +
-            MAX_EXPECTED_SUBGRAPH_INDEXING_TIME
-        );
-      });
-      describe('and workerpoolMaxPrice does NOT covers the non sponsored amount', () => {
-        it(
-          'should throws an error No Workerpool order found for the desired price',
-          async () => {
-            const voucherType = await createVoucherType({
-              description: 'test voucher type',
-              duration: 60 * 60,
-            });
-            await addVoucherEligibleAsset(prodWorkerpoolAddress, voucherType);
-
-            const voucherRemainingValue = 500;
-            const workerpoolOrderPrice = 600;
-
-            // voucher with balance insufficient to cover workerpool price
-            await Promise.all([
-              createVoucher({
-                owner: consumerWallet.address,
-                voucherType,
-                value: voucherRemainingValue,
-                skipOrders: true,
-              }),
-              createAndPublishWorkerpoolOrder(
-                TEST_CHAIN.prodWorkerpool,
-                TEST_CHAIN.prodWorkerpoolOwnerWallet,
-                consumerWallet.address,
-                workerpoolOrderPrice
-              ),
-            ]);
-            await waitSubgraphIndexing();
-
-            let error;
-            try {
-              await web3telegram.sendTelegram({
-                telegramContent: 'e2e telegram content for test',
-                protectedData: validProtectedData.address,
-                // workerpoolAddressOrEns: prodWorkerpoolAddress, // default
-                // workerpoolMaxPrice: 0, // default
-                useVoucher: true,
-              });
-            } catch (err) {
-              error = err;
-            }
-            expect(error).toBeDefined();
-            expect(error.message).toBe('Failed to sendTelegram');
-            expect(error.cause.message).toBe(
-              `No Workerpool order found for the desired price`
-            );
-          },
-          2 * MAX_EXPECTED_BLOCKTIME +
-            MAX_EXPECTED_WEB2_SERVICES_TIME +
-            MAX_EXPECTED_SUBGRAPH_INDEXING_TIME
-        );
-      });
-    });
-  });
 });

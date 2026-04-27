@@ -18,9 +18,7 @@ export async function getChainIdFromProvider(
 ): Promise<number> {
   try {
     if (typeof ethProvider === 'string') {
-      // Handle network string
-      if (ethProvider === 'bellecour') return 134;
-      // TODO add arbitrum & avalanche
+      if (ethProvider === 'arbitrum-sepolia-testnet') return 421614;
       const provider = new JsonRpcProvider(ethProvider);
       const network = await provider.getNetwork();
       return Number(network.chainId);
