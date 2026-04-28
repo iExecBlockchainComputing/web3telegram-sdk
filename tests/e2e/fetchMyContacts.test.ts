@@ -2,20 +2,19 @@ import { describe, expect, it } from '@jest/globals';
 import { IExecDataProtector } from '@iexec/dataprotector';
 import { IExecWeb3telegram } from '../../src/index.js';
 import {
-  DEFAULT_CHAIN_ID,
-  getChainDefaultConfig,
-} from '../../src/config/config.js';
-import { getTestConfig, waitSubgraphIndexing } from '../test-utils.js';
-import { HDNodeWallet, Wallet } from 'ethers';
-import { NULL_ADDRESS } from 'iexec/utils';
-import {
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
   MAX_EXPECTED_SUBGRAPH_INDEXING_TIME,
+  TEST_WEB3TELEGRAM_DAPP_ADDRESS,
   deployRandomDataset,
-  getTestWeb3SignerProvider,
+  getTestConfig,
   getTestIExecOption,
+  getTestWeb3SignerProvider,
+  setBalance,
+  waitSubgraphIndexing,
 } from '../test-utils.js';
+import { HDNodeWallet, Wallet } from 'ethers';
+import { NULL_ADDRESS } from 'iexec/utils';
 import IExec from 'iexec/IExec';
 
 describe('web3telegram.fetchMyContacts()', () => {
@@ -23,10 +22,10 @@ describe('web3telegram.fetchMyContacts()', () => {
   let web3telegram: IExecWeb3telegram;
   let dataProtector: IExecDataProtector;
   let protectedData: any;
-  const defaultConfig = getChainDefaultConfig(DEFAULT_CHAIN_ID);
 
   beforeAll(async () => {
     wallet = Wallet.createRandom();
+    await setBalance(wallet.address, 10n ** 18n);
     dataProtector = new IExecDataProtector(...getTestConfig(wallet.privateKey));
     web3telegram = new IExecWeb3telegram(...getTestConfig(wallet.privateKey));
     protectedData = await dataProtector.core.protectData({
@@ -40,7 +39,7 @@ describe('web3telegram.fetchMyContacts()', () => {
     'pass with a granted access for a specific requester',
     async () => {
       await dataProtector.core.grantAccess({
-        authorizedApp: defaultConfig.dappAddress,
+        authorizedApp: TEST_WEB3TELEGRAM_DAPP_ADDRESS,
         protectedData: protectedData.address,
         authorizedUser: wallet.address,
       });
@@ -65,7 +64,7 @@ describe('web3telegram.fetchMyContacts()', () => {
     async () => {
       const grantedAccessForAnyRequester = await dataProtector.core.grantAccess(
         {
-          authorizedApp: defaultConfig.dappAddress,
+          authorizedApp: TEST_WEB3TELEGRAM_DAPP_ADDRESS,
           protectedData: protectedData.address,
           authorizedUser: NULL_ADDRESS,
         }
@@ -105,7 +104,7 @@ describe('web3telegram.fetchMyContacts()', () => {
       const encryptionKey = await iexec.dataset.generateEncryptionKey();
       await iexec.dataset.pushDatasetSecret(dataset.address, encryptionKey);
       await dataProtector.core.grantAccess({
-        authorizedApp: defaultConfig.dappAddress,
+        authorizedApp: TEST_WEB3TELEGRAM_DAPP_ADDRESS,
         protectedData: dataset.address,
         authorizedUser: wallet.address,
       });
@@ -127,7 +126,7 @@ describe('web3telegram.fetchMyContacts()', () => {
       await waitSubgraphIndexing();
 
       await dataProtector.core.grantAccess({
-        authorizedApp: defaultConfig.dappAddress,
+        authorizedApp: TEST_WEB3TELEGRAM_DAPP_ADDRESS,
         protectedData: notValidProtectedData.address,
         authorizedUser: wallet.address,
       });
@@ -164,7 +163,7 @@ describe('web3telegram.fetchMyContacts()', () => {
       async () => {
         // Grant access with allowBulk: true
         await dataProtector.core.grantAccess({
-          authorizedApp: defaultConfig.dappAddress,
+          authorizedApp: TEST_WEB3TELEGRAM_DAPP_ADDRESS,
           protectedData: protectedDataWithBulk.address,
           authorizedUser: wallet.address,
           allowBulk: true,
@@ -172,7 +171,7 @@ describe('web3telegram.fetchMyContacts()', () => {
 
         // Grant access with allowBulk: false (or default)
         await dataProtector.core.grantAccess({
-          authorizedApp: defaultConfig.dappAddress,
+          authorizedApp: TEST_WEB3TELEGRAM_DAPP_ADDRESS,
           protectedData: protectedDataWithoutBulk.address,
           authorizedUser: wallet.address,
           allowBulk: false,

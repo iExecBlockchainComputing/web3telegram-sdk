@@ -2,14 +2,22 @@ import {
   Contract,
   JsonRpcProvider,
   JsonRpcSigner,
+  Wallet,
   formatEther,
   toBeHex,
 } from 'ethers';
 
+/** Must match tests/test-utils.ts prodWorkerpoolOwnerWallet / appOwnerWallet private keys. */
+const PROD_WORKERPOOL_OWNER_PK =
+  '0x6a12f56d7686e85ab0f46eb3c19cb0c75bfabf8fb04e595654fc93ad652fa7bc';
+const APP_OWNER_PK =
+  '0xa911b93e50f57c156da0b8bff2277d241bcdb9345221a3e246a99c6e7cedcde5';
+
+const PROD_WORKERPOOL_OWNER_WALLET = new Wallet(
+  PROD_WORKERPOOL_OWNER_PK
+).address;
+const APP_OWNER_WALLET = new Wallet(APP_OWNER_PK).address;
 const TARGET_POCO_ADMIN_WALLET = '0x7bd4783FDCAD405A28052a0d1f11236A741da593';
-const PROD_WORKERPOOL_OWNER_WALLET =
-  '0x1Ff6AfF580e8Ca738F76485E0914C2aCaDa7B462';
-const APP_OWNER_WALLET = '0x626D65C778fB98f813C25F84249E3012B80e8d91';
 const PROD_WORKERPOOL = '0x2956f0cb779904795a5f30d3b3ea88b714c3123f';
 const WEB3_TELEGRAM_DAPP_ADDRESS = '0x7f67e78a4b0A98c50333B8b72851952c396601a1';
 const IEXEC_HUB_ADDRESS = '0xB2157BF2fAb286b2A4170E3491Ac39770111Da3E';
@@ -196,6 +204,9 @@ const main = async () => {
     PROD_WORKERPOOL_OWNER_WALLET
   );
   await getIExecResourceOwnership(WEB3_TELEGRAM_DAPP_ADDRESS, APP_OWNER_WALLET);
+
+  await setBalance(PROD_WORKERPOOL_OWNER_WALLET, 100n * 10n ** 18n);
+  await setBalance(APP_OWNER_WALLET, 100n * 10n ** 18n);
 };
 
 main();

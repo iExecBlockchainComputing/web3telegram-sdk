@@ -3,7 +3,7 @@ import {
   ProtectedDataWithSecretProps,
   WorkflowError,
 } from '@iexec/dataprotector';
-import { beforeAll, describe, expect, it } from '@jest/globals';
+import { beforeAll, beforeEach, describe, expect, it } from '@jest/globals';
 import { HDNodeWallet } from 'ethers';
 import {
   IExecWeb3telegram,
@@ -17,10 +17,13 @@ import {
   createAndPublishAppOrders,
   createAndPublishWorkerpoolOrder,
   ensureSufficientStake,
+  getId,
   getRandomWallet,
   getTestConfig,
   getTestIExecOption,
   getTestWeb3SignerProvider,
+  setBalance,
+  setEthForGas,
   waitSubgraphIndexing,
 } from '../test-utils.js';
 import { IExec } from 'iexec';
@@ -36,16 +39,8 @@ describe('web3telegram.sendTelegram()', () => {
   let consumerIExecInstance: IExec;
   let learnProdWorkerpoolAddress: string;
   const iexecOptions = getTestIExecOption();
-  const prodWorkerpoolPublicPrice = 1000;
 
   beforeAll(async () => {
-    await createAndPublishWorkerpoolOrder(
-      TEST_CHAIN.prodWorkerpool,
-      TEST_CHAIN.prodWorkerpoolOwnerWallet,
-      NULL_ADDRESS,
-      1_000,
-      prodWorkerpoolPublicPrice
-    );
     await createAndPublishWorkerpoolOrder(
       TEST_CHAIN.prodWorkerpool,
       TEST_CHAIN.prodWorkerpoolOwnerWallet,
@@ -54,6 +49,7 @@ describe('web3telegram.sendTelegram()', () => {
       10_000
     );
     providerWallet = getRandomWallet();
+    await setBalance(providerWallet.address, 10n ** 18n);
     const ethProvider = getTestWeb3SignerProvider(
       TEST_CHAIN.appOwnerWallet.privateKey
     );
@@ -81,6 +77,7 @@ describe('web3telegram.sendTelegram()', () => {
 
   beforeEach(async () => {
     consumerWallet = getRandomWallet();
+    await setEthForGas(consumerWallet.address);
     const consumerEthProvider = getTestWeb3SignerProvider(
       consumerWallet.privateKey
     );
@@ -100,21 +97,50 @@ describe('web3telegram.sendTelegram()', () => {
   });
 
   describe('when using the default (not free) prod workerpool', () => {
+    let paidWorkerpoolAddress: string;
+    const prodWorkerpoolPublicPrice = 1000;
+
+    beforeAll(async () => {
+      // Deploy a fresh workerpool so it has no pre-existing free orders from the fork
+      await setEthForGas(TEST_CHAIN.prodWorkerpoolOwnerWallet.address);
+      const workerpoolOwnerEthProvider = getTestWeb3SignerProvider(
+        TEST_CHAIN.prodWorkerpoolOwnerWallet.privateKey
+      );
+      const workerpoolOwnerIexec = new IExec(
+        { ethProvider: workerpoolOwnerEthProvider },
+        iexecOptions
+      );
+      const { address } =
+        await workerpoolOwnerIexec.workerpool.deployWorkerpool({
+          owner: TEST_CHAIN.prodWorkerpoolOwnerWallet.address,
+          description: `paid test workerpool ${getId()}`,
+        });
+      paidWorkerpoolAddress = address;
+      await createAndPublishWorkerpoolOrder(
+        paidWorkerpoolAddress,
+        TEST_CHAIN.prodWorkerpoolOwnerWallet,
+        NULL_ADDRESS,
+        prodWorkerpoolPublicPrice,
+        10
+      );
+    }, 3 * MAX_EXPECTED_BLOCKTIME);
+
     describe('when using the user does not set the workerpoolMaxPrice', () => {
       it(
         'should throw an error No Workerpool order found for the desired price',
         async () => {
-          let error: Error;
+          let error!: Error;
           await web3telegram
             .sendTelegram({
               telegramContent: 'e2e telegram content for test',
               protectedData: validProtectedData.address,
+              workerpoolAddressOrEns: paidWorkerpoolAddress,
             })
             .catch((e) => (error = e));
           expect(error).toBeDefined();
           expect(error.message).toBe('Failed to sendTelegram');
           expect(error.cause).toStrictEqual(
-            Error(`No Workerpool order found for the desired price`)
+            new Error(`No Workerpool order found for the desired price`)
           );
         },
         2 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME
@@ -124,18 +150,19 @@ describe('web3telegram.sendTelegram()', () => {
       it(
         `should throw an error if the user can't pay with its account`,
         async () => {
-          let error: Error;
+          let error!: Web3TelegramWorkflowError;
           await web3telegram
             .sendTelegram({
               telegramContent: 'e2e telegram content for test',
               protectedData: validProtectedData.address,
+              workerpoolAddressOrEns: paidWorkerpoolAddress,
               workerpoolMaxPrice: prodWorkerpoolPublicPrice,
             })
             .catch((e) => (error = e));
           expect(error).toBeInstanceOf(Web3TelegramWorkflowError);
           expect(error.message).toBe('Failed to sendTelegram');
           expect(error.cause).toStrictEqual(
-            Error(
+            new Error(
               `Cost per task (${prodWorkerpoolPublicPrice}) is greater than requester account stake (0). Orders can't be matched. If you are the requester, you should deposit to top up your account`
             )
           );
@@ -152,6 +179,7 @@ describe('web3telegram.sendTelegram()', () => {
           const sendTelegramResponse = await web3telegram.sendTelegram({
             telegramContent: 'e2e telegram content for test',
             protectedData: validProtectedData.address,
+            workerpoolAddressOrEns: paidWorkerpoolAddress,
             workerpoolMaxPrice: prodWorkerpoolPublicPrice,
           });
           expect(sendTelegramResponse).toStrictEqual({
@@ -213,7 +241,7 @@ describe('web3telegram.sendTelegram()', () => {
       ).rejects.toThrow(
         new WorkflowError({
           message: 'Failed to sendTelegram',
-          errorCause: Error('No Dataset order found for the desired price'),
+          errorCause: new Error('No Dataset order found for the desired price'),
         })
       );
     },
@@ -322,7 +350,6 @@ describe('web3telegram.sendTelegram()', () => {
 
   it(
     'should successfully send telegram with a valid senderName',
-
     async () => {
       const sendTelegramResponse = await web3telegram.sendTelegram({
         telegramContent: 'e2e telegram content for test',

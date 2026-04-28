@@ -4,7 +4,7 @@
     "description": "arbitrum-sepolia-fork",
     "iapps": [
       {
-        "name": "web3telegram-tdx",
+        "key": "web3telegram-tdx",
         "address": "0x7f67e78a4b0A98c50333B8b72851952c396601a1"
       }
     ],

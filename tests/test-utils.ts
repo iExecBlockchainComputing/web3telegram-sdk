@@ -46,8 +46,64 @@ export const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
 export const MAX_EXPECTED_SUBGRAPH_INDEXING_TIME = 5_000;
 
-export const waitSubgraphIndexing = () =>
-  sleep(MAX_EXPECTED_SUBGRAPH_INDEXING_TIME);
+const DATAPROTECTOR_SUBGRAPH_URL =
+  'http://127.0.0.1:8000/subgraphs/name/DataProtector-v2';
+
+export const waitSubgraphIndexing = async (
+  timeoutMs = 60_000
+): Promise<void> => {
+  const provider = new JsonRpcProvider(TEST_CHAIN.rpcURL);
+  const targetBlock = await provider.getBlockNumber();
+
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    try {
+      const res = await fetch(DATAPROTECTOR_SUBGRAPH_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: '{ _meta { block { number } } }' }),
+      });
+      const json = await res.json();
+      const indexedBlock: number = json?.data?._meta?.block?.number ?? 0;
+      if (indexedBlock >= targetBlock) return;
+    } catch {
+      // subgraph not ready yet, keep polling
+    }
+    await sleep(1_000);
+  }
+  throw new Error(
+    `waitSubgraphIndexing: subgraph did not index block ${targetBlock} within ${timeoutMs}ms`
+  );
+};
+
+const anvilSetBalance = async (address: string, targetWeiBalance: bigint) => {
+  await fetch(TEST_CHAIN.rpcURL, {
+    method: 'POST',
+    body: JSON.stringify({
+      method: 'anvil_setBalance',
+      params: [address, toBeHex(targetWeiBalance)],
+      id: 1,
+      jsonrpc: '2.0',
+    }),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+};
+
+export const setBalance = async (
+  address: string,
+  targetWeiBalance: ethers.BigNumberish
+) => {
+  await anvilSetBalance(address, BigInt(`${targetWeiBalance}`));
+};
+
+export const setEthForGas = async (
+  address: string,
+  wei: bigint = 10n ** 18n
+) => {
+  await setBalance(address, wei);
+};
 
 export const getRequiredFieldMessage = (field: string = 'this') =>
   `${field} is a required field`;
@@ -68,21 +124,6 @@ export const getTestWeb3SignerProvider = (
   utils.getSignerFromPrivateKey(TEST_CHAIN.rpcURL, privateKey);
 
 export const getTestRpcProvider = () => new JsonRpcProvider(TEST_CHAIN.rpcURL);
-
-const anvilSetBalance = async (address: string, targetWeiBalance: bigint) => {
-  await fetch(TEST_CHAIN.rpcURL, {
-    method: 'POST',
-    body: JSON.stringify({
-      method: 'anvil_setBalance',
-      params: [address, toBeHex(targetWeiBalance)],
-      id: 1,
-      jsonrpc: '2.0',
-    }),
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
-};
 
 const anvilSetNRlcTokenBalance = async (
   address: string,
@@ -129,13 +170,6 @@ const anvilSetNRlcTokenBalance = async (
       'Content-Type': 'application/json',
     },
   });
-};
-
-export const setBalance = async (
-  address: string,
-  targetWeiBalance: ethers.BigNumberish
-) => {
-  await anvilSetBalance(address, BigInt(`${targetWeiBalance}`));
 };
 
 export const setNRlcBalance = async (

@@ -37,5 +37,8 @@ writeFileSync(
 ################################################
 
 ARBITRUM_SEPOLIA_FORK_URL=${arbitrumSepoliaForkUrl}
-ARBITRUM_SEPOLIA_FORK_BLOCK=${forkBlockNumber}`
+# block number to fork from
+ARBITRUM_SEPOLIA_FORK_BLOCK=${forkBlockNumber}
+# block number to index from (should be fork block + 1 to skip all existing ArbitrumInternalTxType which is not supported by a graphnode connected to anvil)
+ARBITRUM_SEPOLIA_INDEX_BLOCK=${forkBlockNumber + 1}`
 );

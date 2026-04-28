@@ -4,16 +4,13 @@ import {
 } from '@iexec/dataprotector';
 import { beforeAll, describe, expect, it } from '@jest/globals';
 import { HDNodeWallet } from 'ethers';
-import {
-  DEFAULT_CHAIN_ID,
-  getChainDefaultConfig,
-} from '../../src/config/config.js';
 import { Contact, IExecWeb3telegram } from '../../src/index.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
   MAX_EXPECTED_SUBGRAPH_INDEXING_TIME,
   TEST_CHAIN,
+  TEST_WEB3TELEGRAM_DAPP_ADDRESS,
   createAndPublishAppOrders,
   createAndPublishWorkerpoolOrder,
   ensureSufficientStake,
@@ -21,6 +18,8 @@ import {
   getTestConfig,
   getTestIExecOption,
   getTestWeb3SignerProvider,
+  setBalance,
+  setEthForGas,
   waitSubgraphIndexing,
 } from '../test-utils.js';
 import { IExec } from 'iexec';
@@ -37,7 +36,6 @@ describe('web3telegram.sendTelegramCampaign() - Bulk Processing', () => {
   let consumerIExecInstance: IExec;
   const iexecOptions = getTestIExecOption();
   const prodWorkerpoolPublicPrice = 1000;
-  const defaultConfig = getChainDefaultConfig(DEFAULT_CHAIN_ID);
 
   beforeAll(async () => {
     // Create workerpool orders
@@ -51,6 +49,7 @@ describe('web3telegram.sendTelegramCampaign() - Bulk Processing', () => {
 
     // Create app orders
     providerWallet = getRandomWallet();
+    await setBalance(providerWallet.address, 10n ** 18n);
 
     const resourceProvider = new IExec(
       {
@@ -62,7 +61,7 @@ describe('web3telegram.sendTelegramCampaign() - Bulk Processing', () => {
     );
     await createAndPublishAppOrders(
       resourceProvider,
-      defaultConfig!.dappAddress
+      TEST_WEB3TELEGRAM_DAPP_ADDRESS
     );
 
     dataProtector = new IExecDataProtectorCore(
@@ -90,6 +89,7 @@ describe('web3telegram.sendTelegramCampaign() - Bulk Processing', () => {
 
   beforeEach(async () => {
     consumerWallet = getRandomWallet();
+    await setEthForGas(consumerWallet.address);
     const consumerEthProvider = getTestWeb3SignerProvider(
       consumerWallet.privateKey
     );
@@ -100,21 +100,21 @@ describe('web3telegram.sendTelegramCampaign() - Bulk Processing', () => {
 
     // Grant access with allowBulk for bulk processing
     await dataProtector.grantAccess({
-      authorizedApp: defaultConfig.dappAddress,
+      authorizedApp: TEST_WEB3TELEGRAM_DAPP_ADDRESS,
       protectedData: validProtectedData1.address,
       authorizedUser: consumerWallet.address,
       allowBulk: true,
     });
 
     await dataProtector.grantAccess({
-      authorizedApp: defaultConfig.dappAddress,
+      authorizedApp: TEST_WEB3TELEGRAM_DAPP_ADDRESS,
       protectedData: validProtectedData2.address,
       authorizedUser: consumerWallet.address,
       allowBulk: true,
     });
 
     await dataProtector.grantAccess({
-      authorizedApp: defaultConfig.dappAddress,
+      authorizedApp: TEST_WEB3TELEGRAM_DAPP_ADDRESS,
       protectedData: validProtectedData3.address,
       authorizedUser: consumerWallet.address,
       allowBulk: true,
