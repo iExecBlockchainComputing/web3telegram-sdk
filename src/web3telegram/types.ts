@@ -1,12 +1,8 @@
+import type { AbstractSigner } from 'ethers';
 import { BulkRequest } from '@iexec/dataprotector';
-import { EnhancedWallet } from 'iexec';
 import { IExecConfigOptions } from 'iexec/IExecConfig';
 
-export type Web3SignerProvider = EnhancedWallet;
-
-export type ENS = string;
-
-export type AddressOrENS = Address | ENS;
+export type Web3SignerProvider = AbstractSigner;
 
 export type Address = string;
 
@@ -72,7 +68,7 @@ export type SendTelegramParams = {
   telegramContent: string;
   protectedData: Address;
   label?: string;
-  workerpoolAddressOrEns?: AddressOrENS;
+  workerpoolAddress?: Address;
   dataMaxPrice?: number;
   appMaxPrice?: number;
   workerpoolMaxPrice?: number;
@@ -94,7 +90,7 @@ export type PrepareTelegramCampaignParams = {
   senderName?: string;
   telegramContent: string;
   label?: string;
-  workerpoolAddressOrEns?: AddressOrENS;
+  workerpoolAddress?: Address;
   dataMaxPrice?: number;
   appMaxPrice?: number;
   workerpoolMaxPrice?: number;
@@ -115,9 +111,9 @@ export type SendTelegramCampaignParams = {
    */
   campaignRequest: CampaignRequest;
   /**
-   * Workerpool address or ENS to use for processing
+   * Workerpool contract address used for processing
    */
-  workerpoolAddressOrEns?: string;
+  workerpoolAddress?: string;
 };
 
 export type SendTelegramCampaignResponse = {
@@ -133,10 +129,10 @@ export type SendTelegramCampaignResponse = {
  */
 export type Web3TelegramConfigOptions = {
   /**
-   * The Ethereum contract address or ENS (Ethereum Name Service) for the telegram sender dapp.
+   * Ethereum contract address for the telegram sender dapp.
    * If not provided, the default web3telegram address for the detected chain will be used.
    */
-  dappAddressOrENS?: AddressOrENS;
+  dappAddress?: Address;
 
   /**
    * The Ethereum contract address for the whitelist.

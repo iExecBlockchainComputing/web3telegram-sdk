@@ -202,7 +202,7 @@ export const getTestConfig = (
     ? getTestWeb3SignerProvider(privateKey)
     : undefined;
   const options = {
-    dappAddressOrENS: TEST_WEB3TELEGRAM_DAPP_ADDRESS,
+    dappAddress: TEST_WEB3TELEGRAM_DAPP_ADDRESS,
     iexecOptions: getTestIExecOption(),
     ipfsGateway: 'http://127.0.0.1:8080',
     ipfsNode: 'http://127.0.0.1:5001',

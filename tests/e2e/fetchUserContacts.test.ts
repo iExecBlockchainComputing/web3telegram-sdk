@@ -69,7 +69,7 @@ describe('web3telegram.fetchMyContacts()', () => {
 
       await web3telegram.init();
       // eslint-disable-next-line @typescript-eslint/dot-notation
-      const authorizedApp = web3telegram['dappAddressOrENS'];
+      const authorizedApp = web3telegram['dappAddress'];
 
       await dataProtector.grantAccess({
         authorizedApp: authorizedApp,
@@ -218,7 +218,7 @@ describe('web3telegram.fetchMyContacts()', () => {
         await dataProtector.grantAccess({
           authorizedApp: authorizedApp,
           protectedData: protectedData1.address,
-          authorizedUser: ethProvider.address,
+          authorizedUser: await ethProvider.getAddress(),
         });
 
         const options = {

@@ -82,7 +82,7 @@ describe('fetchMyContacts', () => {
       iexec: iexec,
       // @ts-expect-error No need for graphQLClient here
       graphQLClient: {},
-      dappAddressOrENS: TEST_WEB3TELEGRAM_DAPP_ADDRESS,
+      dappAddress: TEST_WEB3TELEGRAM_DAPP_ADDRESS,
       dappWhitelistAddress: defaultConfig.whitelistSmartContract,
     });
     const userAddress = (await iexec.wallet.getAddress()).toLowerCase();
@@ -143,7 +143,7 @@ describe('fetchMyContacts', () => {
       iexec: iexec,
       // @ts-expect-error No need for graphQLClient here
       graphQLClient: {},
-      dappAddressOrENS: TEST_WEB3TELEGRAM_DAPP_ADDRESS,
+      dappAddress: TEST_WEB3TELEGRAM_DAPP_ADDRESS,
       dappWhitelistAddress: defaultConfig.whitelistSmartContract,
       isUserStrict: true,
     });
@@ -218,7 +218,7 @@ describe('fetchMyContacts', () => {
       iexec: iexec,
       // @ts-expect-error No need for graphQLClient here
       graphQLClient: {},
-      dappAddressOrENS: TEST_WEB3TELEGRAM_DAPP_ADDRESS,
+      dappAddress: TEST_WEB3TELEGRAM_DAPP_ADDRESS,
       dappWhitelistAddress: defaultConfig.whitelistSmartContract,
     });
 
@@ -265,7 +265,7 @@ describe('fetchMyContacts', () => {
       iexec: iexec,
       // @ts-expect-error No need for graphQLClient here
       graphQLClient: {},
-      dappAddressOrENS: TEST_WEB3TELEGRAM_DAPP_ADDRESS,
+      dappAddress: TEST_WEB3TELEGRAM_DAPP_ADDRESS,
       dappWhitelistAddress: defaultConfig.whitelistSmartContract,
       bulkOnly: true,
     });
@@ -327,7 +327,7 @@ describe('fetchMyContacts', () => {
       iexec: iexec,
       // @ts-expect-error No need for graphQLClient here
       graphQLClient: {},
-      dappAddressOrENS: TEST_WEB3TELEGRAM_DAPP_ADDRESS,
+      dappAddress: TEST_WEB3TELEGRAM_DAPP_ADDRESS,
       dappWhitelistAddress: defaultConfig.whitelistSmartContract,
       bulkOnly: false,
     });
@@ -389,7 +389,7 @@ describe('fetchMyContacts', () => {
       iexec: iexec,
       // @ts-expect-error No need for graphQLClient here
       graphQLClient: {},
-      dappAddressOrENS: TEST_WEB3TELEGRAM_DAPP_ADDRESS,
+      dappAddress: TEST_WEB3TELEGRAM_DAPP_ADDRESS,
       dappWhitelistAddress: defaultConfig.whitelistSmartContract,
       isUserStrict: true,
       bulkOnly: true,

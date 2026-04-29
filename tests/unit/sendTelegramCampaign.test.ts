@@ -58,7 +58,7 @@ describe('sendTelegramCampaign', () => {
       // --- WHEN
       const result = await sendTelegramCampaign({
         dataProtector: mockDataprotector,
-        workerpoolAddressOrEns: defaultConfig.prodWorkerpoolAddress,
+        workerpoolAddress: defaultConfig.prodWorkerpoolAddress,
         campaignRequest: mockCampaignRequest,
       });
 
@@ -113,7 +113,7 @@ describe('sendTelegramCampaign', () => {
       // --- WHEN
       const result = await sendTelegramCampaign({
         dataProtector: mockDataprotector,
-        workerpoolAddressOrEns: defaultConfig.prodWorkerpoolAddress,
+        workerpoolAddress: defaultConfig.prodWorkerpoolAddress,
         campaignRequest: mockCampaignRequest,
       });
 
@@ -163,7 +163,7 @@ describe('sendTelegramCampaign', () => {
       // --- WHEN
       await sendTelegramCampaign({
         dataProtector: mockDataprotector,
-        workerpoolAddressOrEns: defaultConfig.prodWorkerpoolAddress,
+        workerpoolAddress: defaultConfig.prodWorkerpoolAddress,
         campaignRequest: mockCampaignRequest,
       });
 
@@ -185,7 +185,7 @@ describe('sendTelegramCampaign', () => {
       await expect(
         sendTelegramCampaign({
           dataProtector: mockDataprotector,
-          workerpoolAddressOrEns: defaultConfig.prodWorkerpoolAddress,
+          workerpoolAddress: defaultConfig.prodWorkerpoolAddress,
           // campaignRequest is not provided
         } as any)
       ).rejects.toThrow();
@@ -194,7 +194,7 @@ describe('sendTelegramCampaign', () => {
       await expect(
         sendTelegramCampaign({
           dataProtector: mockDataprotector,
-          workerpoolAddressOrEns: defaultConfig.prodWorkerpoolAddress,
+          workerpoolAddress: defaultConfig.prodWorkerpoolAddress,
         } as any)
       ).rejects.toMatchObject({
         message: expect.stringMatching(
@@ -237,7 +237,7 @@ describe('sendTelegramCampaign', () => {
       await expect(
         sendTelegramCampaign({
           dataProtector: mockDataprotector,
-          workerpoolAddressOrEns: defaultConfig.prodWorkerpoolAddress,
+          workerpoolAddress: defaultConfig.prodWorkerpoolAddress,
           campaignRequest: mockCampaignRequest,
         })
       ).rejects.toMatchObject({
@@ -245,7 +245,7 @@ describe('sendTelegramCampaign', () => {
       });
     });
 
-    it('should throw error when workerpoolAddressOrEns is not provided', async () => {
+    it('should throw error when workerpoolAddress is not provided', async () => {
       // --- GIVEN
       const mockCampaignRequest: BulkRequest = {
         app: '0x0000000000000000000000000000000000000000',
@@ -275,7 +275,7 @@ describe('sendTelegramCampaign', () => {
         sendTelegramCampaign({
           dataProtector: mockDataprotector,
           campaignRequest: mockCampaignRequest,
-          // workerpoolAddressOrEns is not provided
+          // workerpoolAddress is not provided
         } as any)
       ).rejects.toMatchObject({
         message: expect.stringMatching(
@@ -311,7 +311,7 @@ describe('sendTelegramCampaign', () => {
       await expect(
         sendTelegramCampaign({
           // dataProtector is not provided
-          workerpoolAddressOrEns: defaultConfig.prodWorkerpoolAddress,
+          workerpoolAddress: defaultConfig.prodWorkerpoolAddress,
           campaignRequest: mockCampaignRequest,
         } as any)
       ).rejects.toMatchObject({
@@ -321,7 +321,7 @@ describe('sendTelegramCampaign', () => {
       });
     });
 
-    it('should throw error when workerpoolAddressOrEns is invalid', async () => {
+    it('should throw error when workerpoolAddress is invalid', async () => {
       // --- GIVEN
       const mockCampaignRequest: BulkRequest = {
         app: '0x0000000000000000000000000000000000000000',
@@ -350,7 +350,7 @@ describe('sendTelegramCampaign', () => {
       await expect(
         sendTelegramCampaign({
           dataProtector: mockDataprotector,
-          workerpoolAddressOrEns: 'invalid-address',
+          workerpoolAddress: 'invalid-address',
           campaignRequest: mockCampaignRequest,
         })
       ).rejects.toMatchObject({
@@ -373,7 +373,7 @@ describe('sendTelegramCampaign', () => {
       await expect(
         sendTelegramCampaign({
           dataProtector: mockDataprotector,
-          workerpoolAddressOrEns: defaultConfig.prodWorkerpoolAddress,
+          workerpoolAddress: defaultConfig.prodWorkerpoolAddress,
           campaignRequest: null as any, // Invalid campaignRequest
         })
       ).rejects.toMatchObject({
@@ -420,7 +420,7 @@ describe('sendTelegramCampaign', () => {
       await expect(
         sendTelegramCampaign({
           dataProtector: mockDataprotector,
-          workerpoolAddressOrEns: defaultConfig.prodWorkerpoolAddress,
+          workerpoolAddress: defaultConfig.prodWorkerpoolAddress,
           campaignRequest: mockCampaignRequest,
         })
       ).rejects.toBe(protocolError);
@@ -458,7 +458,7 @@ describe('sendTelegramCampaign', () => {
       await expect(
         sendTelegramCampaign({
           dataProtector: mockDataprotector,
-          workerpoolAddressOrEns: defaultConfig.prodWorkerpoolAddress,
+          workerpoolAddress: defaultConfig.prodWorkerpoolAddress,
           campaignRequest: mockCampaignRequest,
         })
       ).rejects.toMatchObject({
@@ -466,7 +466,7 @@ describe('sendTelegramCampaign', () => {
       });
     });
 
-    it('should throw error when workerpoolAddressOrEns does not match campaignRequest.workerpool', async () => {
+    it('should throw error when workerpoolAddress does not match campaignRequest.workerpool', async () => {
       // --- GIVEN
       const mockCampaignRequest: BulkRequest = {
         app: '0x0000000000000000000000000000000000000000',
@@ -497,15 +497,14 @@ describe('sendTelegramCampaign', () => {
       await expect(
         sendTelegramCampaign({
           dataProtector: mockDataprotector,
-          workerpoolAddressOrEns: differentWorkerpool,
+          workerpoolAddress: differentWorkerpool,
           campaignRequest: mockCampaignRequest,
         })
       ).rejects.toMatchObject({
         message: 'Failed to sendTelegramCampaign',
         cause: expect.objectContaining({
           name: 'ValidationError',
-          message:
-            "workerpoolAddressOrEns doesn't match campaignRequest workerpool",
+          message: "workerpoolAddress doesn't match campaignRequest workerpool",
         }),
       });
 

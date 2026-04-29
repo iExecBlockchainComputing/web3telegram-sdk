@@ -9,7 +9,6 @@ import { generateSecureUniqueId } from '../utils/generateUniqueId.js';
 import * as ipfs from '../utils/ipfs-service.js';
 import { checkProtectedDataValidity } from '../utils/subgraphQuery.js';
 import {
-  addressOrEnsSchema,
   telegramContentSchema,
   positiveNumberSchema,
   labelSchema,
@@ -33,8 +32,8 @@ export type SendTelegram = typeof sendTelegram;
 export const sendTelegram = async ({
   graphQLClient = throwIfMissing(),
   iexec = throwIfMissing(),
-  workerpoolAddressOrEns = throwIfMissing(),
-  dappAddressOrENS,
+  workerpoolAddress = throwIfMissing(),
+  dappAddress,
   dappWhitelistAddress,
   ipfsNode,
   ipfsGateway,
@@ -53,7 +52,7 @@ export const sendTelegram = async ({
   IpfsGatewayConfigConsumer &
   SendTelegramParams): Promise<SendTelegramResponse> => {
   try {
-    const vDatasetAddress = addressOrEnsSchema()
+    const vDatasetAddress = addressSchema()
       .required()
       .label('protectedData')
       .validateSync(protectedData);
@@ -65,14 +64,14 @@ export const sendTelegram = async ({
       .label('telegramContent')
       .validateSync(telegramContent);
     const vLabel = labelSchema().label('label').validateSync(label);
-    const vWorkerpoolAddressOrEns = addressOrEnsSchema()
+    const vWorkerpoolAddress = addressSchema()
       .required()
-      .label('WorkerpoolAddressOrEns')
-      .validateSync(workerpoolAddressOrEns);
-    const vDappAddressOrENS = addressOrEnsSchema()
+      .label('workerpoolAddress')
+      .validateSync(workerpoolAddress);
+    const vDappAddress = addressSchema()
       .required()
-      .label('dappAddressOrENS')
-      .validateSync(dappAddressOrENS);
+      .label('dappAddress')
+      .validateSync(dappAddress);
     const vDappWhitelistAddress = addressSchema()
       .required()
       .label('dappWhitelistAddress')
@@ -102,9 +101,9 @@ export const sendTelegram = async ({
     // Fetch app order
     const apporder = await iexec.orderbook
       .fetchAppOrderbook({
-        app: dappAddressOrENS,
+        app: vDappAddress,
         minTag: ['tee'],
-        workerpool: workerpoolAddressOrEns,
+        workerpool: vWorkerpoolAddress,
       })
       .then((appOrderbook) => {
         const desiredPriceAppOrderbook = appOrderbook.orders.filter(
@@ -125,7 +124,7 @@ export const sendTelegram = async ({
         iexec.orderbook
           .fetchDatasetOrderbook({
             dataset: vDatasetAddress,
-            app: dappAddressOrENS,
+            app: vDappAddress,
             requester: requesterAddress,
           })
           .then((datasetOrderbook) => {
@@ -152,8 +151,8 @@ export const sendTelegram = async ({
         // Fetch workerpool order for App or AppWhitelist
         Promise.all([
           iexec.orderbook.fetchWorkerpoolOrderbook({
-            workerpool: workerpoolAddressOrEns,
-            app: vDappAddressOrENS,
+            workerpool: vWorkerpoolAddress,
+            app: vDappAddress,
             dataset: vDatasetAddress,
             requester: requesterAddress,
             isRequesterStrict: false,
@@ -161,7 +160,7 @@ export const sendTelegram = async ({
             category: 0,
           }),
           iexec.orderbook.fetchWorkerpoolOrderbook({
-            workerpool: workerpoolAddressOrEns,
+            workerpool: vWorkerpoolAddress,
             app: vDappWhitelistAddress,
             dataset: vDatasetAddress,
             requester: requesterAddress,
@@ -232,14 +231,14 @@ export const sendTelegram = async ({
     );
 
     const requestorderToSign = await iexec.order.createRequestorder({
-      app: vDappAddressOrENS,
+      app: vDappAddress,
       category: workerpoolorder.category,
       dataset: vDatasetAddress,
       datasetmaxprice: datasetorder.datasetprice,
       appmaxprice: apporder.appprice,
       workerpoolmaxprice: workerpoolorder.workerpoolprice,
       tag: workerpoolMinTag,
-      workerpool: vWorkerpoolAddressOrEns,
+      workerpool: vWorkerpoolAddress,
       params: {
         iexec_secrets: {
           1: requesterSecretId,
@@ -258,18 +257,11 @@ export const sendTelegram = async ({
     });
     const taskId = await iexec.deal.computeTaskId(dealId, 0);
     return {
-      dealId,
       taskId,
+      dealId,
     };
   } catch (error) {
-    // Protocol error detected, re-throwing as-is
-    if ((error as any)?.isProtocolError === true) {
-      throw error;
-    }
-    // Handle protocol errors - this will throw if it's an ApiCallError
-    // handleIfProtocolError transforms ApiCallError into a WorkflowError with isProtocolError=true
     handleIfProtocolError(error);
-    // For all other errors
     throw new WorkflowError({
       message: 'Failed to sendTelegram',
       errorCause: error,

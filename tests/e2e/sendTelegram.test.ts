@@ -134,7 +134,7 @@ describe('web3telegram.sendTelegram()', () => {
             .sendTelegram({
               telegramContent: 'e2e telegram content for test',
               protectedData: validProtectedData.address,
-              workerpoolAddressOrEns: paidWorkerpoolAddress,
+              workerpoolAddress: paidWorkerpoolAddress,
             })
             .catch((e) => (error = e));
           expect(error).toBeDefined();
@@ -155,7 +155,7 @@ describe('web3telegram.sendTelegram()', () => {
             .sendTelegram({
               telegramContent: 'e2e telegram content for test',
               protectedData: validProtectedData.address,
-              workerpoolAddressOrEns: paidWorkerpoolAddress,
+              workerpoolAddress: paidWorkerpoolAddress,
               workerpoolMaxPrice: prodWorkerpoolPublicPrice,
             })
             .catch((e) => (error = e));
@@ -179,7 +179,7 @@ describe('web3telegram.sendTelegram()', () => {
           const sendTelegramResponse = await web3telegram.sendTelegram({
             telegramContent: 'e2e telegram content for test',
             protectedData: validProtectedData.address,
-            workerpoolAddressOrEns: paidWorkerpoolAddress,
+            workerpoolAddress: paidWorkerpoolAddress,
             workerpoolMaxPrice: prodWorkerpoolPublicPrice,
           });
           expect(sendTelegramResponse).toStrictEqual({
@@ -199,7 +199,7 @@ describe('web3telegram.sendTelegram()', () => {
         web3telegram.sendTelegram({
           telegramContent: 'e2e telegram content for test',
           protectedData: invalidProtectedData.address,
-          workerpoolAddressOrEns: learnProdWorkerpoolAddress,
+          workerpoolAddress: learnProdWorkerpoolAddress,
         })
       ).rejects.toThrow('Failed to sendTelegram');
 
@@ -208,7 +208,7 @@ describe('web3telegram.sendTelegram()', () => {
         await web3telegram.sendTelegram({
           telegramContent: 'e2e telegram content for test',
           protectedData: invalidProtectedData.address,
-          workerpoolAddressOrEns: learnProdWorkerpoolAddress,
+          workerpoolAddress: learnProdWorkerpoolAddress,
         });
       } catch (err) {
         error = err as Web3TelegramWorkflowError;
@@ -236,7 +236,7 @@ describe('web3telegram.sendTelegram()', () => {
         web3telegram.sendTelegram({
           telegramContent: 'e2e telegram content for test',
           protectedData: protectedData.address,
-          workerpoolAddressOrEns: learnProdWorkerpoolAddress,
+          workerpoolAddress: learnProdWorkerpoolAddress,
         })
       ).rejects.toThrow(
         new WorkflowError({
@@ -269,7 +269,7 @@ describe('web3telegram.sendTelegram()', () => {
       try {
         await invalidWeb3telegram.sendTelegram({
           protectedData: validProtectedData.address,
-          workerpoolAddressOrEns: learnProdWorkerpoolAddress,
+          workerpoolAddress: learnProdWorkerpoolAddress,
           telegramContent: 'e2e telegram content for test',
         });
       } catch (err) {
@@ -291,7 +291,7 @@ describe('web3telegram.sendTelegram()', () => {
       const sendTelegramResponse = await web3telegram.sendTelegram({
         telegramContent: 'e2e telegram content for test',
         protectedData: validProtectedData.address,
-        workerpoolAddressOrEns: learnProdWorkerpoolAddress,
+        workerpoolAddress: learnProdWorkerpoolAddress,
       });
       expect(sendTelegramResponse).toStrictEqual({
         dealId: expect.any(String),
@@ -319,7 +319,7 @@ describe('web3telegram.sendTelegram()', () => {
       const sendTelegramResponse = await web3telegram.sendTelegram({
         telegramContent: 'e2e telegram content for test',
         protectedData: protectedDataForWhitelist.address,
-        workerpoolAddressOrEns: learnProdWorkerpoolAddress,
+        workerpoolAddress: learnProdWorkerpoolAddress,
       });
       expect('taskId' in sendTelegramResponse).toBe(true);
       expect(sendTelegramResponse).toStrictEqual({
@@ -337,7 +337,7 @@ describe('web3telegram.sendTelegram()', () => {
         telegramContent:
           '<html><body><h1>Test html</h1> <p>test paragraph </p></body></html>',
         protectedData: validProtectedData.address,
-        workerpoolAddressOrEns: learnProdWorkerpoolAddress,
+        workerpoolAddress: learnProdWorkerpoolAddress,
       });
       expect('taskId' in sendTelegramResponse).toBe(true);
       expect(sendTelegramResponse).toStrictEqual({
@@ -355,7 +355,7 @@ describe('web3telegram.sendTelegram()', () => {
         telegramContent: 'e2e telegram content for test',
         protectedData: validProtectedData.address,
         senderName: 'Product Team',
-        workerpoolAddressOrEns: learnProdWorkerpoolAddress,
+        workerpoolAddress: learnProdWorkerpoolAddress,
       });
       expect(sendTelegramResponse).toBeDefined();
       expect('taskId' in sendTelegramResponse).toBe(true);
@@ -378,7 +378,7 @@ describe('web3telegram.sendTelegram()', () => {
         telegramContent: LARGE_CONTENT,
         protectedData: validProtectedData.address,
         senderName: 'Product Team',
-        workerpoolAddressOrEns: learnProdWorkerpoolAddress,
+        workerpoolAddress: learnProdWorkerpoolAddress,
       });
       expect(sendTelegramResponse).toStrictEqual({
         dealId: expect.any(String),
@@ -394,7 +394,7 @@ describe('web3telegram.sendTelegram()', () => {
       const sendTelegramResponse = await web3telegram.sendTelegram({
         telegramContent: 'e2e telegram content for test',
         protectedData: validProtectedData.address,
-        workerpoolAddressOrEns: learnProdWorkerpoolAddress,
+        workerpoolAddress: learnProdWorkerpoolAddress,
         label: 'ID1234678',
       });
       expect(sendTelegramResponse).toStrictEqual({

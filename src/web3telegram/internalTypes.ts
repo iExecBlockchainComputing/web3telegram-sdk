@@ -1,5 +1,5 @@
 import { IExec } from 'iexec';
-import { AddressOrENS } from './types.js';
+import { Address } from './types.js';
 import { GraphQLClient } from 'graphql-request';
 import { IExecDataProtectorCore } from '@iexec/dataprotector';
 
@@ -13,7 +13,7 @@ export type GraphQLResponse = {
 };
 
 export type DappAddressConsumer = {
-  dappAddressOrENS: AddressOrENS;
+  dappAddress: Address;
 };
 
 export type IpfsNodeConfigConsumer = {

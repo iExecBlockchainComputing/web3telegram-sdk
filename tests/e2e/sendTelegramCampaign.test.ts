@@ -149,7 +149,7 @@ describe('web3telegram.sendTelegramCampaign() - Bulk Processing', () => {
           maxProtectedDataPerTask: 3,
           appMaxPrice: 1000,
           workerpoolMaxPrice: 1000,
-          workerpoolAddressOrEns: TEST_CHAIN.prodWorkerpool,
+          workerpoolAddress: TEST_CHAIN.prodWorkerpool,
           senderName: 'Bulk Test Sender',
         });
         const campaignRequest = prepareResult.campaignRequest;
@@ -158,7 +158,7 @@ describe('web3telegram.sendTelegramCampaign() - Bulk Processing', () => {
         // Use the workerpool from campaignRequest (already resolved to address)
         const result = await web3telegram.sendTelegramCampaign({
           campaignRequest,
-          workerpoolAddressOrEns: campaignRequest.workerpool,
+          workerpoolAddress: campaignRequest.workerpool,
         });
 
         // Verify the result
@@ -200,7 +200,7 @@ describe('web3telegram.sendTelegramCampaign() - Bulk Processing', () => {
           maxProtectedDataPerTask: 1,
           appMaxPrice: 1000,
           workerpoolMaxPrice: 1000,
-          workerpoolAddressOrEns: TEST_CHAIN.prodWorkerpool,
+          workerpoolAddress: TEST_CHAIN.prodWorkerpool,
           senderName: 'Single Contact Test',
         });
         const campaignRequest = prepareResult.campaignRequest;
@@ -209,7 +209,7 @@ describe('web3telegram.sendTelegramCampaign() - Bulk Processing', () => {
         // Use the workerpool from campaignRequest (already resolved to address)
         const result = await web3telegram.sendTelegramCampaign({
           campaignRequest,
-          workerpoolAddressOrEns: campaignRequest.workerpool,
+          workerpoolAddress: campaignRequest.workerpool,
         });
 
         // Verify the result
@@ -248,7 +248,7 @@ describe('web3telegram.sendTelegramCampaign() - Bulk Processing', () => {
           maxProtectedDataPerTask: 1, // Force one protected data per task
           appMaxPrice: 1000,
           workerpoolMaxPrice: 1000,
-          workerpoolAddressOrEns: TEST_CHAIN.prodWorkerpool,
+          workerpoolAddress: TEST_CHAIN.prodWorkerpool,
           senderName: 'Max Data Test',
           label: 'MAXDATA',
         });
@@ -258,7 +258,7 @@ describe('web3telegram.sendTelegramCampaign() - Bulk Processing', () => {
         // Use the workerpool from campaignRequest (already resolved to address)
         const result = await web3telegram.sendTelegramCampaign({
           campaignRequest,
-          workerpoolAddressOrEns: campaignRequest.workerpool,
+          workerpoolAddress: campaignRequest.workerpool,
         });
 
         // Verify the result
@@ -295,7 +295,7 @@ describe('web3telegram.sendTelegramCampaign() - Bulk Processing', () => {
           maxProtectedDataPerTask: 3,
           appMaxPrice: 1000,
           workerpoolMaxPrice: 1000,
-          workerpoolAddressOrEns: TEST_CHAIN.prodWorkerpool,
+          workerpoolAddress: TEST_CHAIN.prodWorkerpool,
           senderName: 'CustomSender',
           label: 'CUSTOM123',
         });
@@ -305,7 +305,7 @@ describe('web3telegram.sendTelegramCampaign() - Bulk Processing', () => {
         // Use the workerpool from campaignRequest (already resolved to address)
         const result = await web3telegram.sendTelegramCampaign({
           campaignRequest,
-          workerpoolAddressOrEns: campaignRequest.workerpool,
+          workerpoolAddress: campaignRequest.workerpool,
         });
 
         // Verify the result
@@ -319,7 +319,7 @@ describe('web3telegram.sendTelegramCampaign() - Bulk Processing', () => {
     );
 
     it(
-      'should throw error when workerpoolAddressOrEns does not match campaignRequest.workerpool',
+      'should throw error when workerpoolAddress does not match campaignRequest.workerpool',
       async () => {
         // Fetch contacts with allowBulk access
         const contacts: Contact[] = await web3telegram.fetchMyContacts({
@@ -335,7 +335,7 @@ describe('web3telegram.sendTelegramCampaign() - Bulk Processing', () => {
           maxProtectedDataPerTask: 3,
           appMaxPrice: 1000,
           workerpoolMaxPrice: 1000,
-          workerpoolAddressOrEns: TEST_CHAIN.prodWorkerpool,
+          workerpoolAddress: TEST_CHAIN.prodWorkerpool,
           senderName: 'Mismatch Test',
         });
         const campaignRequest = prepareResult.campaignRequest;
@@ -346,14 +346,14 @@ describe('web3telegram.sendTelegramCampaign() - Bulk Processing', () => {
         await expect(
           web3telegram.sendTelegramCampaign({
             campaignRequest,
-            workerpoolAddressOrEns: differentWorkerpool,
+            workerpoolAddress: differentWorkerpool,
           })
         ).rejects.toMatchObject({
           message: 'Failed to sendTelegramCampaign',
           cause: expect.objectContaining({
             name: 'ValidationError',
             message:
-              "workerpoolAddressOrEns doesn't match campaignRequest workerpool",
+              "workerpoolAddress doesn't match campaignRequest workerpool",
           }),
         });
       },
