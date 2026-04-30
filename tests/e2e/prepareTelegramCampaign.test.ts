@@ -4,19 +4,24 @@ import {
 } from '@iexec/dataprotector';
 import { beforeAll, describe, expect, it } from '@jest/globals';
 import { HDNodeWallet } from 'ethers';
-import {
-  DEFAULT_CHAIN_ID,
-  getChainDefaultConfig,
-} from '../../src/config/config.js';
 import { Contact, IExecWeb3telegram } from '../../src/index.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
-  MAX_EXPECTED_SUBGRAPH_INDEXING_TIME,
+  TEST_CHAIN,
+  TEST_WEB3TELEGRAM_DAPP_ADDRESS,
+  createAndPublishAppOrders,
+  createAndPublishWorkerpoolOrder,
   getRandomWallet,
   getTestConfig,
+  getTestIExecOption,
+  getTestWeb3SignerProvider,
+  setBalance,
+  setEthForGas,
   waitSubgraphIndexing,
 } from '../test-utils.js';
+import { IExec } from 'iexec';
+import { NULL_ADDRESS } from 'iexec/utils';
 
 describe('web3telegram.prepareTelegramCampaign()', () => {
   let consumerWallet: HDNodeWallet;
@@ -26,16 +31,38 @@ describe('web3telegram.prepareTelegramCampaign()', () => {
   let validProtectedData1: ProtectedDataWithSecretProps;
   let validProtectedData2: ProtectedDataWithSecretProps;
   let validProtectedData3: ProtectedDataWithSecretProps;
+  const iexecOptions = getTestIExecOption();
   const prodWorkerpoolPublicPrice = 1000;
-  const defaultConfig = getChainDefaultConfig(DEFAULT_CHAIN_ID);
 
   beforeAll(async () => {
-    // Create app orders
+    await createAndPublishWorkerpoolOrder(
+      TEST_CHAIN.prodWorkerpool,
+      TEST_CHAIN.prodWorkerpoolOwnerWallet,
+      NULL_ADDRESS,
+      1_000,
+      prodWorkerpoolPublicPrice
+    );
+
     providerWallet = getRandomWallet();
+
+    const resourceProvider = new IExec(
+      {
+        ethProvider: getTestWeb3SignerProvider(
+          TEST_CHAIN.appOwnerWallet.privateKey
+        ),
+      },
+      iexecOptions
+    );
+    await createAndPublishAppOrders(
+      resourceProvider,
+      TEST_WEB3TELEGRAM_DAPP_ADDRESS
+    );
 
     dataProtector = new IExecDataProtectorCore(
       ...getTestConfig(providerWallet.privateKey)
     );
+
+    await setBalance(providerWallet.address, 10n ** 18n);
 
     // create valid protected data
     validProtectedData1 = await dataProtector.protectData({
@@ -54,28 +81,29 @@ describe('web3telegram.prepareTelegramCampaign()', () => {
     });
 
     await waitSubgraphIndexing();
-  }, 5 * MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME + 5_000);
+  }, 5 * (MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME) + TEST_CHAIN.maxExpectedSubgraphIndexingTime + 5_000);
 
   beforeEach(async () => {
     consumerWallet = getRandomWallet();
+    await setEthForGas(consumerWallet.address);
 
     // Grant access with allowBulk for bulk processing
     await dataProtector.grantAccess({
-      authorizedApp: defaultConfig.dappAddress,
+      authorizedApp: TEST_WEB3TELEGRAM_DAPP_ADDRESS,
       protectedData: validProtectedData1.address,
       authorizedUser: consumerWallet.address,
       allowBulk: true,
     });
 
     await dataProtector.grantAccess({
-      authorizedApp: defaultConfig.dappAddress,
+      authorizedApp: TEST_WEB3TELEGRAM_DAPP_ADDRESS,
       protectedData: validProtectedData2.address,
       authorizedUser: consumerWallet.address,
       allowBulk: true,
     });
 
     await dataProtector.grantAccess({
-      authorizedApp: defaultConfig.dappAddress,
+      authorizedApp: TEST_WEB3TELEGRAM_DAPP_ADDRESS,
       protectedData: validProtectedData3.address,
       authorizedUser: consumerWallet.address,
       allowBulk: true,
@@ -85,7 +113,7 @@ describe('web3telegram.prepareTelegramCampaign()', () => {
     web3telegram = new IExecWeb3telegram(
       ...getTestConfig(consumerWallet.privateKey)
     );
-  }, MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_SUBGRAPH_INDEXING_TIME);
+  }, MAX_EXPECTED_BLOCKTIME + TEST_CHAIN.maxExpectedSubgraphIndexingTime);
 
   it(
     'should prepare a telegram campaignRequest',

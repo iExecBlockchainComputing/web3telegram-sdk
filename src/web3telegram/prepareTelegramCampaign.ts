@@ -6,7 +6,7 @@ import {
 import { handleIfProtocolError, WorkflowError } from '../utils/errors.js';
 import * as ipfs from '../utils/ipfs-service.js';
 import {
-  addressOrEnsSchema,
+  addressSchema,
   telegramContentSchema,
   positiveNumberSchema,
   labelSchema,
@@ -30,8 +30,8 @@ export type PrepareTelegramCampaign = typeof prepareTelegramCampaign;
 export const prepareTelegramCampaign = async ({
   iexec = throwIfMissing(),
   dataProtector = throwIfMissing(),
-  workerpoolAddressOrEns,
-  dappAddressOrENS,
+  workerpoolAddress,
+  dappAddress,
   ipfsNode,
   ipfsGateway,
   senderName,
@@ -48,9 +48,9 @@ export const prepareTelegramCampaign = async ({
   DataProtectorConsumer &
   PrepareTelegramCampaignParams): Promise<PrepareTelegramCampaignResponse> => {
   try {
-    const vWorkerpoolAddressOrEns = addressOrEnsSchema()
-      .label('WorkerpoolAddressOrEns')
-      .validateSync(workerpoolAddressOrEns);
+    const vWorkerpoolAddress = addressSchema()
+      .label('workerpoolAddress')
+      .validateSync(workerpoolAddress);
     const vSenderName = senderNameSchema()
       .label('senderName')
       .validateSync(senderName);
@@ -59,10 +59,10 @@ export const prepareTelegramCampaign = async ({
       .label('telegramContent')
       .validateSync(telegramContent);
     const vLabel = labelSchema().label('label').validateSync(label);
-    const vDappAddressOrENS = addressOrEnsSchema()
+    const vDappAddress = addressSchema()
       .required()
-      .label('dappAddressOrENS')
-      .validateSync(dappAddressOrENS);
+      .label('dappAddress')
+      .validateSync(dappAddress);
     const vAppMaxPrice = positiveNumberSchema()
       .label('appMaxPrice')
       .validateSync(appMaxPrice);
@@ -115,10 +115,10 @@ export const prepareTelegramCampaign = async ({
 
     const { bulkRequest: campaignRequest } =
       await dataProtector.prepareBulkRequest({
-        app: vDappAddressOrENS,
+        app: vDappAddress,
         appMaxPrice: vAppMaxPrice,
         workerpoolMaxPrice: vWorkerpoolMaxPrice,
-        workerpool: vWorkerpoolAddressOrEns,
+        workerpool: vWorkerpoolAddress,
         args: vLabel,
         inputFiles: [],
         secrets,
@@ -132,7 +132,7 @@ export const prepareTelegramCampaign = async ({
       throw error;
     }
     // Handle protocol errors - this will throw if it's an ApiCallError
-    // handleIfProtocolError transforms ApiCallError into a WorkflowError with isProtocolError=true
+    // handleIfProtocolError transforms ApiCallError into WorkflowError with isProtocolError=true
     handleIfProtocolError(error);
     // For all other errors
     throw new WorkflowError({

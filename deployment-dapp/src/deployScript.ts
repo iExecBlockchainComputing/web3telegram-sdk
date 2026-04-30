@@ -2,15 +2,8 @@ import { deployApp } from './singleFunction/deployApp.js';
 import { getIExec, saveAppAddress } from './utils/utils.js';
 
 const main = async () => {
-  // get env variables from GitHub Actions
-  const {
-    RPC_URL,
-    WALLET_PRIVATE_KEY,
-    DOCKER_IMAGE_TAG,
-    CHECKSUM,
-    FINGERPRINT,
-    SCONIFY_VERSION,
-  } = process.env;
+  const { RPC_URL, WALLET_PRIVATE_KEY, DOCKER_IMAGE_TAG, CHECKSUM } =
+    process.env;
 
   if (!WALLET_PRIVATE_KEY)
     throw Error(`Missing WALLET_PRIVATE_KEY environment variable`);
@@ -25,8 +18,6 @@ const main = async () => {
     iexec,
     dockerTag: DOCKER_IMAGE_TAG,
     checksum: CHECKSUM,
-    fingerprint: FINGERPRINT,
-    sconifyVersion: SCONIFY_VERSION,
   });
   await saveAppAddress(address);
 };

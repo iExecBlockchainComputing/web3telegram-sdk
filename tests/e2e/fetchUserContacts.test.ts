@@ -4,16 +4,15 @@ import {
 } from '@iexec/dataprotector';
 import { beforeAll, describe, expect, it } from '@jest/globals';
 import { HDNodeWallet, Wallet } from 'ethers';
-import {
-  DEFAULT_CHAIN_ID,
-  getChainDefaultConfig,
-} from '../../src/config/config.js';
+import { getChainDefaultConfig } from '../../src/config/config.js';
 import { IExecWeb3telegram, WorkflowError } from '../../src/index.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
-  MAX_EXPECTED_SUBGRAPH_INDEXING_TIME,
+  TEST_CHAIN,
+  TEST_WEB3TELEGRAM_DAPP_ADDRESS,
   getTestConfig,
+  setBalance,
   waitSubgraphIndexing,
 } from '../test-utils.js';
 
@@ -26,6 +25,7 @@ describe('web3telegram.fetchMyContacts()', () => {
 
   beforeAll(async () => {
     wallet = Wallet.createRandom();
+    await setBalance(wallet.address, 10n ** 18n);
     dataProtector = new IExecDataProtectorCore(
       ...getTestConfig(wallet.privateKey)
     );
@@ -66,7 +66,7 @@ describe('web3telegram.fetchMyContacts()', () => {
 
       await web3telegram.init();
       // eslint-disable-next-line @typescript-eslint/dot-notation
-      const authorizedApp = web3telegram['dappAddressOrENS'];
+      const authorizedApp = web3telegram['dappAddress'];
 
       await dataProtector.grantAccess({
         authorizedApp: authorizedApp,
@@ -92,10 +92,10 @@ describe('web3telegram.fetchMyContacts()', () => {
       'should return the user contacts for both app and whitelist',
       async () => {
         const userWithAccess = Wallet.createRandom().address;
-        const defaultConfig = getChainDefaultConfig(DEFAULT_CHAIN_ID);
-        expect(defaultConfig).not.toBeNull();
-        const authorizedApp = defaultConfig!.dappAddress;
-        const authorizedWhitelist = defaultConfig!.whitelistSmartContract;
+        const chainConfig = getChainDefaultConfig(421614);
+        expect(chainConfig).not.toBeNull();
+        const authorizedApp = TEST_WEB3TELEGRAM_DAPP_ADDRESS;
+        const authorizedWhitelist = chainConfig!.whitelistSmartContract;
 
         await dataProtector.grantAccess({
           authorizedApp: authorizedApp,
@@ -123,15 +123,14 @@ describe('web3telegram.fetchMyContacts()', () => {
       async () => {
         const user1 = Wallet.createRandom().address;
         const user2 = Wallet.createRandom().address;
-        const defaultConfig = getChainDefaultConfig(DEFAULT_CHAIN_ID);
         await dataProtector.grantAccess({
-          authorizedApp: defaultConfig.dappAddress,
+          authorizedApp: TEST_WEB3TELEGRAM_DAPP_ADDRESS,
           protectedData: protectedData1.address,
           authorizedUser: user1,
         });
 
         await dataProtector.grantAccess({
-          authorizedApp: defaultConfig.dappAddress,
+          authorizedApp: TEST_WEB3TELEGRAM_DAPP_ADDRESS,
           protectedData: protectedData2.address,
           authorizedUser: user2,
         });
@@ -151,9 +150,8 @@ describe('web3telegram.fetchMyContacts()', () => {
       'Test that the protected data can be accessed by authorized user',
       async () => {
         const userWithAccess = Wallet.createRandom().address;
-        const defaultConfig = getChainDefaultConfig(DEFAULT_CHAIN_ID);
         await dataProtector.grantAccess({
-          authorizedApp: defaultConfig.dappAddress,
+          authorizedApp: TEST_WEB3TELEGRAM_DAPP_ADDRESS,
           protectedData: protectedData1.address,
           authorizedUser: userWithAccess,
         });
@@ -212,14 +210,12 @@ describe('web3telegram.fetchMyContacts()', () => {
         // Call getTestConfig to get the default configuration
         const [ethProvider, defaultOptions] = getTestConfig(wallet.privateKey);
 
-        const defaultConfig = getChainDefaultConfig(DEFAULT_CHAIN_ID);
-        expect(defaultConfig).not.toBeNull();
-        const authorizedApp = defaultConfig!.dappAddress;
+        const authorizedApp = TEST_WEB3TELEGRAM_DAPP_ADDRESS;
 
         await dataProtector.grantAccess({
           authorizedApp: authorizedApp,
           protectedData: protectedData1.address,
-          authorizedUser: ethProvider.address,
+          authorizedUser: await ethProvider.getAddress(),
         });
 
         const options = {
@@ -266,12 +262,8 @@ describe('web3telegram.fetchMyContacts()', () => {
     it(
       'should return only contacts with bulk access when bulkOnly is true',
       async () => {
-        const defaultConfig = getChainDefaultConfig(DEFAULT_CHAIN_ID);
-        expect(defaultConfig).not.toBeNull();
-
-        // Grant access with allowBulk: true
         await dataProtector.grantAccess({
-          authorizedApp: defaultConfig!.dappAddress,
+          authorizedApp: TEST_WEB3TELEGRAM_DAPP_ADDRESS,
           protectedData: protectedDataWithBulk.address,
           authorizedUser: userWithAccess,
           allowBulk: true,
@@ -279,7 +271,7 @@ describe('web3telegram.fetchMyContacts()', () => {
 
         // Grant access with allowBulk: false (or default)
         await dataProtector.grantAccess({
-          authorizedApp: defaultConfig!.dappAddress,
+          authorizedApp: TEST_WEB3TELEGRAM_DAPP_ADDRESS,
           protectedData: protectedDataWithoutBulk.address,
           authorizedUser: userWithAccess,
           allowBulk: false,
@@ -307,7 +299,7 @@ describe('web3telegram.fetchMyContacts()', () => {
         expect(noBulkContact).toBeUndefined();
       },
       MAX_EXPECTED_BLOCKTIME +
-        MAX_EXPECTED_SUBGRAPH_INDEXING_TIME +
+        TEST_CHAIN.maxExpectedSubgraphIndexingTime +
         MAX_EXPECTED_WEB2_SERVICES_TIME
     );
 

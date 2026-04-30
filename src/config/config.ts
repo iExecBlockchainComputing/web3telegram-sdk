@@ -3,8 +3,6 @@ export const MAX_DESIRED_APP_ORDER_PRICE = 0;
 export const MAX_DESIRED_WORKERPOOL_ORDER_PRICE = 0;
 export const ANY_DATASET_ADDRESS = 'any';
 
-export const DEFAULT_CHAIN_ID = 134;
-
 interface ChainConfig {
   name: string;
   dappAddress?: string;
@@ -17,16 +15,6 @@ interface ChainConfig {
 }
 
 export const CHAIN_CONFIG: Record<number, ChainConfig> = {
-  134: {
-    name: 'bellecour',
-    dappAddress: 'web3telegram.apps.iexec.eth',
-    prodWorkerpoolAddress: 'prod-v8-bellecour.main.pools.iexec.eth',
-    dataProtectorSubgraph:
-      'https://thegraph.iex.ec/subgraphs/name/bellecour/dataprotector-v2',
-    ipfsUploadUrl: '/dns4/ipfs-upload.v8-bellecour.iex.ec/https',
-    ipfsGateway: 'https://ipfs-gateway.v8-bellecour.iex.ec',
-    whitelistSmartContract: '0x192C6f5AccE52c81Fcc2670f10611a3665AAA98F',
-  },
   421614: {
     name: 'arbitrum-sepolia-testnet',
     dappAddress: undefined, // ENS not supported on this network, address will be resolved from Compass
@@ -62,3 +50,27 @@ export const getChainDefaultConfig = (
   }
   return config;
 };
+
+/**
+ * When `ethProvider` is a string, it may be an RPC URL, a decimal chain id, or an
+ * iExec chain host name (see each chain's `name` in CHAIN_CONFIG). RPC URLs are not
+ * resolved here (returns undefined); JsonRpcProvider handles those.
+ */
+export function tryResolveChainIdFromProviderString(
+  hint: string
+): number | undefined {
+  const trimmed = hint.trim();
+  if (/^https?:\/\//i.test(trimmed)) {
+    return undefined;
+  }
+  if (/^\d+$/.test(trimmed)) {
+    return Number(trimmed);
+  }
+  const lower = trimmed.toLowerCase();
+  for (const [id, cfg] of Object.entries(CHAIN_CONFIG)) {
+    if (cfg.name.toLowerCase() === lower) {
+      return Number(id);
+    }
+  }
+  return undefined;
+}

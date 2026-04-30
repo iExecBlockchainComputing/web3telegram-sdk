@@ -10,7 +10,7 @@ import {
   Contact,
   FetchUserContactsParams,
   SendTelegramParams,
-  AddressOrENS,
+  Address,
   Web3TelegramConfigOptions,
   Web3SignerProvider,
   FetchMyContactsParams,
@@ -34,8 +34,8 @@ type EthersCompatibleProvider =
   | string;
 
 interface Web3telegramResolvedConfig {
-  dappAddressOrENS: AddressOrENS;
-  dappWhitelistAddress: AddressOrENS;
+  dappAddress: Address;
+  dappWhitelistAddress: Address;
   graphQLClient: GraphQLClient;
   ipfsNode: string;
   ipfsGateway: string;
@@ -45,9 +45,9 @@ interface Web3telegramResolvedConfig {
 }
 
 export class IExecWeb3telegram {
-  private dappAddressOrENS!: AddressOrENS;
+  private dappAddress!: Address;
 
-  private dappWhitelistAddress!: AddressOrENS;
+  private dappWhitelistAddress!: Address;
 
   private graphQLClient!: GraphQLClient;
 
@@ -68,17 +68,17 @@ export class IExecWeb3telegram {
   private options: Web3TelegramConfigOptions;
 
   constructor(
-    ethProvider?: EthersCompatibleProvider,
+    ethProvider: EthersCompatibleProvider,
     options?: Web3TelegramConfigOptions
   ) {
-    this.ethProvider = ethProvider || 'bellecour';
+    this.ethProvider = ethProvider;
     this.options = options || {};
   }
 
   async init(): Promise<void> {
     if (!this.initPromise) {
       this.initPromise = this.resolveConfig().then((config) => {
-        this.dappAddressOrENS = config.dappAddressOrENS;
+        this.dappAddress = config.dappAddress;
         this.dappWhitelistAddress = config.dappWhitelistAddress;
         this.graphQLClient = config.graphQLClient;
         this.ipfsNode = config.ipfsNode;
@@ -99,7 +99,7 @@ export class IExecWeb3telegram {
       ...args,
       iexec: this.iexec,
       graphQLClient: this.graphQLClient,
-      dappAddressOrENS: this.dappAddressOrENS,
+      dappAddress: this.dappAddress,
       dappWhitelistAddress: this.dappWhitelistAddress,
     });
   }
@@ -111,7 +111,7 @@ export class IExecWeb3telegram {
       ...args,
       iexec: this.iexec,
       graphQLClient: this.graphQLClient,
-      dappAddressOrENS: this.dappAddressOrENS,
+      dappAddress: this.dappAddress,
       dappWhitelistAddress: this.dappWhitelistAddress,
     });
   }
@@ -121,12 +121,11 @@ export class IExecWeb3telegram {
     await isValidProvider(this.iexec);
     return sendTelegram({
       ...args,
-      workerpoolAddressOrEns:
-        args.workerpoolAddressOrEns || this.defaultWorkerpool,
+      workerpoolAddress: args.workerpoolAddress || this.defaultWorkerpool,
       iexec: this.iexec,
       ipfsNode: this.ipfsNode,
       ipfsGateway: this.ipfsGateway,
-      dappAddressOrENS: this.dappAddressOrENS,
+      dappAddress: this.dappAddress,
       dappWhitelistAddress: this.dappWhitelistAddress,
       graphQLClient: this.graphQLClient,
     });
@@ -139,8 +138,7 @@ export class IExecWeb3telegram {
     await isValidProvider(this.iexec);
     return sendTelegramCampaign({
       ...args,
-      workerpoolAddressOrEns:
-        args.workerpoolAddressOrEns || this.defaultWorkerpool,
+      workerpoolAddress: args.workerpoolAddress || this.defaultWorkerpool,
       dataProtector: this.dataProtector,
     });
   }
@@ -156,7 +154,7 @@ export class IExecWeb3telegram {
       dataProtector: this.dataProtector,
       ipfsNode: this.ipfsNode,
       ipfsGateway: this.ipfsGateway,
-      dappAddressOrENS: this.dappAddressOrENS,
+      dappAddress: this.dappAddress,
     });
   }
 
@@ -187,8 +185,8 @@ export class IExecWeb3telegram {
     const subgraphUrl =
       this.options?.dataProtectorSubgraph ||
       chainDefaultConfig?.dataProtectorSubgraph;
-    const dappAddressOrENS =
-      this.options?.dappAddressOrENS ||
+    const dappAddress =
+      this.options?.dappAddress ||
       chainDefaultConfig?.dappAddress ||
       (await resolveDappAddressFromCompass(
         await iexec.config.resolveCompassURL(),
@@ -204,7 +202,7 @@ export class IExecWeb3telegram {
 
     const missing = [];
     if (!subgraphUrl) missing.push('dataProtectorSubgraph');
-    if (!dappAddressOrENS) missing.push('dappAddress');
+    if (!dappAddress) missing.push('dappAddress');
     if (!dappWhitelistAddress) missing.push('whitelistSmartContract');
     if (!ipfsGateway) missing.push('ipfsGateway');
     if (!defaultWorkerpool) missing.push('prodWorkerpoolAddress');
@@ -236,7 +234,7 @@ export class IExecWeb3telegram {
     });
 
     return {
-      dappAddressOrENS,
+      dappAddress,
       dappWhitelistAddress: dappWhitelistAddress.toLowerCase(),
       defaultWorkerpool,
       graphQLClient,

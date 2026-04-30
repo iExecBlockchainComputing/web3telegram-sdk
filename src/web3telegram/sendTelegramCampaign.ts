@@ -1,7 +1,7 @@
 import { NULL_ADDRESS } from 'iexec/utils';
 import { handleIfProtocolError, WorkflowError } from '../utils/errors.js';
 import {
-  addressOrEnsSchema,
+  addressSchema,
   throwIfMissing,
   campaignRequestSchema,
 } from '../utils/validators.js';
@@ -21,7 +21,7 @@ export type SendTelegramCampaign = typeof sendTelegramCampaign;
 
 export const sendTelegramCampaign = async ({
   dataProtector = throwIfMissing(),
-  workerpoolAddressOrEns = throwIfMissing(),
+  workerpoolAddress = throwIfMissing(),
   campaignRequest,
 }: DataProtectorConsumer &
   SendTelegramCampaignParams): Promise<SendTelegramCampaignResponse> => {
@@ -31,18 +31,18 @@ export const sendTelegramCampaign = async ({
       .label('campaignRequest')
       .validateSync(campaignRequest) as CampaignRequest;
 
-    const vWorkerpoolAddressOrEns = addressOrEnsSchema()
+    const vWorkerpoolAddress = addressSchema()
       .required()
-      .label('WorkerpoolAddressOrEns')
-      .validateSync(workerpoolAddressOrEns);
+      .label('workerpoolAddress')
+      .validateSync(workerpoolAddress);
 
     if (
       vCampaignRequest.workerpool !== NULL_ADDRESS &&
       vCampaignRequest.workerpool.toLowerCase() !==
-        vWorkerpoolAddressOrEns.toLowerCase()
+        vWorkerpoolAddress.toLowerCase()
     ) {
       throw new ValidationError(
-        "workerpoolAddressOrEns doesn't match campaignRequest workerpool"
+        "workerpoolAddress doesn't match campaignRequest workerpool"
       );
     }
 
@@ -50,7 +50,7 @@ export const sendTelegramCampaign = async ({
     const processBulkRequestResponse: ProcessBulkRequestResponse<ProcessBulkRequestParams> =
       await dataProtector.processBulkRequest({
         bulkRequest: vCampaignRequest,
-        workerpool: vWorkerpoolAddressOrEns,
+        workerpool: vWorkerpoolAddress,
       });
 
     return processBulkRequestResponse;
