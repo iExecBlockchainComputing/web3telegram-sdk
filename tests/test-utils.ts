@@ -40,7 +40,8 @@ export const TEST_CHAIN = {
   }),
   hubAddress: '0xB2157BF2fAb286b2A4170E3491Ac39770111Da3E',
   isNative: false,
-  subgraphUrl: 'http://127.0.0.1:8000/subgraphs/name/DataProtector-v2',
+  subgraphUrl:
+    'http://127.0.0.1:8000/subgraphs/name/arbitrum-sepolia/dataprotector-v2',
   maxExpectedSubgraphIndexingTime: 5_000,
   /**
    * [rlc-multichain](https://github.com/iExecBlockchainComputing/rlc-multichain/tree/v0.1.0) is an openzeppelin ERC20Upgradeable contract
