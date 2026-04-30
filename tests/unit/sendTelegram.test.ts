@@ -4,10 +4,7 @@ import {
   getRandomAddress,
   TEST_WEB3TELEGRAM_DAPP_ADDRESS,
 } from '../test-utils.js';
-import {
-  DEFAULT_CHAIN_ID,
-  getChainDefaultConfig,
-} from '../../src/config/config.js';
+import { getChainDefaultConfig } from '../../src/config/config.js';
 import { mockAllForSendTelegram } from '../utils/mockAllForSendTelegram.js';
 
 jest.unstable_mockModule('../../src/utils/subgraphQuery.js', () => ({
@@ -24,7 +21,7 @@ jest.unstable_mockModule('../../src/utils/ipfs-service.js', () => ({
 describe('sendTelegram', () => {
   let testedModule: any;
   let sendTelegram: SendTelegram;
-  const defaultConfig = getChainDefaultConfig(DEFAULT_CHAIN_ID);
+  const defaultConfig = getChainDefaultConfig(421614);
 
   beforeAll(async () => {
     // import tested module after all mocked modules

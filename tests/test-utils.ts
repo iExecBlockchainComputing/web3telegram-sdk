@@ -40,14 +40,23 @@ export const TEST_CHAIN = {
   }),
   hubAddress: '0xB2157BF2fAb286b2A4170E3491Ac39770111Da3E',
   isNative: false,
+  subgraphUrl: 'http://127.0.0.1:8000/subgraphs/name/DataProtector-v2',
+  maxExpectedSubgraphIndexingTime: 5_000,
+  /**
+   * [rlc-multichain](https://github.com/iExecBlockchainComputing/rlc-multichain/tree/v0.1.0) is an openzeppelin ERC20Upgradeable contract
+   *
+   * ERC20Upgradeable contract use a specific storage slot, which is:
+   * ```
+   * // keccak256(abi.encode(uint256(keccak256("openzeppelin.storage.ERC20")) - 1)) & ~bytes32(uint256(0xff))
+   * bytes32 private constant ERC20StorageLocation = 0x52c63247e1f47db19d5ce0460030c497f067ca4cebf71ba98eeadabe20bace00;
+   * ```
+   * sources: https://github.com/OpenZeppelin/openzeppelin-contracts-upgradeable/blob/v5.3.0/contracts/token/ERC20/ERC20Upgradeable.sol#L43-L44
+   */
+  erc20BalanceSlot:
+    '0x52c63247e1f47db19d5ce0460030c497f067ca4cebf71ba98eeadabe20bace00' as const,
 };
 
 export const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
-
-export const MAX_EXPECTED_SUBGRAPH_INDEXING_TIME = 5_000;
-
-const DATAPROTECTOR_SUBGRAPH_URL =
-  'http://127.0.0.1:8000/subgraphs/name/DataProtector-v2';
 
 export const waitSubgraphIndexing = async (
   timeoutMs = 60_000
@@ -58,7 +67,7 @@ export const waitSubgraphIndexing = async (
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
     try {
-      const res = await fetch(DATAPROTECTOR_SUBGRAPH_URL, {
+      const res = await fetch(TEST_CHAIN.subgraphUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query: '{ _meta { block { number } } }' }),
@@ -144,13 +153,10 @@ const anvilSetNRlcTokenBalance = async (
   );
   const rlcAddress = await hubContract.token();
 
-  const erc20StorageLocation =
-    '0x52c63247e1f47db19d5ce0460030c497f067ca4cebf71ba98eeadabe20bace00';
-
   const balanceSlot = keccak256(
     AbiCoder.defaultAbiCoder().encode(
       ['address', 'uint256'],
-      [address, erc20StorageLocation]
+      [address, TEST_CHAIN.erc20BalanceSlot]
     )
   );
 
@@ -196,18 +202,15 @@ export const getTestIExecOption = () => ({
 });
 
 export const getTestConfig = (
-  privateKey?: string
+  privateKey: string
 ): [Web3SignerProvider, Web3TelegramConfigOptions] => {
-  const ethProvider = privateKey
-    ? getTestWeb3SignerProvider(privateKey)
-    : undefined;
+  const ethProvider = getTestWeb3SignerProvider(privateKey);
   const options = {
     dappAddress: TEST_WEB3TELEGRAM_DAPP_ADDRESS,
     iexecOptions: getTestIExecOption(),
     ipfsGateway: 'http://127.0.0.1:8080',
     ipfsNode: 'http://127.0.0.1:5001',
-    dataProtectorSubgraph:
-      'http://127.0.0.1:8000/subgraphs/name/DataProtector-v2',
+    dataProtectorSubgraph: TEST_CHAIN.subgraphUrl,
   };
   return [ethProvider, options];
 };
@@ -246,16 +249,8 @@ export const getRandomTxHash = () => {
 
 export const createAndPublishAppOrders = async (
   resourceProvider,
-  appAddressOrEns
+  appAddress: string
 ) => {
-  let appAddress = appAddressOrEns;
-  if (appAddressOrEns && appAddressOrEns.includes('.eth')) {
-    appAddress = await resourceProvider.ens.resolveName(appAddressOrEns);
-    if (!appAddress) {
-      throw new Error(`Failed to resolve ENS name: ${appAddressOrEns}`);
-    }
-  }
-
   await resourceProvider.order
     .createApporder({
       app: appAddress,

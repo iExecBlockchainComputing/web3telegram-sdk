@@ -68,10 +68,10 @@ export class IExecWeb3telegram {
   private options: Web3TelegramConfigOptions;
 
   constructor(
-    ethProvider?: EthersCompatibleProvider,
+    ethProvider: EthersCompatibleProvider,
     options?: Web3TelegramConfigOptions
   ) {
-    this.ethProvider = ethProvider || 'arbitrum-sepolia-testnet';
+    this.ethProvider = ethProvider;
     this.options = options || {};
   }
 

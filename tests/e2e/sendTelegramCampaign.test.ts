@@ -8,7 +8,6 @@ import { Contact, IExecWeb3telegram } from '../../src/index.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
-  MAX_EXPECTED_SUBGRAPH_INDEXING_TIME,
   TEST_CHAIN,
   TEST_WEB3TELEGRAM_DAPP_ADDRESS,
   createAndPublishAppOrders,
@@ -85,7 +84,7 @@ describe('web3telegram.sendTelegramCampaign() - Bulk Processing', () => {
     });
 
     await waitSubgraphIndexing();
-  }, 5 * (MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME) + MAX_EXPECTED_SUBGRAPH_INDEXING_TIME + 5_000);
+  }, 5 * (MAX_EXPECTED_BLOCKTIME + MAX_EXPECTED_WEB2_SERVICES_TIME) + TEST_CHAIN.maxExpectedSubgraphIndexingTime + 5_000);
 
   beforeEach(async () => {
     consumerWallet = getRandomWallet();

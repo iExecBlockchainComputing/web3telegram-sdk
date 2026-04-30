@@ -1,9 +1,6 @@
 import { describe, expect, it, jest } from '@jest/globals';
 import { Address } from 'iexec';
-import {
-  DEFAULT_CHAIN_ID,
-  getChainDefaultConfig,
-} from '../../src/config/config.js';
+import { getChainDefaultConfig } from '../../src/config/config.js';
 import { type FetchMyContacts } from '../../src/web3telegram/fetchMyContacts.js';
 import {
   getRandomAddress,
@@ -17,7 +14,7 @@ jest.unstable_mockModule('../../src/utils/subgraphQuery.js', () => ({
 describe('fetchMyContacts', () => {
   let testedModule: any;
   let fetchMyContacts: FetchMyContacts;
-  const defaultConfig = getChainDefaultConfig(DEFAULT_CHAIN_ID);
+  const defaultConfig = getChainDefaultConfig(421614);
 
   beforeAll(async () => {
     // import tested module after all mocked modules
@@ -64,11 +61,6 @@ describe('fetchMyContacts', () => {
     const iexec = {
       wallet: {
         getAddress: jest
-          .fn<() => Promise<Address>>()
-          .mockResolvedValue(getRandomAddress()),
-      },
-      ens: {
-        resolveName: jest
           .fn<() => Promise<Address>>()
           .mockResolvedValue(getRandomAddress()),
       },
@@ -125,11 +117,6 @@ describe('fetchMyContacts', () => {
     const iexec = {
       wallet: {
         getAddress: jest
-          .fn<() => Promise<Address>>()
-          .mockResolvedValue(getRandomAddress()),
-      },
-      ens: {
-        resolveName: jest
           .fn<() => Promise<Address>>()
           .mockResolvedValue(getRandomAddress()),
       },
@@ -202,11 +189,6 @@ describe('fetchMyContacts', () => {
           .fn<() => Promise<Address>>()
           .mockResolvedValue(getRandomAddress()),
       },
-      ens: {
-        resolveName: jest
-          .fn<() => Promise<Address>>()
-          .mockResolvedValue(getRandomAddress()),
-      },
       orderbook: {
         fetchDatasetOrderbook: mockFetchDatasetOrderbook,
       },
@@ -247,11 +229,6 @@ describe('fetchMyContacts', () => {
     const iexec = {
       wallet: {
         getAddress: jest
-          .fn<() => Promise<Address>>()
-          .mockResolvedValue(getRandomAddress()),
-      },
-      ens: {
-        resolveName: jest
           .fn<() => Promise<Address>>()
           .mockResolvedValue(getRandomAddress()),
       },
@@ -312,11 +289,6 @@ describe('fetchMyContacts', () => {
           .fn<() => Promise<Address>>()
           .mockResolvedValue(getRandomAddress()),
       },
-      ens: {
-        resolveName: jest
-          .fn<() => Promise<Address>>()
-          .mockResolvedValue(getRandomAddress()),
-      },
       orderbook: {
         fetchDatasetOrderbook: mockFetchDatasetOrderbook,
       },
@@ -371,11 +343,6 @@ describe('fetchMyContacts', () => {
     const iexec = {
       wallet: {
         getAddress: jest
-          .fn<() => Promise<Address>>()
-          .mockResolvedValue(getRandomAddress()),
-      },
-      ens: {
-        resolveName: jest
           .fn<() => Promise<Address>>()
           .mockResolvedValue(getRandomAddress()),
       },

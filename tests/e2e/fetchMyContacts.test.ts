@@ -4,7 +4,7 @@ import { IExecWeb3telegram } from '../../src/index.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
-  MAX_EXPECTED_SUBGRAPH_INDEXING_TIME,
+  TEST_CHAIN,
   TEST_WEB3TELEGRAM_DAPP_ADDRESS,
   deployRandomDataset,
   getTestConfig,
@@ -198,7 +198,7 @@ describe('web3telegram.fetchMyContacts()', () => {
         expect(noBulkContact).toBeUndefined();
       },
       MAX_EXPECTED_BLOCKTIME +
-        MAX_EXPECTED_SUBGRAPH_INDEXING_TIME +
+        TEST_CHAIN.maxExpectedSubgraphIndexingTime +
         MAX_EXPECTED_WEB2_SERVICES_TIME
     );
 

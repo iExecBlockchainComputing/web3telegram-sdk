@@ -1,16 +1,13 @@
 import { expect, it, jest, describe, beforeAll } from '@jest/globals';
 import { type SendTelegramCampaign } from '../../src/web3telegram/sendTelegramCampaign.js';
 import { getRandomAddress } from '../test-utils.js';
-import {
-  DEFAULT_CHAIN_ID,
-  getChainDefaultConfig,
-} from '../../src/config/config.js';
+import { getChainDefaultConfig } from '../../src/config/config.js';
 import { BulkRequest } from '@iexec/dataprotector';
 
 describe('sendTelegramCampaign', () => {
   let testedModule: any;
   let sendTelegramCampaign: SendTelegramCampaign;
-  const defaultConfig = getChainDefaultConfig(DEFAULT_CHAIN_ID);
+  const defaultConfig = getChainDefaultConfig(421614);
 
   beforeAll(async () => {
     // import tested module after all mocked modules

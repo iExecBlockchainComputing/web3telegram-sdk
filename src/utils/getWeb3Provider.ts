@@ -3,12 +3,9 @@ import { Web3SignerProvider } from '../web3telegram/types.js';
 
 export const getWeb3Provider = (
   privateKey: string,
-  options: { allowExperimentalNetworks?: boolean; host?: number | string } = {}
-): Web3SignerProvider => {
-  const chainHost = options?.host
-    ? `${options.host}`
-    : 'arbitrum-sepolia-testnet';
-  return getSignerFromPrivateKey(chainHost, privateKey, {
+  host: number | string,
+  options: { allowExperimentalNetworks?: boolean } = {}
+): Web3SignerProvider =>
+  getSignerFromPrivateKey(`${host}`, privateKey, {
     allowExperimentalNetworks: options?.allowExperimentalNetworks,
   });
-};

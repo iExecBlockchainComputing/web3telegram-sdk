@@ -4,15 +4,12 @@ import {
 } from '@iexec/dataprotector';
 import { beforeAll, describe, expect, it } from '@jest/globals';
 import { HDNodeWallet, Wallet } from 'ethers';
-import {
-  DEFAULT_CHAIN_ID,
-  getChainDefaultConfig,
-} from '../../src/config/config.js';
+import { getChainDefaultConfig } from '../../src/config/config.js';
 import { IExecWeb3telegram, WorkflowError } from '../../src/index.js';
 import {
   MAX_EXPECTED_BLOCKTIME,
   MAX_EXPECTED_WEB2_SERVICES_TIME,
-  MAX_EXPECTED_SUBGRAPH_INDEXING_TIME,
+  TEST_CHAIN,
   TEST_WEB3TELEGRAM_DAPP_ADDRESS,
   getTestConfig,
   setBalance,
@@ -95,7 +92,7 @@ describe('web3telegram.fetchMyContacts()', () => {
       'should return the user contacts for both app and whitelist',
       async () => {
         const userWithAccess = Wallet.createRandom().address;
-        const chainConfig = getChainDefaultConfig(DEFAULT_CHAIN_ID);
+        const chainConfig = getChainDefaultConfig(421614);
         expect(chainConfig).not.toBeNull();
         const authorizedApp = TEST_WEB3TELEGRAM_DAPP_ADDRESS;
         const authorizedWhitelist = chainConfig!.whitelistSmartContract;
@@ -302,7 +299,7 @@ describe('web3telegram.fetchMyContacts()', () => {
         expect(noBulkContact).toBeUndefined();
       },
       MAX_EXPECTED_BLOCKTIME +
-        MAX_EXPECTED_SUBGRAPH_INDEXING_TIME +
+        TEST_CHAIN.maxExpectedSubgraphIndexingTime +
         MAX_EXPECTED_WEB2_SERVICES_TIME
     );
 

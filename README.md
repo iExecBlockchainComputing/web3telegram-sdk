@@ -55,7 +55,7 @@ import { IExecWeb3telegram, getWeb3Provider } from '@iexec/web3telegram';
 
 const { PRIVATE_KEY } = process.env;
 
-const web3Provider = getWeb3Provider(PRIVATE_KEY);
+const web3Provider = getWeb3Provider(PRIVATE_KEY, 421614);
 const web3telegram = new IExecWeb3telegram(web3Provider);
 ```
 
