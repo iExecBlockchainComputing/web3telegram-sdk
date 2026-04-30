@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.0-alpha.6](https://github.com/iExecBlockchainComputing/web3telegram-sdk/compare/dapp-v1.0.0-alpha.5...dapp-v1.0.0-alpha.6) (2026-04-30)
+
+
+### ⚠ BREAKING CHANGES
+
+* bellecour chain support is removed; `ethProvider` is now required in `IExecWeb3telegram` constructor (used to fallback to a read-only provider connected to bellecour); `host` is now required as the second argument of `getWeb3Provider(privateKey, host, options)` (host used to be an option with a fallback to bellecour).
+
+### Changed
+
+* remove bellecour and SGX Scone support (https://github.com/iExecBlockchainComputing/web3telegram-sdk/pull/108) ([e740067](https://github.com/iExecBlockchainComputing/web3telegram-sdk/commit/e7400677fbee3f6fda5b1c1fa767aaa58af80e14))
+
 ## [1.0.0-alpha.5](https://github.com/iExecBlockchainComputing/web3telegram-sdk/compare/dapp-v1.0.0-alpha.4...dapp-v1.0.0-alpha.5) (2026-04-20)
 
 
